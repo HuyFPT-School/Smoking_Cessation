@@ -54,6 +54,7 @@ const Register = () => {
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
       console.log("User fetched from backend:", user);
+      console.log("User role:", user.role);
       showSnackbar("✅ Registration successful!", "success");
       navigate("/home");
     } catch (err) {
