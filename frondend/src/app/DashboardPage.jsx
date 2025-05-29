@@ -1,11 +1,11 @@
-import { useState } from 'react';                        // Hook useState để quản lý trạng thái
-import { Card, Row, Col, Tabs, Radio, Tag } from 'antd'; // Các thành phần giao diện từ Ant Design
-import { Line } from '@ant-design/charts';               // Biểu đồ đường từ thư viện Ant Design Charts
-import { Divider } from 'antd';                          // Thành phần phân cách của Ant Design
-import { Segmented } from 'antd';                        // Thành phần Segmented để tạo nút chuyển đổi tab
-import HealthMilestones from './HealthMilestones';
-import { Link } from 'react-router-dom';
-       // Nhập component HealthMilestones để hiển thị cột mốc sức khỏe
+import { useState } from "react"; // Hook useState để quản lý trạng thái
+import { Card, Row, Col, Tabs, Radio, Tag } from "antd"; // Các thành phần giao diện từ Ant Design
+import { Line } from "@ant-design/charts"; // Biểu đồ đường từ thư viện Ant Design Charts
+import { Divider } from "antd"; // Thành phần phân cách của Ant Design
+import { Segmented } from "antd"; // Thành phần Segmented để tạo nút chuyển đổi tab
+import HealthMilestones from "./HealthMilestones";
+import { Link } from "react-router-dom";
+// Nhập component HealthMilestones để hiển thị cột mốc sức khỏe
 
 // Nhập các biểu tượng từ Ant Design Icons
 import {
@@ -13,12 +13,12 @@ import {
   DollarCircleOutlined,
   FireOutlined,
   FlagOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
 // Định nghĩa component DashboardPage
 const DashboardPage = () => {
   // Khởi tạo state activeTab để theo dõi tab đang được chọn (mặc định là 'Progress')
-  const [activeTab, setActiveTab] = useState('Progress');
+  const [activeTab, setActiveTab] = useState("Progress");
 
   // Dữ liệu giả lập cho biểu đồ tiến độ, tạo mảng 28 ngày với giá trị progress ngẫu nhiên
   const data = Array.from({ length: 28 }, (_, i) => ({
@@ -28,26 +28,25 @@ const DashboardPage = () => {
 
   // Cấu hình cho biểu đồ đường hiển thị tiến độ
   const chartConfig = {
-    data,                                // Dữ liệu cho biểu đồ
-    xField: 'day',                       // Trục X là ngày
-    yField: 'progress',                  // Trục Y là giá trị tiến độ
-    height: 200,                         // Chiều cao biểu đồ
-    smooth: true,                        // Làm mượt đường cong
-    point: { size: 4, shape: 'circle' }, // Hiển thị các điểm trên biểu đồ
-    color: '#52c41a',                    // Màu xanh lá cho biểu đồ
+    data, // Dữ liệu cho biểu đồ
+    xField: "day", // Trục X là ngày
+    yField: "progress", // Trục Y là giá trị tiến độ
+    height: 200, // Chiều cao biểu đồ
+    smooth: true, // Làm mượt đường cong
+    point: { size: 4, shape: "circle" }, // Hiển thị các điểm trên biểu đồ
+    color: "#52c41a", // Màu xanh lá cho biểu đồ
   };
 
   // Phần JSX để render giao diện
   return (
     // Container chính của trang Dashboard, chứa toàn bộ nội dung
-    <div className='Dashboard-Backgroup'>
-
+    <div className="Dashboard-Backgroup">
       {/* Phần chào mừng người dùng */}
-      <h2 style={{ color: '#262626', marginBottom: '5px' }}>
+      <h2 style={{ color: "#262626", marginBottom: "5px" }}>
         Welcome back, John
         {/* Tiêu đề chào mừng người dùng, hiển thị tên "John" */}
       </h2>
-      <p style={{ color: '#595959', marginBottom: '24px' }}>
+      <p style={{ color: "#595959", marginBottom: "24px" }}>
         You’ve been smoke-free for 28 days. Keep going!
         {/* Thông báo động viên, hiển thị số ngày không hút thuốc (28 ngày) */}
       </p>
@@ -95,7 +94,6 @@ const DashboardPage = () => {
             <p className="dashboard-card-value">560</p>
 
             <p className="dashboard-card-subtext">Based on 20/day</p>
-
           </div>
         </Col>
 
@@ -118,12 +116,11 @@ const DashboardPage = () => {
       <Card
         title="🚬SMOKING STATUS"
         className="smoking-status-card"
-      // Card của Ant Design để hiển thị trạng thái hút thuốc
+        // Card của Ant Design để hiển thị trạng thái hút thuốc
       >
         <div className="card-content">
           {/* Nội dung bên trong card */}
           <p className="subtitle">Track your smoking habits and cravings</p>
-
 
           {/* Bố cục chính của card, chia thành 2 cột lớn */}
           <Row gutter={48} className="main-layout">
@@ -141,9 +138,15 @@ const DashboardPage = () => {
                 <Col span={12} className="stat-item">
                   <h3>🚬Today</h3>
                   <div className="stat-details">
-                    <div><span className="stat-label">Cigarettes:</span> <span style={{ fontWeight: 'bold' }}>0</span></div>
+                    <div>
+                      <span className="stat-label">Cigarettes:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>0</span>
+                    </div>
                     {/* Hiển thị số điếu thuốc hôm nay: 0 */}
-                    <div><span className="stat-label">Cravings:</span> <span style={{ fontWeight: 'bold' }}>2</span></div>
+                    <div>
+                      <span className="stat-label">Cravings:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>2</span>
+                    </div>
                     {/* Hiển thị số cơn thèm hôm nay: 2 */}
                   </div>
                 </Col>
@@ -152,9 +155,15 @@ const DashboardPage = () => {
                 <Col span={12} className="stat-item">
                   <h3>🚬Yesterday</h3>
                   <div className="stat-details">
-                    <div><span className="stat-label">Cigarettes:</span> <span style={{ fontWeight: 'bold' }}>0</span></div>
+                    <div>
+                      <span className="stat-label">Cigarettes:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>0</span>
+                    </div>
                     {/* Hiển thị số điếu thuốc hôm qua: 0 */}
-                    <div><span className="stat-label">Cravings:</span> <span style={{ fontWeight: 'bold' }}>3</span></div>
+                    <div>
+                      <span className="stat-label">Cravings:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>3</span>
+                    </div>
                     {/* Hiển thị số cơn thèm hôm qua: 3 */}
                   </div>
                 </Col>
@@ -168,11 +177,20 @@ const DashboardPage = () => {
                 <Col span={24} className="stat-item">
                   <h3>🚬Last 7 days</h3>
                   <div className="stat-details">
-                    <div><span className="stat-label">Total cigarettes:</span> <span style={{ fontWeight: 'bold' }}>1</span></div>
+                    <div>
+                      <span className="stat-label">Total cigarettes:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>1</span>
+                    </div>
 
-                    <div><span className="stat-label">Total cravings:</span> <span style={{ fontWeight: 'bold' }}>12</span></div>
+                    <div>
+                      <span className="stat-label">Total cravings:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>12</span>
+                    </div>
 
-                    <div><span className="stat-label">Resistance rate:</span> <span style={{ fontWeight: 'bold' }}>92%</span></div>
+                    <div>
+                      <span className="stat-label">Resistance rate:</span>{" "}
+                      <span style={{ fontWeight: "bold" }}>92%</span>
+                    </div>
                   </div>
                 </Col>
               </Row>
@@ -183,15 +201,43 @@ const DashboardPage = () => {
               <h3>🔥Common triggers</h3>
 
               <div className="triggers-list">
-                <Tag style={{ backgroundColor: '#ffffff', color: '#666', border: 'none', fontSize: '14px' }}>⚡Căng thẳng</Tag>
-                <Tag style={{ backgroundColor: '#ffffff', color: '#666', border: 'none', fontSize: '14px' }}>⚡Sau bữa ăn</Tag>
-                <Tag style={{ backgroundColor: '#ffffff', color: '#666', border: 'none', fontSize: '14px' }}>⚡Uống cà phê</Tag>
+                <Tag
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "#666",
+                    border: "none",
+                    fontSize: "14px",
+                  }}
+                >
+                  ⚡Căng thẳng
+                </Tag>
+                <Tag
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "#666",
+                    border: "none",
+                    fontSize: "14px",
+                  }}
+                >
+                  ⚡Sau bữa ăn
+                </Tag>
+                <Tag
+                  style={{
+                    backgroundColor: "#ffffff",
+                    color: "#666",
+                    border: "none",
+                    fontSize: "14px",
+                  }}
+                >
+                  ⚡Uống cà phê
+                </Tag>
                 {/* Hiển thị danh sách các yếu tố kích thích cơn thèm */}
               </div>
               <Divider />
               {/* Đường phân cách */}
               <p>
-                Identifying triggers helps you better prepare to deal with cravings.
+                Identifying triggers helps you better prepare to deal with
+                cravings.
               </p>
               <Link to="/tracking" className="record-button">
                 Record Smoking Status
@@ -207,9 +253,15 @@ const DashboardPage = () => {
         {/* Container chứa toàn bộ phần thống kê cuối */}
 
         {/* Nút chuyển đổi giữa Progress và Health Benefits */}
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            marginBottom: 16,
+          }}
+        >
           <Segmented
-            options={['Progress', 'Health Benefits']}
+            options={["Progress", "Health Benefits"]}
             value={activeTab}
             onChange={setActiveTab}
             className="custom-segmented"
@@ -218,16 +270,16 @@ const DashboardPage = () => {
         </div>
 
         {/* Tab Progress: Hiển thị biểu đồ tiến độ */}
-        {activeTab === 'Progress' && (
-          <div style={{ minHeight: 'calc(100vh - 200px)', paddingBottom: '60px' }}>
+        {activeTab === "Progress" && (
+          <div style={{ paddingBottom: "60px" }}>
             <h3>Your Progress</h3>
             <p>Track your smoke-free journey over time</p>
-            <Line {...chartConfig} style={{ minHeight: '300px' }} />
+            <Line {...chartConfig} style={{ minHeight: "300px" }} />
           </div>
         )}
 
         {/* Tab Health Benefits: Hiển thị cột mốc sức khỏe */}
-        {activeTab === 'Health Benefits' && (
+        {activeTab === "Health Benefits" && (
           <div>
             <h3>Health Improvements</h3>
             <p>See how your body is healing</p>
@@ -240,6 +292,5 @@ const DashboardPage = () => {
     </div>
   );
 };
-
 
 export default DashboardPage;

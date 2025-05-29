@@ -53,8 +53,6 @@ const Register = () => {
       const user = res.data.user || res.data; // đề phòng 2 format khác nhau
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
-      console.log("User fetched from backend:", user);
-      console.log("User role:", user.role);
       showSnackbar("✅ Registration successful!", "success");
       navigate("/home");
     } catch (err) {

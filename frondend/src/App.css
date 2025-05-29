@@ -1,73 +1,71 @@
-
-
 /*================================================================ CSS FOR DASHBOARD======================================================= */
 /* Kiểu dáng cho container chính */
 .Dashboard-Backgroup {
-  max-width: 1400px;                  /* Độ rộng tối đa 1400px */
-  margin: 20px auto;                  /* Căn giữa với lề trên/dưới 20px */
-  padding: 32px;                      /* Đệm bên trong 32px */
-  background-color: #f0f2f5;        /* Màu nền xám nhạt */
-  margin-bottom: 0px;                 /* Loại bỏ lề dưới */
-  padding-bottom: 0px;                /* Loại bỏ đệm dưới */
+  max-width: 1400px; /* Độ rộng tối đa 1400px */
+  margin: 20px auto; /* Căn giữa với lề trên/dưới 20px */
+  padding: 32px; /* Đệm bên trong 32px */
+  background-color: #f0f2f5; /* Màu nền xám nhạt */
+  margin-bottom: 0px; /* Loại bỏ lề dưới */
+  padding-bottom: 0px; /* Loại bỏ đệm dưới */
 }
 
 /* Kiểu dáng cho hàng chứa các card */
 .dashboard-row-spacing {
-  margin-top: 8px;                    /* Lề trên 8px */
-  margin-bottom: 16px;                /* Lề dưới 16px */
+  margin-top: 8px; /* Lề trên 8px */
+  margin-bottom: 16px; /* Lề dưới 16px */
 }
 
 /* Kiểu dáng chung cho các card */
 .dashboard-card {
-  padding: 16px;                       /* Đệm bên trong 16px */
-  border-radius: 8px;                  /* Bo góc 8px */
-  height: 140px;                       /* Chiều cao cố định 140px */
-  position: relative;                  /* Định vị tương đối cho icon */
-  display: flex;                       /* Sử dụng flexbox để sắp xếp */
-  flex-direction: column;              /* Xếp nội dung theo cột */
-  justify-content: space-between;      /* Căn đều nội dung theo chiều dọc */
-  background-color: #fff;            /* Màu nền trắng */
-  border: 1px solid #f0f0f0;         /* Viền xám nhạt */
+  padding: 16px; /* Đệm bên trong 16px */
+  border-radius: 8px; /* Bo góc 8px */
+  height: 140px; /* Chiều cao cố định 140px */
+  position: relative; /* Định vị tương đối cho icon */
+  display: flex; /* Sử dụng flexbox để sắp xếp */
+  flex-direction: column; /* Xếp nội dung theo cột */
+  justify-content: space-between; /* Căn đều nội dung theo chiều dọc */
+  background-color: #fff; /* Màu nền trắng */
+  border: 1px solid #f0f0f0; /* Viền xám nhạt */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Chuyển đổi mượt mà */
 }
 
 /* Hiệu ứng khi hover card */
 .dashboard-card:hover {
-  transform: translateY(-8px);                   /* Nâng card lên 8px */
+  transform: translateY(-8px); /* Nâng card lên 8px */
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12); /* Tăng bóng */
-  border-color: #d9d9d9;                       /* Viền xám đậm hơn */
+  border-color: #d9d9d9; /* Viền xám đậm hơn */
 }
 
 /* SAU DAY LA CSS CHO FONT CHU TRONG CAC KHUNG */
 /* Kiểu dáng cho tiêu đề card */
 .dashboard-card-title {
-  font-weight: 600;                    /* Chữ in đậm */
-  color: #000;                       /* Màu đen */
-  font-size: 16px;                     /* Kích thước chữ 16px */
-} 
+  font-weight: 600; /* Chữ in đậm */
+  color: #000; /* Màu đen */
+  font-size: 16px; /* Kích thước chữ 16px */
+}
 
 /* Kiểu dáng cho giá trị lớn trong card */
 .dashboard-card-value {
-  font-size: 28px;                    /* Kích thước chữ 28px */
-  font-weight: bold;                  /* Chữ in đậm */
-  margin: 0;                          /* Loại bỏ lề mặc định */
+  font-size: 28px; /* Kích thước chữ 28px */
+  font-weight: bold; /* Chữ in đậm */
+  margin: 0; /* Loại bỏ lề mặc định */
 }
 
 /* Kiểu dáng cho dòng mô tả nhỏ */
 .dashboard-card-subtext {
-  font-size: 13px;                    /* Kích thước chữ 13px */
-  color: #8c8c8c;                   /* Màu xám nhạt */
-  margin: 0;                          /* Loại bỏ lề mặc định */
+  font-size: 13px; /* Kích thước chữ 13px */
+  color: #8c8c8c; /* Màu xám nhạt */
+  margin: 0; /* Loại bỏ lề mặc định */
 }
 
 /* Kiểu dáng cho icon góc phải trên */
 .dashboard-card-icon {
-  position: absolute;                 /* Định vị tuyệt đối */
-  top: 12px;                          /* Cách đỉnh 12px */
-  right: 12px;                        /* Cách phải 12px */
-  font-size: 16px;                    /* Kích thước icon 16px */
-  color: #8c8c8c;                   /* Màu xám nhạt */
+  position: absolute; /* Định vị tuyệt đối */
+  top: 12px; /* Cách đỉnh 12px */
+  right: 12px; /* Cách phải 12px */
+  font-size: 16px; /* Kích thước icon 16px */
+  color: #8c8c8c; /* Màu xám nhạt */
 }
 /* KẾT THÚC CSS CHO FONT CHU TRONG CAC KHUNG */
 
@@ -82,249 +80,245 @@
 /* BẮT ĐẦU CSS CHO SMOKING STATUS */
 /* Kiểu dáng cho card Smoking Status */
 .smoking-status-card {
-  width: 100%;                        /* Độ rộng toàn màn hình */
-  border-radius: 8px;                 /* Bo góc 8px */
+  width: 100%; /* Độ rộng toàn màn hình */
+  border-radius: 8px; /* Bo góc 8px */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
-  margin: 0 auto;                     /* Căn giữa */
+  margin: 0 auto; /* Căn giữa */
 }
 
 /* Kiểu dáng cho nội dung bên trong card */
 .card-content {
-  padding-left: 16px;                  /* Đệm trái 16px */
-  padding-right: 16px;                 /* Đệm phải 16px */
+  padding-left: 16px; /* Đệm trái 16px */
+  padding-right: 16px; /* Đệm phải 16px */
 }
 
 /* Kiểu dáng cho dòng chữ phụ */
 .subtitle {
-  color: #666;                      /* Màu xám */
-  font-size: 14px;                    /* Kích thước chữ 14px */
-  margin-bottom: 16px;                /* Lề dưới 16px */
+  color: #666; /* Màu xám */
+  font-size: 14px; /* Kích thước chữ 14px */
+  margin-bottom: 16px; /* Lề dưới 16px */
 }
 
 /* Kiểu dáng cho Row lớn chứa 2 cột */
 .main-layout {
-  display: flex;                       /* Sử dụng flexbox */
-  align-items: stretch;                /* Căn chỉnh cột bằng nhau */
+  display: flex; /* Sử dụng flexbox */
+  align-items: stretch; /* Căn chỉnh cột bằng nhau */
 }
 
 /* Kiểu dáng cho container thống kê trái */
 .stats-container {
-  padding-right: 16px;                 /* Đệm phải 16px */
+  padding-right: 16px; /* Đệm phải 16px */
 }
 
 /* Kiểu dáng cho hàng thống kê Today/Yesterday */
 .stats-section {
-  display: flex;                      /* Sử dụng flexbox */
-  flex-wrap: wrap;                    /* Cho phép xuống dòng */
-  width: 100%;                        /* Chiếm toàn bộ chiều rộng */
-  margin-left: 0px;                   /* Loại bỏ lề trái */
+  display: flex; /* Sử dụng flexbox */
+  flex-wrap: wrap; /* Cho phép xuống dòng */
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
+  margin-left: 0px; /* Loại bỏ lề trái */
 }
 
 /* Kiểu dáng cho hàng thống kê Last 7 days */
 .stats-section-last-7-days {
-  display: flex;                      /* Sử dụng flexbox */
-  flex-wrap: wrap;                    /* Cho phép xuống dòng */
-  width: 95%;                         /* Chiếm 95% chiều rộng */
-  margin-left: 0px;                   /* Loại bỏ lề trái */
+  display: flex; /* Sử dụng flexbox */
+  flex-wrap: wrap; /* Cho phép xuống dòng */
+  width: 95%; /* Chiếm 95% chiều rộng */
+  margin-left: 0px; /* Loại bỏ lề trái */
 }
 
 /* Kiểu dáng cho mục thống kê */
 .stat-item {
-  padding: 16px;                      /* Đệm bên trong 16px */
-  border-radius: 8px;                 /* Bo góc 8px */
-  height: 140px;                      /* Chiều cao cố định 140px */
-  position: relative;                 /* Định vị tương đối */
-  display: flex;                      /* Sử dụng flexbox */
-  flex-direction: column;             /* Xếp nội dung theo cột */
-  justify-content: space-between;     /* Căn đều nội dung */
+  padding: 16px; /* Đệm bên trong 16px */
+  border-radius: 8px; /* Bo góc 8px */
+  height: 140px; /* Chiều cao cố định 140px */
+  position: relative; /* Định vị tương đối */
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: column; /* Xếp nội dung theo cột */
+  justify-content: space-between; /* Căn đều nội dung */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Chuyển đổi mượt mà */
 }
 
 /* Hiệu ứng hover cho mục thống kê */
 .stat-item:hover {
-  transform: translateY(-8px);         /* Nâng lên 8px */
+  transform: translateY(-8px); /* Nâng lên 8px */
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12); /* Tăng bóng */
-  border-color: #d9d9d9;             /* Viền xám đậm hơn */
+  border-color: #d9d9d9; /* Viền xám đậm hơn */
 }
 
 /* Kiểu dáng cho tiêu đề mục thống kê */
 .stat-item h3 {
-  font-size: 16px;                    /* Kích thước chữ 16px */
-  margin-bottom: 8px;                 /* Lề dưới 8px */
-  color: #333;                      /* Màu xám đậm */
+  font-size: 16px; /* Kích thước chữ 16px */
+  margin-bottom: 8px; /* Lề dưới 8px */
+  color: #333; /* Màu xám đậm */
 }
 
 /* Kiểu dáng cho chi tiết thống kê */
 .stat-details div {
-  display: flex;                       /* Sử dụng flexbox */
-  justify-content: space-between;      /* Căn đều hai bên */
-  align-items: center;                 /* Căn giữa theo chiều dọc */
+  display: flex; /* Sử dụng flexbox */
+  justify-content: space-between; /* Căn đều hai bên */
+  align-items: center; /* Căn giữa theo chiều dọc */
 }
 
 /* Kiểu dáng cho nhãn thống kê */
 .stat-label {
-  font-size: 14px;                    /* Kích thước chữ 14px */
-  color: #666;                      /* Màu xám */
-  margin-right: 8px;                  /* Lề phải 8px */
+  font-size: 14px; /* Kích thước chữ 14px */
+  color: #666; /* Màu xám */
+  margin-right: 8px; /* Lề phải 8px */
 }
 
 /* Kiểu dáng cho thẻ tag trong thống kê */
 .stat-details .ant-tag {
-  font-size: 12px;                    /* Kích thước chữ 12px */
-  padding: 2px 8px;                   /* Đệm 2px trên/dưới, 8px trái/phải */
+  font-size: 12px; /* Kích thước chữ 12px */
+  padding: 2px 8px; /* Đệm 2px trên/dưới, 8px trái/phải */
 }
 
 /* Kiểu dáng cho phần Common Triggers */
 .triggers-section {
-  padding: 16px;                      /* Đệm bên trong 16px */
-  border-radius: 8px;                 /* Bo góc 8px */
-  position: relative;                 /* Định vị tương đối */
-  display: flex;                      /* Sử dụng flexbox */
-  flex-direction: column;             /* Xếp nội dung theo cột */
-  justify-content: space-between;     /* Căn đều nội dung */
-  background-color: #ffffff;        /* Màu nền trắng */
-  border: 1px solid #f0f0f0;        /* Viền xám nhạt */
+  padding: 16px; /* Đệm bên trong 16px */
+  border-radius: 8px; /* Bo góc 8px */
+  position: relative; /* Định vị tương đối */
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: column; /* Xếp nội dung theo cột */
+  justify-content: space-between; /* Căn đều nội dung */
+  background-color: #ffffff; /* Màu nền trắng */
+  border: 1px solid #f0f0f0; /* Viền xám nhạt */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
 }
 
 /* Kiểu dáng cho tiêu đề Common Triggers */
 .triggers-section h3 {
-  font-size: 16px;                    /* Kích thước chữ 16px */
-  margin-bottom: 8px;                 /* Lề dưới 8px */
-  color: #333;                      /* Màu xám đậm */
+  font-size: 16px; /* Kích thước chữ 16px */
+  margin-bottom: 8px; /* Lề dưới 8px */
+  color: #333; /* Màu xám đậm */
 }
 
 /* Kiểu dáng cho đoạn văn Common Triggers */
 .triggers-section p {
-  margin-bottom: 40px;                /* Lề dưới 40px */
+  margin-bottom: 40px; /* Lề dưới 40px */
 }
 
 /* Kiểu dáng cho danh sách yếu tố kích thích */
 .triggers-list {
-  display: flex;                       /* Sử dụng flexbox */
-  flex-direction: column;              /* Xếp tag theo cột */
-  gap: 8px;                            /* Khoảng cách 8px giữa các tag */
-  margin-bottom: 8px;                  /* Lề dưới 8px */
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: column; /* Xếp tag theo cột */
+  gap: 8px; /* Khoảng cách 8px giữa các tag */
+  margin-bottom: 8px; /* Lề dưới 8px */
 }
 
 /* Kiểu dáng cho nút Record Smoking Status */
 .record-button {
-  background-color: #16A34A;         /* Màu xanh lá */
-  color: white;                      /* Chữ trắng */
-  text-align: center;                  /* Căn giữa chữ */
-  padding: 8px;                        /* Đệm 8px */
-  border-radius: 4px;                  /* Bo góc 4px */
-  font-size: 14px;                     /* Kích thước chữ 14px */
-  cursor: pointer;                     /* Con trỏ thành tay khi hover */
+  background-color: #16a34a; /* Màu xanh lá */
+  color: white; /* Chữ trắng */
+  text-align: center; /* Căn giữa chữ */
+  padding: 8px; /* Đệm 8px */
+  border-radius: 4px; /* Bo góc 4px */
+  font-size: 14px; /* Kích thước chữ 14px */
+  cursor: pointer; /* Con trỏ thành tay khi hover */
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Chuyển đổi mượt mà */
 }
 
 /* Hiệu ứng hover cho nút */
 .record-button:hover {
-  transform: translateY(-8px);           /* Nâng lên 8px */
+  transform: translateY(-8px); /* Nâng lên 8px */
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12); /* Tăng bóng */
-  border-color: #d9d9d9;               /* Viền xám đậm hơn */
+  border-color: #d9d9d9; /* Viền xám đậm hơn */
 }
 
 /* Kiểu dáng cho đường phân cách */
 .ant-divider {
-  margin: 12px 0;                        /* Lề trên/dưới 12px */
+  margin: 12px 0; /* Lề trên/dưới 12px */
 }
 
 /* KẾT THÚC CSS CHO SMOKING STATUS */
-
 
 /* BẮT ĐẦU CSS CHO CONTAINER THỐNG KÊ */
 
 /* css cho Col trong container */
 
 .Last-item {
-  padding: 16px;                      /* Đệm bên trong 16px */
-  border-radius: 8px;                 /* Bo góc 8px */
-  height: 140px;                  
-  position: relative;                 /* Định vị tương đối */
-  display: flex;                      /* Sử dụng flexbox */
-  flex-direction: column;             /* Xếp nội dung theo cột */
-  justify-content: space-between;     /* Căn đều nội dung */
+  padding: 16px; /* Đệm bên trong 16px */
+  border-radius: 8px; /* Bo góc 8px */
+  height: 140px;
+  position: relative; /* Định vị tương đối */
+  display: flex; /* Sử dụng flexbox */
+  flex-direction: column; /* Xếp nội dung theo cột */
+  justify-content: space-between; /* Căn đều nội dung */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
-  padding-bottom: 340px;              /* Đệm dưới lớn */
-  background-color: #fff;           /* Màu nền trắng */
-  margin-top: 20px;                   /* Lề trên 20px */
+  padding-bottom: 340px; /* Đệm dưới lớn */
+  background-color: #fff; /* Màu nền trắng */
+  margin: 20px 0px 100px 0px; /* Lề trên 20px */
 }
 /* Kiểu dáng cho đoạn văn trong container thống kê */
 .Last-item p {
-  padding-bottom: 10px;               /* Đệm dưới 10px */
+  padding-bottom: 10px; /* Đệm dưới 10px */
 }
 
 /* Kiểu dáng cho component Segmented */
 .ant-segmented {
-  background: #f0f2f5;               /* Màu nền xám nhạt */
-  border-radius: 8px;                  /* Bo góc 8px */
-  padding: 4px;                        /* Đệm bên trong 4px */
+  background: #f0f2f5; /* Màu nền xám nhạt */
+  border-radius: 8px; /* Bo góc 8px */
+  padding: 4px; /* Đệm bên trong 4px */
 }
 
 /* Kiểu dáng cho item được chọn trong Segmented */
 .ant-segmented-item-selected {
-  background: #16A34A !important;    /* Màu xanh lá khi chọn */
-  color: #fff !important;            /* Chữ trắng */
-  font-weight: 700;                    /* Chữ in đậm */
-  border-radius: 6px;                  /* Bo góc 6px */
+  background: #16a34a !important; /* Màu xanh lá khi chọn */
+  color: #fff !important; /* Chữ trắng */
+  font-weight: 700; /* Chữ in đậm */
+  border-radius: 6px; /* Bo góc 6px */
 }
 
 /* KẾT THÚC CSS CHO CONTAINER THỐNG KÊ */
 
-
-
 /* Các kiểu dáng cho component HealthMilestones */
 .health-milestones {
-  padding: 20px;              /* Thêm đệm 20px cho toàn bộ container */
+  padding: 20px; /* Thêm đệm 20px cho toàn bộ container */
 }
 
 /* Lưới chứa các cột mốc sức khỏe */
 .milestone-grid {
-  display: grid;              /* Sử dụng lưới để sắp xếp các cột mốc */
-  gap: 10px;                  /* Khoảng cách 10px giữa các phần tử trong lưới */
-  max-height: 180px;          /* Giới hạn chiều cao tối đa */
-  overflow-y: auto;           /* Bật cuộn dọc nếu nội dung vượt quá chiều cao */
-  padding-right: 10px;        /* Thêm đệm phải để tránh thanh cuộn che nội dung */
+  display: grid; /* Sử dụng lưới để sắp xếp các cột mốc */
+  gap: 10px; /* Khoảng cách 10px giữa các phần tử trong lưới */
+  max-height: 180px; /* Giới hạn chiều cao tối đa */
+  overflow-y: auto; /* Bật cuộn dọc nếu nội dung vượt quá chiều cao */
+  padding-right: 10px; /* Thêm đệm phải để tránh thanh cuộn che nội dung */
 }
 
 /* Kiểu dáng cho mỗi cột mốc */
 .milestone-col {
-  border: 1px solid #ccc;               /* Viền xám nhạt xung quanh cột mốc */
-  border-radius: 5px;                     /* Bo góc 5px cho viền */
-  padding: 10px;                          /* Thêm đệm 10px bên trong cột mốc */
-  display: flex;                          /* Sử dụng flexbox để căn chỉnh nội dung */
-  align-items: center;                    /* Căn giữa nội dung theo chiều dọc */
-  justify-content: flex-start;            /* Căn trái nội dung theo chiều ngang */
-  transition: background-color 0.3s;      /* Hiệu ứng chuyển màu nền mượt mà trong 0.3 giây */
+  border: 1px solid #ccc; /* Viền xám nhạt xung quanh cột mốc */
+  border-radius: 5px; /* Bo góc 5px cho viền */
+  padding: 10px; /* Thêm đệm 10px bên trong cột mốc */
+  display: flex; /* Sử dụng flexbox để căn chỉnh nội dung */
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: flex-start; /* Căn trái nội dung theo chiều ngang */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền mượt mà trong 0.3 giây */
 }
 
 /* Kiểu dáng khi cột mốc được đạt */
 .milestone-col.achieved {
-  background-color: #e6ffe6;            /* Màu nền xanh nhạt khi cột mốc đạt được */
+  background-color: #e6ffe6; /* Màu nền xanh nhạt khi cột mốc đạt được */
 }
 
 /* Kiểu dáng cho biểu tượng cột mốc */
 .milestone-icon {
-  margin-right: 10px;                     /* Khoảng cách 10px bên phải biểu tượng */
-  background-image: url('https://img.icons8.com/?size=100&id=113106&format=png&color=40C057'); /* Hình nền biểu tượng từ URL */
-  background-size: 30px 30px;             /* Kích thước biểu tượng 30x30px */
-  background-repeat: no-repeat;           /* Không lặp lại hình nền */
-  width: 30px;                            /* Chiều rộng khớp với kích thước hình nền */
-  height: 30px;                           /* Chiều cao khớp với kích thước hình nền */
+  margin-right: 10px; /* Khoảng cách 10px bên phải biểu tượng */
+  background-image: url("https://img.icons8.com/?size=100&id=113106&format=png&color=40C057"); /* Hình nền biểu tượng từ URL */
+  background-size: 30px 30px; /* Kích thước biểu tượng 30x30px */
+  background-repeat: no-repeat; /* Không lặp lại hình nền */
+  width: 30px; /* Chiều rộng khớp với kích thước hình nền */
+  height: 30px; /* Chiều cao khớp với kích thước hình nền */
 }
 
 /* Kiểu dáng cho trạng thái (Achieved/Coming soon) */
 .status {
-  color: #28a745;                       /* Màu xanh lá cho văn bản trạng thái */
-  font-weight: bold;                      /* Chữ in đậm */
-  margin-left: auto;                      /* Đẩy trạng thái sang bên phải của container */
+  color: #28a745; /* Màu xanh lá cho văn bản trạng thái */
+  font-weight: bold; /* Chữ in đậm */
+  margin-left: auto; /* Đẩy trạng thái sang bên phải của container */
 }
 
 /* ========================================================================================================================================== */
-
 
 .tracking-container {
   max-width: 600px;
@@ -770,4 +764,3 @@
   font-size: 14px;
   color: #333;
 }
-
