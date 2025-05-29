@@ -49,7 +49,6 @@ const Login = () => {
       const user = res.data;
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
-      console.log("User fetched from backend:", user);
       navigate(user.role === "ADMIN" ? "/admin" : "/home");
     } catch (err) {
       console.error("Error fetching user:", err);
