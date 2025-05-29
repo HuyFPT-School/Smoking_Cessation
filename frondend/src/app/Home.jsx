@@ -12,7 +12,6 @@ const Home = () => {
     if (userStr) {
       try {
         const userObj = JSON.parse(userStr);
-        console.log("User data:", userObj);
         setUsername(userObj.name || "Guest");
       } catch {
         localStorage.removeItem("user");
