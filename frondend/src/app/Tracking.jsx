@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Radio, Input, Select, Slider, Button, Tabs } from "antd";
 import moment from "moment";
-import "antd/dist/reset.css"; // Thêm CSS của antd để đảm bảo giao diện đẹp
-import "../App.css"; // Nhập file CSS tùy chỉnh cho ứng dụng
-const { TabPane } = Tabs;
+import "antd/dist/reset.css"; // Nhập CSS của Ant Design để đảm bảo giao diện các thành phần như Button, Select, Slider hiển thị đúng kiểu
+import "../App.css"; // Nhập file CSS tùy chỉnh để định dạng giao diện ứng dụng
+const { TabPane } = Tabs; // Lấy component TabPane từ Ant Design để sử dụng trong Tabs
 
 // Khởi tạo danh sách các tùy chọn cho trigger, đây là các giá trị người dùng có thể chọn
+// Chức năng: Cung cấp các tùy chọn cho dropdown Trigger (nguyên nhân dẫn đến hút thuốc hoặc thèm thuốc)
 const triggerOptions = [
   { label: "Stress", value: "stress" },
   { label: "Social", value: "social" },
@@ -14,6 +15,7 @@ const triggerOptions = [
 ];
 
 // Ánh xạ các giá trị trigger sang nhãn tiếng Việt (dùng nội bộ để tính toán, không hiển thị trên UI)
+// Chức năng: Định nghĩa ánh xạ để hiển thị tên trigger trong biểu đồ hoặc log bằng tiếng Việt
 const triggerLabels = {
   stress: "Stress",
   social: "Social",
@@ -22,6 +24,7 @@ const triggerLabels = {
 };
 
 // Dữ liệu giả lập cho biểu đồ trong tab "Chart", hiển thị số lần hút thuốc và thèm thuốc mỗi ngày
+// Chức năng: Cung cấp dữ liệu tĩnh để hiển thị biểu đồ cột trong tab Chart
 const chartData = [
   { day: "Mon", smoking: 5, craving: 7 }, // T2
   { day: "Tue", smoking: 4, craving: 6 }, // T3
@@ -34,6 +37,7 @@ const chartData = [
 
 const Tracking = () => {
   // Khởi tạo các state để quản lý dữ liệu trong form và giao diện
+  // Chức năng: Sử dụng React Hooks để quản lý trạng thái của các trường dữ liệu trong form và giao diện
   const [selectedDate, setSelectedDate] = useState(moment("2025-04-17")); // Ngày được chọn mặc định là 17/04/2025
   const [currentMonth, setCurrentMonth] = useState(moment("2025-04-17")); // Tháng hiện tại để hiển thị lịch
   const [time, setTime] = useState(moment().format("hh:mm A")); // Thời gian hiện tại, định dạng 12 giờ (VD: 06:36 PM)
@@ -47,6 +51,7 @@ const Tracking = () => {
   const [incidents, setIncidents] = useState([]); // Danh sách các bản ghi (Smoking hoặc Craving)
 
   // Hàm xử lý khi người dùng submit form để ghi lại hoạt động (Smoking hoặc Craving)
+  // Chức năng: Thu thập dữ liệu từ form, tạo bản ghi mới và thêm vào danh sách incidents, sau đó reset các trường
   const handleSubmit = (e) => {
     e.preventDefault(); // Ngăn chặn hành vi mặc định của form (reload trang)
     const newIncident = {
@@ -76,6 +81,7 @@ const Tracking = () => {
   };
 
   // Hàm tạo danh sách các ngày trong tháng để hiển thị trên lịch
+  // Chức năng: Tạo mảng các ngày (bao gồm cả ngày của tháng trước/sau) để hiển thị trên lịch dạng lưới
   const generateCalendarDays = () => {
     const startOfMonth = currentMonth.clone().startOf("month"); // Ngày đầu tiên của tháng
     const endOfMonth = currentMonth.clone().endOf("month"); // Ngày cuối cùng của tháng
@@ -112,6 +118,7 @@ const Tracking = () => {
   };
 
   // Hàm vẽ lịch dạng lưới để người dùng chọn ngày
+  // Chức năng: Tạo giao diện lịch với các ngày trong tháng và nút điều hướng tháng
   const renderCalendar = () => {
     const days = generateCalendarDays(); // Lấy danh sách các ngày từ hàm generateCalendarDays
     const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; // Tên các ngày trong tuần bằng tiếng Anh
@@ -172,7 +179,9 @@ const Tracking = () => {
   };
 
   // Hàm vẽ biểu đồ trong tab "Chart", hiển thị số lần hút thuốc và thèm thuốc
+  // Chức năng: Hiển thị biểu đồ cột so sánh số lần hút thuốc và thèm thuốc theo ngày
   const renderChart = () => {
+    const barHeightFactor = window.innerWidth < 480 ? 8 : 10; // Giảm hệ số chiều cao trên màn hình nhỏ
     return (
       <div className="chart-container">
         {chartData.map((data, index) => (
@@ -180,12 +189,12 @@ const Tracking = () => {
             {/* Thanh biểu đồ cho Smoking */}
             <div
               className="chart-bar smoking"
-              style={{ height: `${data.smoking * 10}px` }}
+              style={{ height: `${data.smoking * barHeightFactor}px` }}
             />
             {/* Thanh biểu đồ cho Craving */}
             <div
               className="chart-bar craving"
-              style={{ height: `${data.craving * 10}px` }}
+              style={{ height: `${data.craving * barHeightFactor}px` }}
             />
             <span className="chart-label">{data.day}</span>{" "}
             {/* Nhãn ngày (Mon, Tue, ...) */}
@@ -196,6 +205,7 @@ const Tracking = () => {
   };
 
   // Lọc danh sách các bản ghi để hiển thị trong tab "Log"
+  // Chức năng: Lọc các bản ghi theo loại hoạt động (smoking hoặc craving) để hiển thị trong bảng log
   const filteredIncidents = incidents.filter((incident) =>
     activityType === "smoking"
       ? incident.type === "smoking"
@@ -203,6 +213,7 @@ const Tracking = () => {
   );
 
   // Hàm đếm số lần xuất hiện của từng trigger để hiển thị trong tab "Triggers"
+  // Chức năng: Tính toán tần suất các trigger để hiển thị trong biểu đồ trigger
   const countTriggers = () => {
     const triggerCount = { stress: 0, social: 0, habit: 0, other: 0 }; // Khởi tạo object để đếm
     incidents.forEach((incident) => {
@@ -215,6 +226,7 @@ const Tracking = () => {
 
   const triggerCounts = countTriggers(); // Lấy số lần xuất hiện của từng trigger
   // Chuyển dữ liệu trigger sang định dạng dùng cho biểu đồ trong tab "Triggers"
+  // Chức năng: Chuẩn bị dữ liệu để hiển thị biểu đồ thanh ngang cho các trigger
   const triggersData = Object.keys(triggerCounts).map((key) => ({
     label: triggerLabels[key], // Nhãn tiếng Việt dùng nội bộ
     value: triggerCounts[key], // Số lần xuất hiện

@@ -1,25 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css"; // Nhập file CSS tùy chỉnh
-import Footer from "./components/Footer"; // Import Footer component
-import Header from "./components/Header"; // Import Header component
-import Tracking from "./app/Tracking"; // Import Tracking component
+import { BrowserRouter, Route, Routes } from "react-router";
+import "./App.css";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./app/Login";
+import Register from "./app/Register";
+import Home from "./app/Home";
+import Tracking from "./app/Tracking";
+import DashboardPage from "./app/DashboardPage";
+import { Layout } from "antd";
+import HomePage from "./app/HomePage";
 
 function App() {
+  const { Content } = Layout;
   return (
-    <Router>
-      {/* Bao bọc toàn bộ ứng dụng trong Router để hỗ trợ định tuyến */}
-      <div className="app-container">
-        <Header /> {/* Header hiển thị trên tất cả các trang */}
+    <BrowserRouter>
+      <AuthProvider>
+        <Header />
+
         <Routes>
-          {/* Định nghĩa các route cho ứng dụng */}
-          <Route path="/tracking" element={<Tracking />} />{" "}
-          {/* Route cho trang Tracking */}
-          {/* Route mặc định (trang chủ), bạn có thể thay bằng component khác nếu cần */}
-          <Route path="/" element={<div>Welcome to BreatheFree</div>} />
+          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
         </Routes>
-        <Footer /> {/* Footer hiển thị trên tất cả các trang */}
-      </div>
-    </Router>
+
+        <Footer />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
