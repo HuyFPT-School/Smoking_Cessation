@@ -6,9 +6,11 @@
   padding: 32px; /* Đệm bên trong 32px */
   background-color: #f0f2f5; /* Màu nền xám nhạt */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
+
   margin-top: 0px;
   padding-bottom: 32px;
   box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
+
 }
 
 /* Kiểu dáng cho hàng chứa các card */
