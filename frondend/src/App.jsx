@@ -17,16 +17,16 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Header />
-        <Content className="dashboard-content-wrapper">
-          <Routes>
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/" element={<Home />} />
-          </Routes>
-        </Content>
+
+        <Routes>
+          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+
         <Footer />
       </AuthProvider>
     </BrowserRouter>
