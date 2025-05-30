@@ -4,13 +4,11 @@
   max-width: 1400px; /* Độ rộng tối đa 1400px */
   margin: 20px auto; /* Căn giữa với lề trên/dưới 20px */
   padding: 32px; /* Đệm bên trong 32px */
-  background-color: #f0f2f5; /* Màu nền xám nhạt */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
 
   margin-top: 0px;
   padding-bottom: 32px;
   box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
-
 }
 
 /* Kiểu dáng cho hàng chứa các card */
@@ -769,4 +767,9 @@
   width: 120px;
   font-size: 14px;
   color: #333;
+}
+button:hover,
+.ant-btn:hover {
+  filter: brightness(0.9); /* Làm nút tối hơn khi hover */
+  transition: all 0.3s ease;
 }
