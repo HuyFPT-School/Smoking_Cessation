@@ -23,7 +23,7 @@ const DashboardPage = () => {
   // Dữ liệu giả lập cho biểu đồ tiến độ, tạo mảng 28 ngày với giá trị progress ngẫu nhiên
   const data = Array.from({ length: 28 }, (_, i) => ({
     day: i + 1, // Ngày từ 1 đến 28
-    progress: 20 + Math.random() * 60, // Giá trị tiến độ ngẫu nhiên từ 20 đến 80
+    progress: 20 + Math.random() * 60, // Giá trị tiến độ ngẫu nhiên từ 20 đến 80000000000000
   }));
 
   // Cấu hình cho biểu đồ đường hiển thị tiến độ
