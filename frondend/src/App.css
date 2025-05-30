@@ -6,7 +6,9 @@
   padding: 32px; /* Đệm bên trong 32px */
   background-color: #f0f2f5; /* Màu nền xám nhạt */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
-  padding-bottom: 0px; /* Loại bỏ đệm dưới */
+  margin-top: 0px;
+  padding-bottom: 32px;
+  box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
 }
 
 /* Kiểu dáng cho hàng chứa các card */
@@ -72,7 +74,6 @@
 /* css cho màu của vùng context, màu back-group phải giống với .Dashboard-Backgroup  */
 .dashboard-content-wrapper {
   min-height: 100vh;
-  padding: 24px;
   margin: 0;
   background-color: #f0f2f5; /* 🌈 Đổi thành màu bạn muốn */
 }
@@ -201,6 +202,9 @@
 /* Kiểu dáng cho danh sách yếu tố kích thích */
 .triggers-list {
   display: flex; /* Sử dụng flexbox */
+  flex-wrap: wrap; /* Cho phép các Tag xuống dòng */
+  gap: 8px; /* Khoảng cách giữa các Tag */
+  justify-content: flex-start;
   flex-direction: column; /* Xếp tag theo cột */
   gap: 8px; /* Khoảng cách 8px giữa các tag */
   margin-bottom: 8px; /* Lề dưới 8px */
