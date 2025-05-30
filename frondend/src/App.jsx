@@ -9,6 +9,7 @@ import Home from "./app/Home";
 import Tracking from "./app/Tracking";
 import DashboardPage from "./app/DashboardPage";
 import { Layout } from "antd";
+import HomePage from "./app/HomePage";
 
 function App() {
   const { Content } = Layout;
