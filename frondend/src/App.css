@@ -6,7 +6,8 @@
   padding: 32px; /* Đệm bên trong 32px */
   background-color: #f0f2f5; /* Màu nền xám nhạt */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
-  padding-bottom: 0px; /* Loại bỏ đệm dưới */
+  margin-top: 0px; /* Loại bỏ lề trên */
+  padding-bottom: 32px; /* Loại bỏ đệm dưới */
 }
 
 /* Kiểu dáng cho hàng chứa các card */
