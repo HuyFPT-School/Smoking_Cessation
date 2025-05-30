@@ -1,8 +1,7 @@
 import React from "react";
 import { Typography, Button, Row, Col, Card } from "antd";
 import { RiseOutlined, TeamOutlined, BookOutlined } from "@ant-design/icons";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { Navigate } from "react-router";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -195,7 +194,7 @@ const SuccessStories = () => (
           <Button
             type="primary"
             style={ctaButtonStyle}
-            onClick={() => alert("Sign-up coming soon!")}
+            onClick={() => Navigate("/register")}
           >
             Create Free Account
           </Button>
