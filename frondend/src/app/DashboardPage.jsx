@@ -23,7 +23,7 @@ const DashboardPage = () => {
   // Dữ liệu giả lập cho biểu đồ tiến độ, tạo mảng 28 ngày với giá trị progress ngẫu nhiên
   const data = Array.from({ length: 28 }, (_, i) => ({
     day: i + 1, // Ngày từ 1 đến 28
-    progress: 20 + Math.random() * 60, // Giá trị tiến độ ngẫu nhiên từ 20 đến 80
+    progress: 20 + Math.random() * 60, // Giá trị tiến độ ngẫu nhiên từ 20 đến 80000000000000
   }));
 
   // Cấu hình cho biểu đồ đường hiển thị tiến độ
@@ -52,11 +52,11 @@ const DashboardPage = () => {
       </p>
 
       {/* Hàng các khung thông tin đầu tiên */}
-      <Row gutter={[24, 24]} className="dashboard-row-spacing">
-        {/* Sử dụng Row của Ant Design để tạo bố cục lưới, khoảng cách 24px giữa các cột */}
+      <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 24]} className="dashboard-row-spacing">
+        {/* Sử dụng Row của Ant Design để tạo bố cục lưới, khoảng cách responsive */}
 
         {/* Khung 1: Số ngày không hút thuốc */}
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <div className="dashboard-card">
             <div className="dashboard-card-icon">
               <FireOutlined />
@@ -71,7 +71,7 @@ const DashboardPage = () => {
         </Col>
 
         {/* Khung 2: Số tiền tiết kiệm */}
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <div className="dashboard-card">
             <div className="dashboard-card-icon">
               <DollarCircleOutlined />
@@ -84,7 +84,7 @@ const DashboardPage = () => {
         </Col>
 
         {/* Khung 3: Số điếu thuốc tránh được */}
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <div className="dashboard-card">
             <div className="dashboard-card-icon">
               <ArrowUpOutlined />
@@ -92,13 +92,12 @@ const DashboardPage = () => {
             </div>
             <div className="dashboard-card-title">Cigarettes Avoided</div>
             <p className="dashboard-card-value">560</p>
-
             <p className="dashboard-card-subtext">Based on 20/day</p>
           </div>
         </Col>
 
         {/* Khung 4: Cột mốc tiếp theo */}
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <div className="dashboard-card">
             <div className="dashboard-card-icon">
               <FlagOutlined />
@@ -123,19 +122,19 @@ const DashboardPage = () => {
           <p className="subtitle">Track your smoking habits and cravings</p>
 
           {/* Bố cục chính của card, chia thành 2 cột lớn */}
-          <Row gutter={48} className="main-layout">
-            {/* Khoảng cách 48px giữa các cột */}
+          <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 24]} className="main-layout">
+            {/* Khoảng cách responsive giữa các cột */}
 
             {/* Cột trái: Thống kê trạng thái hút thuốc */}
-            <Col span={12} className="stats-container">
+            <Col xs={24} sm={24} md={12} className="stats-container">
               {/* Container chứa các thống kê */}
 
               {/* Hàng 1: Thống kê hôm nay và hôm qua */}
-              <Row gutter={32} className="stats-section">
-                {/* Khoảng cách 32px giữa các cột con */}
+              <Row gutter={[{ xs: 8, sm: 16, md: 32 }, 16]} className="stats-section">
+                {/* Khoảng cách responsive giữa các cột con */}
 
                 {/* Thống kê hôm nay */}
-                <Col span={12} className="stat-item">
+                <Col xs={24} sm={12} md={12} className="stat-item">
                   <h3>🚬Today</h3>
                   <div className="stat-details">
                     <div>
@@ -152,7 +151,7 @@ const DashboardPage = () => {
                 </Col>
 
                 {/* Thống kê hôm qua */}
-                <Col span={12} className="stat-item">
+                <Col xs={24} sm={12} md={12} className="stat-item">
                   <h3>🚬Yesterday</h3>
                   <div className="stat-details">
                     <div>
@@ -197,7 +196,7 @@ const DashboardPage = () => {
             </Col>
 
             {/* Cột phải: Các yếu tố kích thích cơn thèm */}
-            <Col span={12} className="triggers-section">
+            <Col xs={24} sm={24} md={12} className="triggers-section">
               <h3>🔥Common triggers</h3>
 
               <div className="triggers-list">
@@ -271,10 +270,10 @@ const DashboardPage = () => {
 
         {/* Tab Progress: Hiển thị biểu đồ tiến độ */}
         {activeTab === "Progress" && (
-          <div style={{ paddingBottom: "60px" }}>
+          <div style={{ paddingBottom: "60px", width: "100%" }}>
             <h3>Your Progress</h3>
             <p>Track your smoke-free journey over time</p>
-            <Line {...chartConfig} style={{ minHeight: "300px" }} />
+            <Line {...chartConfig} style={{ minHeight: "300px", width: "100%" }} />
           </div>
         )}
 
