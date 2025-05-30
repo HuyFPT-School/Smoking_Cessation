@@ -328,3 +328,10 @@ body {
   color: #6b7280;
   border-top: 1px solid #e5e5e5;
 }
+
+/* ========== Hover hiệu ứng chung cho Button trên HomePage ========== */
+button:hover,
+.ant-btn:hover {
+  filter: brightness(0.9); /* Làm nút tối hơn khi hover */
+  transition: all 0.3s ease;
+}

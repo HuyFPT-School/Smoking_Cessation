@@ -17,6 +17,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Header />
+
         <Routes>
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/login" element={<Login />} />
@@ -25,6 +26,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
+
         <Footer />
       </AuthProvider>
     </BrowserRouter>

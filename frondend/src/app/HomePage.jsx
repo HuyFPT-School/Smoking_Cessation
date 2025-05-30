@@ -1,7 +1,8 @@
 import React from "react";
 import { Typography, Button, Row, Col, Card } from "antd";
 import { RiseOutlined, TeamOutlined, BookOutlined } from "@ant-design/icons";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router";
+
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -106,7 +107,7 @@ const SupportSection = () => (
   </div>
 );
 
-const SuccessStories = () => (
+const SuccessStories = ({ onNavigate }) => (
   <div style={{ background: "#fff", padding: "80px 24px 0" }}>
     <div style={{ maxWidth: "960px", margin: "0 auto" }}>
       <Title
@@ -194,7 +195,9 @@ const SuccessStories = () => (
           <Button
             type="primary"
             style={ctaButtonStyle}
-            onClick={() => Navigate("/register")}
+
+            onClick={() => onNavigate("/register")}
+
           >
             Create Free Account
           </Button>
@@ -303,13 +306,16 @@ const secondaryButtonStyle = {
   borderRadius: "8px",
 };
 
-const HomePage = () => (
-  <div>
-    <HeroSection />
-    <StatsSection />
-    <SupportSection />
-    <SuccessStories />
-  </div>
-);
+const HomePage = () => {
+  const navigate = useNavigate();
+  return (
+    <div>
+      <HeroSection />
+      <StatsSection />
+      <SupportSection />
+      <SuccessStories onNavigate={navigate} />
+    </div>
+  );
+};
 
 export default HomePage;
