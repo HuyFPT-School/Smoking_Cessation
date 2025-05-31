@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Radio, Input, Select, Slider, Button, Tabs } from "antd";
 import moment from "moment";
-import "antd/dist/reset.css"; // Nhập CSS của Ant Design để đảm bảo giao diện các thành phần như Button, Select, Slider hiển thị đúng kiểu
-import "../App.css"; // Nhập file CSS tùy chỉnh để định dạng giao diện ứng dụng
-const { TabPane } = Tabs; // Lấy component TabPane từ Ant Design để sử dụng trong Tabs
+import "antd/dist/reset.css";
+import "../App.css";
+const { TabPane } = Tabs;
 
-// Khởi tạo danh sách các tùy chọn cho trigger, đây là các giá trị người dùng có thể chọn
-// Chức năng: Cung cấp các tùy chọn cho dropdown Trigger (nguyên nhân dẫn đến hút thuốc hoặc thèm thuốc)
+// Khởi tạo danh sách các tùy chọn cho trigger
 const triggerOptions = [
   { label: "Stress", value: "stress" },
   { label: "Social", value: "social" },
@@ -14,8 +13,7 @@ const triggerOptions = [
   { label: "Other", value: "other" },
 ];
 
-// Ánh xạ các giá trị trigger sang nhãn tiếng Việt (dùng nội bộ để tính toán, không hiển thị trên UI)
-// Chức năng: Định nghĩa ánh xạ để hiển thị tên trigger trong biểu đồ hoặc log bằng tiếng Việt
+// Ánh xạ các giá trị trigger
 const triggerLabels = {
   stress: "Stress",
   social: "Social",
@@ -23,77 +21,67 @@ const triggerLabels = {
   other: "Other",
 };
 
-// Dữ liệu giả lập cho biểu đồ trong tab "Chart", hiển thị số lần hút thuốc và thèm thuốc mỗi ngày
-// Chức năng: Cung cấp dữ liệu tĩnh để hiển thị biểu đồ cột trong tab Chart
-const chartData = [
-  { day: "Mon", smoking: 5, craving: 7 }, // T2
-  { day: "Tue", smoking: 4, craving: 6 }, // T3
-  { day: "Wed", smoking: 6, craving: 9 }, // T4
-  { day: "Thu", smoking: 3, craving: 5 }, // T5
-  { day: "Fri", smoking: 2, craving: 4 }, // T6
-  { day: "Sat", smoking: 4, craving: 6 }, // T7
-  { day: "Sun", smoking: 1, craving: 3 }, // CN
-];
-
 const Tracking = () => {
-  // Khởi tạo các state để quản lý dữ liệu trong form và giao diện
-  // Chức năng: Sử dụng React Hooks để quản lý trạng thái của các trường dữ liệu trong form và giao diện
-  const [selectedDate, setSelectedDate] = useState(moment("2025-04-17")); // Ngày được chọn mặc định là 17/04/2025
-  const [currentMonth, setCurrentMonth] = useState(moment("2025-04-17")); // Tháng hiện tại để hiển thị lịch
-  const [time, setTime] = useState(moment().format("hh:mm A")); // Thời gian hiện tại, định dạng 12 giờ (VD: 06:36 PM)
-  const [location, setLocation] = useState("E.g., Balcony, Coffee shop"); // Vị trí mặc định cho form Smoking
-  const [trigger, setTrigger] = useState("stress"); // Trigger mặc định
-  const [satisfaction, setSatisfaction] = useState(10); // Mức độ hài lòng, dùng cho Smoking (1-10)
-  const [cravingIntensity, setCravingIntensity] = useState(5); // Độ mạnh cơn thèm, dùng cho Cravings (1-10)
-  const [copingStrategy, setCopingStrategy] = useState(""); // Chiến lược đối phó, dùng cho Cravings
-  const [notes, setNotes] = useState(""); // Ghi chú bổ sung
-  const [activityType, setActivityType] = useState("smoking"); // Loại hoạt động: "smoking" hoặc "craving"
-  const [incidents, setIncidents] = useState([]); // Danh sách các bản ghi (Smoking hoặc Craving)
+  const [selectedDate, setSelectedDate] = useState(moment("2025-04-17"));
+  const [currentMonth, setCurrentMonth] = useState(moment("2025-04-17"));
+  const [time, setTime] = useState(moment().format("hh:mm A"));
+  const [location, setLocation] = useState("E.g., Balcony, Coffee shop");
+  const [trigger, setTrigger] = useState("stress");
+  const [satisfaction, setSatisfaction] = useState(10);
+  const [notes, setNotes] = useState("");
+  const [activityType, setActivityType] = useState("smoking");
+  // Thay đổi: Bắt đầu với mảng rỗng thay vì dữ liệu mẫu
+  const [incidents, setIncidents] = useState([]);
 
-  // Hàm xử lý khi người dùng submit form để ghi lại hoạt động (Smoking hoặc Craving)
-  // Chức năng: Thu thập dữ liệu từ form, tạo bản ghi mới và thêm vào danh sách incidents, sau đó reset các trường
   const handleSubmit = (e) => {
-    e.preventDefault(); // Ngăn chặn hành vi mặc định của form (reload trang)
+    e.preventDefault();
     const newIncident = {
-      date: selectedDate.format("YYYY-MM-DD"), // Ngày của bản ghi
-      time, // Thời gian
-      ...(activityType === "smoking" && {
-        // Nếu là Smoking, thêm các thông tin liên quan
-        location,
-        trigger,
-        satisfaction,
-        type: "smoking",
-      }),
-      ...(activityType === "craving" && {
-        // Nếu là Craving, thêm các thông tin liên quan
-        trigger,
-        cravingIntensity,
-        copingStrategy,
-        type: "craving",
-      }),
-      notes, // Ghi chú
+      date: selectedDate.format("YYYY-MM-DD"),
+      time,
+      location,
+      trigger,
+      satisfaction,
+      type: "smoking",
+      notes,
     };
-    setIncidents([...incidents, newIncident]); // Thêm bản ghi mới vào danh sách
-    // Reset các trường sau khi submit
+    setIncidents([...incidents, newIncident]);
+    // Reset form
+    setTime(moment().format("hh:mm A"));
     setLocation("E.g., Balcony, Coffee shop");
+    setTrigger("stress");
+    setSatisfaction(10);
     setNotes("");
-    setCopingStrategy("");
   };
 
-  // Hàm tạo danh sách các ngày trong tháng để hiển thị trên lịch
-  // Chức năng: Tạo mảng các ngày (bao gồm cả ngày của tháng trước/sau) để hiển thị trên lịch dạng lưới
+  const getChartDataFromIncidents = () => {
+    const today = new Date();
+    const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    return weekDays.map((day, index) => {
+      // Get date for each day in the last 7 days
+      const date = new Date(today);
+      date.setDate(today.getDate() - (6 - index)); // Last 7 days including today
+      const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+      const count = incidents.filter((incident) => {
+        return incident.date === dateStr && incident.type === "smoking";
+      }).length;
+
+      return { day, smoking: count };
+    });
+  };
+
   const generateCalendarDays = () => {
-    const startOfMonth = currentMonth.clone().startOf("month"); // Ngày đầu tiên của tháng
-    const endOfMonth = currentMonth.clone().endOf("month"); // Ngày cuối cùng của tháng
-    const startDay = startOfMonth.day(); // Ngày đầu tháng là thứ mấy (0: CN, 1: T2, ..., 6: T7)
-    const daysInMonth = endOfMonth.date(); // Số ngày trong tháng
+    const startOfMonth = currentMonth.clone().startOf("month");
+    const endOfMonth = currentMonth.clone().endOf("month");
+    const startDay = startOfMonth.day();
+    const daysInMonth = endOfMonth.date();
 
-    const startOffset = startDay === 0 ? 6 : startDay - 1; // Tính offset để T2 là cột đầu tiên
-    const totalDays = daysInMonth + startOffset; // Tổng số ngày cần hiển thị (bao gồm ngày của tháng trước)
-    const weeks = Math.ceil(totalDays / 7); // Số tuần cần hiển thị
-    const days = []; // Danh sách các ngày sẽ hiển thị trên lịch
+    const startOffset = startDay === 0 ? 6 : startDay - 1;
+    const totalDays = daysInMonth + startOffset;
+    const weeks = Math.ceil(totalDays / 7);
+    const days = [];
 
-    // Thêm các ngày của tháng trước để lấp đầy các ô đầu tiên
     for (let i = 0; i < startOffset; i++) {
       const prevMonthDay = startOfMonth
         .clone()
@@ -101,13 +89,11 @@ const Tracking = () => {
       days.push({ date: prevMonthDay, isCurrentMonth: false });
     }
 
-    // Thêm các ngày của tháng hiện tại
     for (let i = 1; i <= daysInMonth; i++) {
       const day = startOfMonth.clone().date(i);
       days.push({ date: day, isCurrentMonth: true });
     }
 
-    // Thêm các ngày của tháng sau để lấp đầy các ô còn lại
     const remainingDays = weeks * 7 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       const nextMonthDay = endOfMonth.clone().add(i, "days");
@@ -117,15 +103,12 @@ const Tracking = () => {
     return days;
   };
 
-  // Hàm vẽ lịch dạng lưới để người dùng chọn ngày
-  // Chức năng: Tạo giao diện lịch với các ngày trong tháng và nút điều hướng tháng
   const renderCalendar = () => {
-    const days = generateCalendarDays(); // Lấy danh sách các ngày từ hàm generateCalendarDays
-    const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; // Tên các ngày trong tuần bằng tiếng Anh
+    const days = generateCalendarDays();
+    const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
     return (
       <div className="calendar-wrapper">
-        {/* Phần tiêu đề của lịch, hiển thị tháng và năm, cùng với nút điều hướng */}
         <div className="calendar-header">
           <button
             className="calendar-nav-button"
@@ -133,11 +116,10 @@ const Tracking = () => {
               setCurrentMonth(currentMonth.clone().subtract(1, "month"))
             }
           >
-            &lt; {/* Nút để quay lại tháng trước */}
+            &lt;
           </button>
           <span className="calendar-month-year">
-            Month {currentMonth.format("M")} Year {currentMonth.format("YYYY")}{" "}
-            {/* Hiển thị tháng và năm hiện tại */}
+            Month {currentMonth.format("M")} Year {currentMonth.format("YYYY")}
           </span>
           <button
             className="calendar-nav-button"
@@ -145,18 +127,15 @@ const Tracking = () => {
               setCurrentMonth(currentMonth.clone().add(1, "month"))
             }
           >
-            &gt; {/* Nút để chuyển sang tháng sau */}
+            &gt;
           </button>
         </div>
-        {/* Phần lưới hiển thị các ngày */}
         <div className="calendar-grid">
-          {/* Hiển thị tên các ngày trong tuần (T2 - CN) */}
           {weekdays.map((day, index) => (
             <div key={index} className="calendar-weekday">
               {day}
             </div>
           ))}
-          {/* Hiển thị các ngày trong tháng */}
           {days.map((day, index) => (
             <div
               key={index}
@@ -164,190 +143,160 @@ const Tracking = () => {
                 day.isCurrentMonth ? "current-month" : "other-month"
               } ${selectedDate.isSame(day.date, "day") ? "selected-day" : ""}`}
               onClick={() => {
-                setSelectedDate(day.date); // Cập nhật ngày được chọn
-                setCurrentMonth(day.date); // Cập nhật tháng hiện tại
+                setSelectedDate(day.date);
+                setCurrentMonth(day.date);
               }}
             >
-              {day.date.date()} {/* Hiển thị số ngày (VD: 1, 2, 3, ...) */}
+              {day.date.date()}
             </div>
           ))}
         </div>
-        <p>Selected Date: {selectedDate.format("DD/MM/YYYY")}</p>{" "}
-        {/* Hiển thị ngày đã chọn */}
+        <p>Selected Date: {selectedDate.format("DD/MM/YYYY")}</p>
       </div>
     );
   };
 
-  // Hàm vẽ biểu đồ trong tab "Chart", hiển thị số lần hút thuốc và thèm thuốc
-  // Chức năng: Hiển thị biểu đồ cột so sánh số lần hút thuốc và thèm thuốc theo ngày
   const renderChart = () => {
-    const barHeightFactor = window.innerWidth < 480 ? 8 : 10; // Giảm hệ số chiều cao trên màn hình nhỏ
+    const chartData = getChartDataFromIncidents();
+    // Đặt giá trị tối đa cố định hoặc tính toán một cách hợp lý
+    const maxVal = Math.max(...chartData.map((d) => d.smoking), 10); // Tối thiểu là 10
+    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0);
+
+    console.log("Chart Data:", chartData);
+    console.log("Max Value:", maxVal);
+
     return (
       <div className="chart-container">
-        {chartData.map((data, index) => (
-          <div key={index} className="chart-bar-group">
-            {/* Thanh biểu đồ cho Smoking */}
-            <div
-              className="chart-bar smoking"
-              style={{ height: `${data.smoking * barHeightFactor}px` }}
-            />
-            {/* Thanh biểu đồ cho Craving */}
-            <div
-              className="chart-bar craving"
-              style={{ height: `${data.craving * barHeightFactor}px` }}
-            />
-            <span className="chart-label">{data.day}</span>{" "}
-            {/* Nhãn ngày (Mon, Tue, ...) */}
+        <div className="chart-header">
+          <span className="chart-title">Smoking Incidents</span>
+          <Select defaultValue="last7days" style={{ width: 120 }}>
+            <Select.Option value="last7days">Last 7 Days</Select.Option>
+          </Select>
+        </div>
+        {totalIncidents === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+            <p>No smoking incidents recorded yet.</p>
+            <p>Start recording your activities to see the chart data.</p>
           </div>
-        ))}
+        ) : (
+          <div className="chart-bars">
+            {chartData.map((data, index) => {
+              // Tính chiều cao theo pixel thay vì phần trăm
+              const heightPx = data.smoking * 20; // Mỗi incident = 20px
+
+              return (
+                <div key={index} className="bar-group">
+                  <div
+                    className="bar smoking"
+                    style={{
+                      height: `${heightPx}px`,
+                      minHeight: data.smoking > 0 ? "20px" : "2px",
+                    }}
+                  />
+                  <span className="bar-label">{data.day}</span>
+                  <span
+                    className="bar-value"
+                    style={{ fontSize: "12px", color: "#666" }}
+                  >
+                    {data.smoking}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <div style={{ marginTop: "10px", fontSize: "12px", color: "#666" }}>
+          Total incidents this week: {totalIncidents}
+        </div>
       </div>
     );
   };
 
-  // Lọc danh sách các bản ghi để hiển thị trong tab "Log"
-  // Chức năng: Lọc các bản ghi theo loại hoạt động (smoking hoặc craving) để hiển thị trong bảng log
-  const filteredIncidents = incidents.filter((incident) =>
-    activityType === "smoking"
-      ? incident.type === "smoking"
-      : incident.type === "craving"
+  const filteredIncidents = incidents.filter(
+    (incident) => incident.type === "smoking"
   );
 
-  // Hàm đếm số lần xuất hiện của từng trigger để hiển thị trong tab "Triggers"
-  // Chức năng: Tính toán tần suất các trigger để hiển thị trong biểu đồ trigger
   const countTriggers = () => {
-    const triggerCount = { stress: 0, social: 0, habit: 0, other: 0 }; // Khởi tạo object để đếm
+    const triggerCount = { stress: 0, social: 0, habit: 0, other: 0 };
     incidents.forEach((incident) => {
       if (incident.trigger in triggerCount) {
-        triggerCount[incident.trigger]++; // Tăng số đếm cho trigger tương ứng
+        triggerCount[incident.trigger]++;
       }
     });
     return triggerCount;
   };
 
-  const triggerCounts = countTriggers(); // Lấy số lần xuất hiện của từng trigger
-  // Chuyển dữ liệu trigger sang định dạng dùng cho biểu đồ trong tab "Triggers"
-  // Chức năng: Chuẩn bị dữ liệu để hiển thị biểu đồ thanh ngang cho các trigger
+  const triggerCounts = countTriggers();
   const triggersData = Object.keys(triggerCounts).map((key) => ({
-    label: triggerLabels[key], // Nhãn tiếng Việt dùng nội bộ
-    value: triggerCounts[key], // Số lần xuất hiện
+    label: triggerLabels[key],
+    value: triggerCounts[key],
   }));
 
   return (
     <div className="tracking-page">
-      {/* Phần ghi nhận hoạt động (Record Activity) */}
       <div className="tracking-section">
         <h2>Record Activity</h2>
-        <p>Track your smoking incidents or cravings</p>
+        <p>Track your smoking incidents</p>
         <div className="tracking-content">
-          {/* Phần lịch để chọn ngày */}
           <div className="calendar-section">
             <h3>Select Date</h3>
             <p>Choose a date to record activity or view data</p>
             {renderCalendar()}
           </div>
-          {/* Phần form để ghi nhận hoạt động */}
           <div className="record-section">
             <h3>Record Activity</h3>
-            <p>Log a smoking incident or craving</p>
+            <p>Log a smoking incident</p>
             <form onSubmit={handleSubmit} className="tracking-form">
-              {/* Radio button để chọn loại hoạt động: Smoking hoặc Craving */}
               <Radio.Group
                 value={activityType}
                 onChange={(e) => setActivityType(e.target.value)}
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
-                <Radio.Button value="craving">Cravings</Radio.Button>
               </Radio.Group>
-              {/* Form cho Smoking */}
-              {activityType === "smoking" && (
-                <>
-                  <div className="form-group">
-                    <label>Time</label>
-                    <Input
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      placeholder="06:36 PM"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Location</label>
-                    <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder="E.g., Balcony, Coffee shop"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Trigger</label>
-                    <Select
-                      value={trigger}
-                      onChange={(value) => setTrigger(value)}
-                      options={triggerOptions}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Satisfaction Level (1-10)</label>
-                    <Slider
-                      value={satisfaction}
-                      onChange={(value) => setSatisfaction(value)}
-                      min={1}
-                      max={10}
-                    />
-                    <p>
-                      {satisfaction === 1
-                        ? "Low satisfaction"
-                        : "High satisfaction"}
-                    </p>
-                  </div>
-                </>
-              )}
-              {/* Form cho Craving */}
-              {activityType === "craving" && (
-                <>
-                  <div className="form-group">
-                    <label>Time</label>
-                    <Input
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      placeholder="06:36 PM"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Trigger</label>
-                    <Select
-                      value={trigger}
-                      onChange={(value) => setTrigger(value)}
-                      options={triggerOptions}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Craving Intensity (1-10)</label>
-                    <Slider
-                      value={cravingIntensity}
-                      onChange={(value) => setCravingIntensity(value)}
-                      min={1}
-                      max={10}
-                    />
-                    <p>
-                      {cravingIntensity === 1
-                        ? "Mild"
-                        : cravingIntensity === 10
-                        ? "Very intense"
-                        : ""}
-                    </p>
-                  </div>
-                  <div className="form-group">
-                    <label>Coping Strategy</label>
-                    <Input
-                      value={copingStrategy}
-                      onChange={(e) => setCopingStrategy(e.target.value)}
-                      placeholder="What did you do to cope?"
-                    />
-                  </div>
-                </>
-              )}
-              {/* Trường ghi chú chung cho cả Smoking và Craving */}
+              <>
+                <div className="form-group">
+                  <label>Time</label>
+                  <Input
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    placeholder="06:36 PM"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Location</label>
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="E.g., Balcony, Coffee shop"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Trigger</label>
+                  <Select
+                    value={trigger}
+                    onChange={(value) => setTrigger(value)}
+                    options={triggerOptions}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Satisfaction Level (1-10)</label>
+                  <Slider
+                    value={satisfaction}
+                    onChange={(value) => setSatisfaction(value)}
+                    min={1}
+                    max={10}
+                  />
+                  <p>
+                    Current: {satisfaction} -{" "}
+                    {satisfaction <= 3
+                      ? "Low satisfaction"
+                      : satisfaction <= 7
+                      ? "Medium satisfaction"
+                      : "High satisfaction"}
+                  </p>
+                </div>
+              </>
               <div className="form-group">
                 <label>Notes</label>
                 <Input.TextArea
@@ -357,40 +306,25 @@ const Tracking = () => {
                   rows={3}
                 />
               </div>
-              {/* Nút submit để gửi form */}
               <Button
                 type="primary"
                 htmlType="submit"
                 className="submit-button"
               >
-                {activityType === "smoking"
-                  ? "RECORD SMOKING INCIDENT"
-                  : "RECORD CRAVING"}
+                RECORD SMOKING INCIDENT
               </Button>
             </form>
           </div>
         </div>
       </div>
 
-      {/* Phần phân tích dữ liệu (Data Analysis) */}
       <div className="data-analysis-section">
         <h2>Data Analysis</h2>
         <p>Better understand your smoking habits</p>
         <Tabs defaultActiveKey="chart">
-          {/* Tab Chart: Hiển thị biểu đồ số lần hút thuốc và thèm thuốc */}
           <TabPane tab="Chart" key="chart">
-            <div className="chart-header">
-              <div className="chart-legend">
-                <span className="legend smoking">Smoking Incidents</span>
-                <span className="legend craving">Cravings</span>
-              </div>
-              <Select defaultValue="last7days" style={{ width: 120 }}>
-                <Select.Option value="last7days">Last 7 Days</Select.Option>
-              </Select>
-            </div>
             {renderChart()}
           </TabPane>
-          {/* Tab Log: Hiển thị danh sách các bản ghi */}
           <TabPane tab="Log" key="log">
             <div className="log-header">
               <Radio.Group
@@ -399,97 +333,85 @@ const Tracking = () => {
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
-                <Radio.Button value="craving">Cravings</Radio.Button>
               </Radio.Group>
             </div>
-            <table className="log-table">
-              <thead>
-                <tr>
-                  {activityType === "smoking" && (
-                    <>
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>Location</th>
-                      <th>Trigger</th>
-                      <th>Intensity</th>
-                      <th>Notes</th>
-                    </>
-                  )}
-                  {activityType === "craving" && (
-                    <>
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>Trigger</th>
-                      <th>Intensity</th>
-                      <th>Coping Action</th>
-                      <th>Notes</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredIncidents.map((incident, index) => (
-                  <tr key={index}>
-                    {activityType === "smoking" && (
-                      <>
-                        <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
-                        <td>{incident.time}</td>
-                        <td>{incident.location || "-"}</td>
-                        <td>{incident.trigger}</td>
-                        <td>{incident.satisfaction}/10</td>
-                        <td>{incident.notes}</td>
-                      </>
-                    )}
-                    {activityType === "craving" && (
-                      <>
-                        <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
-                        <td>{incident.time}</td>
-                        <td>{incident.trigger}</td>
-                        <td>{incident.cravingIntensity}/10</td>
-                        <td>{incident.copingStrategy || "-"}</td>
-                        <td>{incident.notes}</td>
-                      </>
-                    )}
+            {filteredIncidents.length === 0 ? (
+              <div
+                style={{ textAlign: "center", padding: "40px", color: "#666" }}
+              >
+                <p>No smoking incidents recorded yet.</p>
+                <p>Start recording your activities to see the log data.</p>
+              </div>
+            ) : (
+              <table className="log-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Trigger</th>
+                    <th>Intensity</th>
+                    <th>Notes</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredIncidents.map((incident, index) => (
+                    <tr key={index}>
+                      <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
+                      <td>{incident.time}</td>
+                      <td>{incident.location || "-"}</td>
+                      <td>{incident.trigger}</td>
+                      <td>{incident.satisfaction}/10</td>
+                      <td>{incident.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </TabPane>
-          {/* Tab Triggers: Hiển thị biểu đồ các trigger phổ biến */}
           <TabPane tab="Triggers" key="triggers">
             <h3>Most Common Triggers</h3>
-            <div className="trigger-chart">
-              {triggersData.map((trigger, index) => (
-                <div key={index} className="trigger-bar-group">
-                  <span className="trigger-label">{trigger.label}</span>{" "}
-                  {/* Hiển thị nhãn trigger (giữ tiếng Việt nội bộ) */}
-                  <div
-                    className="trigger-bar"
-                    style={{
-                      width: `${
-                        trigger.value > 0
-                          ? (trigger.value /
-                              Math.max(...triggersData.map((t) => t.value))) *
-                            100
-                          : 0
-                      }%`,
-                      backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
-                    }}
-                  >
-                    <span className="trigger-value">{trigger.value}</span>
-                  </div>
+            {incidents.length === 0 ? (
+              <div
+                style={{ textAlign: "center", padding: "40px", color: "#666" }}
+              >
+                <p>No trigger data available yet.</p>
+                <p>Start recording incidents to see trigger analysis.</p>
+              </div>
+            ) : (
+              <>
+                <div className="trigger-chart">
+                  {triggersData.map((trigger, index) => (
+                    <div key={index} className="trigger-bar-group">
+                      <span className="trigger-label">{trigger.label}</span>
+                      <div
+                        className="trigger-bar"
+                        style={{
+                          width: `${
+                            trigger.value > 0
+                              ? (trigger.value /
+                                  Math.max(
+                                    ...triggersData.map((t) => t.value),
+                                    1
+                                  )) *
+                                100
+                              : 0
+                          }%`,
+                          backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                        }}
+                      >
+                        <span className="trigger-value">{trigger.value}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <p>
-              Chart shows the most common triggers leading to smoking or
-              cravings
-            </p>
+                <p>Chart shows the most common triggers leading to smoking</p>
+              </>
+            )}
           </TabPane>
         </Tabs>
       </div>
 
-      {/* Phần gợi ý để vượt qua cơn thèm thuốc */}
       <div className="tips-section">
         <h2>Tips to Overcome Cravings</h2>
         <p>Effective strategies to cope with cravings</p>
