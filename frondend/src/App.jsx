@@ -10,7 +10,7 @@ import Tracking from "./app/Tracking";
 import DashboardPage from "./app/DashboardPage";
 import { Layout } from "antd";
 import HomePage from "./app/HomePage";
-
+import Plan from "./app/Plan";
 function App() {
   const { Content } = Layout;
   return (
@@ -23,6 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/plan" element={<Plan />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
