@@ -440,6 +440,7 @@
 .tracking-section h2,
 .data-analysis-section h2,
 .tips-section h2 {
+  font-weight: bold;
   font-size: 24px;
   margin-bottom: 10px;
   color: #333;
@@ -571,7 +572,7 @@
 /* Updated Chart Styles to Match Calendar Design */
 .chart-wrapper {
   background: #fff;
-  border: 4px solid #1E90FF; /* Blue frame */
+  border: 4px solid #1e90ff; /* Blue frame */
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -592,8 +593,8 @@
 .chart-title {
   font-size: 16px;
   font-weight: bold;
-  color: #1E90FF; /* Blue color for title */
-  font-family: 'Arial', sans-serif;
+  color: #1e90ff; /* Blue color for title */
+  font-family: "Arial", sans-serif;
 }
 
 .chart-grid {
@@ -616,17 +617,17 @@
 .chart-bar {
   width: 15px;
   border-radius: 4px;
-  background: #F0F0F0; /* Light gray background for bars */
+  background: #f0f0f0; /* Light gray background for bars */
 }
 
 .chart-bar.smoking {
-  background-color: #1E90FF; /* Blue for smoking incidents */
+  background-color: #1e90ff; /* Blue for smoking incidents */
 }
 
 .chart-label {
   font-size: 12px;
   color: #666;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .tips-section {
@@ -650,11 +651,13 @@
 .tip-card h4 {
   font-size: 16px;
   margin-bottom: 8px;
+  font-weight: bold;
 }
 
 .tip-card p {
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
+  line-height: 25px;
 }
 
 /* Định dạng cho lịch tùy chỉnh */
@@ -783,9 +786,8 @@ button:hover,
   padding: 20px;
   max-width: 100%;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-
 
 .chart-header {
   display: flex;
@@ -807,7 +809,6 @@ button:hover,
   gap: 16px;
   padding-bottom: 10px; /* Thêm padding để tạo khoảng cách */
 }
-
 
 .bar-group {
   display: flex;
@@ -846,7 +847,7 @@ button:hover,
   margin: 0 auto;
   padding-top: 100px; /* Khoảng cách trên để tránh bị che bởi header */
   position: relative;
-  font-family: 'Arial', sans-serif; /* Font chữ mặc định */
+  font-family: "Arial", sans-serif; /* Font chữ mặc định */
 }
 
 /* Định dạng tiêu đề chính */
@@ -856,7 +857,7 @@ button:hover,
   margin-bottom: 8px;
   display: block;
   font-weight: bold;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng phụ đề */
@@ -865,7 +866,7 @@ button:hover,
   color: #666;
   margin-bottom: 16px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng thanh tiến trình */
@@ -889,7 +890,7 @@ button:hover,
   left: 15px;
   right: 15px;
   height: 2px;
-  background: #16A34A; /* Màu xanh lá cây cho đường tiến trình */
+  background: #16a34a; /* Màu xanh lá cây cho đường tiến trình */
   z-index: 0;
 }
 
@@ -898,7 +899,7 @@ button:hover,
   width: 30px;
   height: 30px;
   background: #fff;
-  border: 2px solid #16A34A; /* Viền màu xanh lá cây */
+  border: 2px solid #16a34a; /* Viền màu xanh lá cây */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -912,15 +913,15 @@ button:hover,
 
 /* Định dạng bước đã hoàn thành */
 .plan-step.completed {
-  background: #BBF7D0; /* Màu nền xanh nhạt khi hoàn thành */
-  border-color: #BBF7D0;
+  background: #bbf7d0; /* Màu nền xanh nhạt khi hoàn thành */
+  border-color: #bbf7d0;
   color: #389e0d;
 }
 
 /* Định dạng bước đang active */
 .plan-step.active {
-  background: #16A34A; /* Màu xanh lá cây khi active */
-  border-color: #16A34A;
+  background: #16a34a; /* Màu xanh lá cây khi active */
+  border-color: #16a34a;
   color: #fff;
 }
 
@@ -935,7 +936,7 @@ button:hover,
   font-size: 14px;
   color: #666;
   text-align: center;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .plan-step-labels span {
@@ -951,7 +952,7 @@ button:hover,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
   margin-bottom: 20px;
   position: relative;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng tiêu đề của bước */
@@ -961,7 +962,7 @@ button:hover,
   color: #333;
   margin-bottom: 16px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng mô tả của bước */
@@ -970,7 +971,7 @@ button:hover,
   color: #666;
   margin-bottom: 16px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng khung lịch */
@@ -1008,7 +1009,7 @@ button:hover,
 .plan-calendar-month-year {
   font-size: 16px;
   font-weight: bold;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng lưới lịch */
@@ -1025,7 +1026,7 @@ button:hover,
   padding: 5px;
   font-weight: bold;
   color: #888;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng các ô ngày trong lịch */
@@ -1041,7 +1042,7 @@ button:hover,
 }
 
 .plan-calendar-day.plan-selected-day {
-  background: #16A34A; /* Màu xanh lá cây khi ngày được chọn */
+  background: #16a34a; /* Màu xanh lá cây khi ngày được chọn */
   color: #fff;
   border-radius: 3%;
 }
@@ -1057,7 +1058,7 @@ button:hover,
   margin-top: 16px;
   margin-left: 30px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng nhóm form */
@@ -1069,11 +1070,11 @@ button:hover,
 .plan-quit-method-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #1a1a1a;
   margin-bottom: 30px;
   margin-top: 30px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng wrapper cho các tùy chọn */
@@ -1095,8 +1096,8 @@ button:hover,
 .plan-option-title {
   font-size: 15px;
   font-weight: 400;
-  color: #1A1A1A;
-  font-family: 'Arial', sans-serif;
+  color: #1a1a1a;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng mô tả tùy chọn */
@@ -1106,7 +1107,7 @@ button:hover,
   margin-left: 0;
   margin-top: 5px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng container cho các nút điều hướng */
@@ -1143,7 +1144,7 @@ button:hover,
   color: #333;
   margin-bottom: 8px;
   display: block;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng input tùy chỉnh */
@@ -1155,7 +1156,7 @@ button:hover,
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   padding: 8px 12px;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .plan-custom-input:focus {
@@ -1173,16 +1174,16 @@ button:hover,
   font-size: 16px;
   color: #333;
   margin-right: 8px;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng phần lời khuyên */
 .plan-advice-section {
-  background: #F0FDF4; /* Nền xanh nhạt */
+  background: #f0fdf4; /* Nền xanh nhạt */
   border-radius: 8px;
   padding: 20px;
   margin-top: 30px;
-  border: 1px solid #BBF7D0;
+  border: 1px solid #bbf7d0;
 }
 
 /* Định dạng tiêu đề lời khuyên */
@@ -1192,13 +1193,13 @@ button:hover,
   margin-bottom: 16px;
   display: block;
   font-weight: bold;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng card lời khuyên */
 .plan-advice-card {
   background: #fff;
-  border: 1px solid #BBF7D0;
+  border: 1px solid #bbf7d0;
   border-radius: 6px;
   padding: 10px;
   min-height: 15px; /* Đảm bảo chiều cao đồng đều */
@@ -1210,7 +1211,7 @@ button:hover,
 /* Định dạng tiêu đề card lời khuyên */
 .plan-advice-card-title {
   font-weight: bold;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng văn bản trong card lời khuyên */
@@ -1218,13 +1219,13 @@ button:hover,
   font-size: 14px;
   color: #333;
   margin-top: 8px;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Ghi đè style của Ant Design */
 .ant-input {
   margin: 5px 0;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .ant-checkbox-wrapper {
@@ -1245,7 +1246,7 @@ button:hover,
 .ant-menu-item {
   margin: 0 10px;
   font-size: 16px;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Tùy chỉnh vị trí thông báo */
@@ -1254,7 +1255,7 @@ button:hover,
   bottom: 60px;
   right: 20px;
   z-index: 1000;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Đảm bảo layout của Row và Col gọn hơn */
@@ -1302,7 +1303,7 @@ button:hover,
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #16A34A;
+  border: 2px solid #16a34a;
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
@@ -1312,7 +1313,7 @@ button:hover,
 
 .ant-checkbox-checked .ant-checkbox-inner::after {
   display: block;
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1335,12 +1336,12 @@ button:hover,
 .ant-radio-inner {
   width: 20px;
   height: 20px;
-  border: 2px solid #16A34A;
+  border: 2px solid #16a34a;
 }
 
 .ant-radio-checked .ant-radio-inner {
-  background-color: #16A34A;
-  border-color: #16A34A;
+  background-color: #16a34a;
+  border-color: #16a34a;
 }
 
 .ant-radio-inner::after {

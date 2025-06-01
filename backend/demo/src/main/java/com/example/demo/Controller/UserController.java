@@ -1,4 +1,4 @@
-package com.example.demo.UserController;
+package com.example.demo.Controller;
 
 import com.example.demo.Repo.UserRepo;
 import com.example.demo.entity.Role;
