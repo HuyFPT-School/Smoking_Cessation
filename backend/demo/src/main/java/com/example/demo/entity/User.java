@@ -16,7 +16,7 @@ public class User {
     @Id
     @Column(name = "user_id", length = 45)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int user_id;
+    private int id;
     @Column(name = "user_name", length = 255)
     private String name;
     @Column(name = "email", length = 255, unique = true)

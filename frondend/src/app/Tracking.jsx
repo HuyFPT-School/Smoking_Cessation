@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Radio, Input, Select, Slider, Button, Tabs } from "antd";
 import moment from "moment";
+import axios from "axios"; // Import axios
 import "antd/dist/reset.css";
 import "../App.css";
 const { TabPane } = Tabs;
@@ -10,6 +11,12 @@ const triggerOptions = [
   { label: "Stress", value: "stress" },
   { label: "Social", value: "social" },
   { label: "Habit", value: "habit" },
+  { label: "Breath time", value: "breathtime" },
+  { label: "After meals", value: "aftermeals" },
+  { label: "Drinking Coffee", value: "drinkingcoffee" },
+  { label: "Drinking Alcohol", value: "drinkingalcohol" },
+  { label: "Boredom", value: "boredom" },
+  { label: "Social Interaction", value: "socialinteraction" },
   { label: "Other", value: "other" },
 ];
 
@@ -19,55 +26,117 @@ const triggerLabels = {
   social: "Social",
   habit: "Habit",
   other: "Other",
+  breathtime: "Breath time",
+  aftermeals: "After meals",
+  drinkingcoffee: "Drinking Coffee",
+  drinkingalcohol: "Drinking Alcohol",
+  boredom: "Boredom",
+  socialinteraction: "Social Interaction",
 };
 
 const Tracking = () => {
-  const [selectedDate, setSelectedDate] = useState(moment("2025-04-17"));
-  const [currentMonth, setCurrentMonth] = useState(moment("2025-04-17"));
+  const [selectedDate, setSelectedDate] = useState(moment());
+  const [currentMonth, setCurrentMonth] = useState(moment());
   const [time, setTime] = useState(moment().format("hh:mm A"));
   const [location, setLocation] = useState("E.g., Balcony, Coffee shop");
   const [trigger, setTrigger] = useState("stress");
   const [satisfaction, setSatisfaction] = useState(10);
+  const [cravingIntensity, setCravingIntensity] = useState(5);
   const [notes, setNotes] = useState("");
   const [activityType, setActivityType] = useState("smoking");
   // Thay đổi: Bắt đầu với mảng rỗng thay vì dữ liệu mẫu
   const [incidents, setIncidents] = useState([]);
+  const userStr = localStorage.getItem("user");
+  const userObj = userStr ? JSON.parse(userStr) : null;
+  const userId = userObj ? userObj.id : null;
+  useEffect(() => {
+    const fetchTrackingData = async () => {
+      if (!userId) return;
+      try {
+        // GỌI API backend lấy log theo userId (ví dụ: /api/tracking/user/{userId})
+        const response = await axios.get(
+          `http://localhost:8080/api/tracking/user/${userId}`
+        );
+        if (response.status === 200) {
+          setIncidents(response.data); // data trả về phải là array các incident
+        } else {
+          setIncidents([]); // Không có data thì set rỗng
+        }
+      } catch (error) {
+        setIncidents([]);
+        console.error("Error fetching tracking data:", error);
+      }
+    };
 
-  const handleSubmit = (e) => {
+    fetchTrackingData();
+  }, [userId]);
+
+  const handleSubmit = async (e) => {
+    // Mark function as async
     e.preventDefault();
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      // Optionally, display a message to the user
+      return;
+    }
+
     const newIncident = {
       date: selectedDate.format("YYYY-MM-DD"),
       time,
       location,
       trigger,
-      satisfaction,
-      type: "smoking",
+      satisfaction:
+        activityType === "smoking" ? satisfaction : cravingIntensity, // Lưu giá trị phù hợp theo loại
+      type: activityType,
       notes,
+      userId: userId,
     };
-    setIncidents([...incidents, newIncident]);
-    // Reset form
-    setTime(moment().format("hh:mm A"));
-    setLocation("E.g., Balcony, Coffee shop");
-    setTrigger("stress");
-    setSatisfaction(10);
-    setNotes("");
+
+    try {
+      // Replace 'YOUR_BACKEND_API_ENDPOINT' with your actual API endpoint
+      const response = await axios.post(
+        "http://localhost:8080/api/tracking",
+        newIncident
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        // Check for successful response
+        setIncidents([...incidents, newIncident]);
+        // Reset form
+        setTime(moment().format("hh:mm A"));
+        setLocation("E.g., Balcony, Coffee shop");
+        setTrigger("stress");
+        setSatisfaction(10);
+        setCravingIntensity(5);
+        setNotes("");
+        console.log("Incident recorded successfully:", response.data);
+      } else {
+        console.error(
+          "Failed to record incident:",
+          response.status,
+          response.data
+        );
+        // Optionally, display an error message to the user
+      }
+    } catch (error) {
+      console.error("Error submitting incident:", error);
+      // Optionally, display an error message to the user
+    }
   };
 
   const getChartDataFromIncidents = () => {
-    const today = new Date();
+    // Lấy ngày bắt đầu tuần (Chủ nhật) từ ngày được chọn
+    const weekStart = selectedDate.clone().startOf("week");
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     return weekDays.map((day, index) => {
-      // Get date for each day in the last 7 days
-      const date = new Date(today);
-      date.setDate(today.getDate() - (6 - index)); // Last 7 days including today
-      const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD format
-
+      // Tính ngày cho từng ngày trong tuần
+      const date = weekStart.clone().add(index, "days");
+      const dateStr = date.format("YYYY-MM-DD");
       const count = incidents.filter((incident) => {
-        return incident.date === dateStr && incident.type === "smoking";
+        return incident.date === dateStr && incident.type === activityType;
       }).length;
-
-      return { day, smoking: count };
+      return { day, smoking: count, date: dateStr };
     });
   };
 
@@ -158,32 +227,35 @@ const Tracking = () => {
 
   const renderChart = () => {
     const chartData = getChartDataFromIncidents();
-    // Đặt giá trị tối đa cố định hoặc tính toán một cách hợp lý
-    const maxVal = Math.max(...chartData.map((d) => d.smoking), 10); // Tối thiểu là 10
     const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0);
-
-    console.log("Chart Data:", chartData);
-    console.log("Max Value:", maxVal);
+    // Hiển thị khoảng tuần
+    const weekStart = selectedDate.clone().startOf("week").format("DD/MM");
+    const weekEnd = selectedDate.clone().endOf("week").format("DD/MM/YYYY");
 
     return (
       <div className="chart-container">
         <div className="chart-header">
-          <span className="chart-title">Smoking Incidents</span>
-          <Select defaultValue="last7days" style={{ width: 120 }}>
-            <Select.Option value="last7days">Last 7 Days</Select.Option>
-          </Select>
+          <span className="chart-title">
+            {activityType === "smoking"
+              ? "Smoking Incidents"
+              : "Craving Incidents"}
+          </span>
+          <span style={{ fontSize: "14px", color: "#666", marginLeft: 12 }}>
+            Week: {weekStart} - {weekEnd}
+          </span>
         </div>
         {totalIncidents === 0 ? (
           <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-            <p>No smoking incidents recorded yet.</p>
+            <p>No {activityType} incidents recorded yet.</p>
             <p>Start recording your activities to see the chart data.</p>
           </div>
         ) : (
           <div className="chart-bars">
             {chartData.map((data, index) => {
-              // Tính chiều cao theo pixel thay vì phần trăm
-              const heightPx = data.smoking * 20; // Mỗi incident = 20px
-
+              const heightPx = data.smoking * 20;
+              // Highlight cột nếu là ngày đang chọn
+              const isSelected =
+                selectedDate.format("YYYY-MM-DD") === data.date;
               return (
                 <div key={index} className="bar-group">
                   <div
@@ -191,6 +263,8 @@ const Tracking = () => {
                     style={{
                       height: `${heightPx}px`,
                       minHeight: data.smoking > 0 ? "20px" : "2px",
+                      background: isSelected ? "#1890ff" : undefined,
+                      border: isSelected ? "0px solid #0050b3" : undefined,
                     }}
                   />
                   <span className="bar-label">{data.day}</span>
@@ -206,19 +280,47 @@ const Tracking = () => {
           </div>
         )}
         <div style={{ marginTop: "10px", fontSize: "12px", color: "#666" }}>
-          Total incidents this week: {totalIncidents}
+          Total {activityType} incidents this week: {totalIncidents}
         </div>
       </div>
     );
   };
 
-  const filteredIncidents = incidents.filter(
-    (incident) => incident.type === "smoking"
-  );
+  // Lọc các sự kiện theo tuần của ngày đang chọn
+  const getWeekIncidents = () => {
+    const weekStart = selectedDate.clone().startOf("week");
+    const weekEnd = selectedDate.clone().endOf("week");
+
+    return incidents.filter((incident) => {
+      const incidentDate = moment(incident.date);
+      return (
+        incidentDate.isSameOrAfter(weekStart, "day") &&
+        incidentDate.isSameOrBefore(weekEnd, "day") &&
+        incident.type === activityType
+      );
+    });
+  };
+
+  // Sử dụng các sự kiện đã lọc theo tuần thay vì toàn bộ
+  const filteredIncidents = getWeekIncidents();
 
   const countTriggers = () => {
-    const triggerCount = { stress: 0, social: 0, habit: 0, other: 0 };
-    incidents.forEach((incident) => {
+    const triggerCount = {
+      stress: 0,
+      social: 0,
+      habit: 0,
+      breathtime: 0,
+      other: 0,
+      aftermeals: 0,
+      drinkingcoffee: 0,
+      drinkingalcohol: 0,
+      boredom: 0,
+      socialinteraction: 0,
+    };
+
+    // Chỉ đếm triggers từ các sự kiện trong tuần được chọn
+    const weekIncidents = getWeekIncidents();
+    weekIncidents.forEach((incident) => {
       if (incident.trigger in triggerCount) {
         triggerCount[incident.trigger]++;
       }
@@ -253,50 +355,115 @@ const Tracking = () => {
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
-              <>
-                <div className="form-group">
-                  <label>Time</label>
-                  <Input
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    placeholder="06:36 PM"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Location</label>
-                  <Input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="E.g., Balcony, Coffee shop"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Trigger</label>
-                  <Select
-                    value={trigger}
-                    onChange={(value) => setTrigger(value)}
-                    options={triggerOptions}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Satisfaction Level (1-10)</label>
-                  <Slider
-                    value={satisfaction}
-                    onChange={(value) => setSatisfaction(value)}
-                    min={1}
-                    max={10}
-                  />
-                  <p>
-                    Current: {satisfaction} -{" "}
-                    {satisfaction <= 3
-                      ? "Low satisfaction"
-                      : satisfaction <= 7
-                      ? "Medium satisfaction"
-                      : "High satisfaction"}
-                  </p>
-                </div>
-              </>
+              {activityType === "smoking" ? (
+                <>
+                  <div className="form-group">
+                    <label>Time</label>
+                    <Input
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      placeholder="06:36 PM"
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Location</label>
+                    <Input
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="E.g., Balcony, Coffee shop"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Trigger</label>
+                    <Select
+                      style={{
+                        padding: "0px",
+                        borderRadius: "6px",
+                      }}
+                      value={trigger}
+                      onChange={(value) => setTrigger(value)}
+                      options={triggerOptions}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Satisfaction Level (1-10)</label>
+                    <Slider
+                      style={{
+                        padding: "4px",
+                        border: "0px",
+                      }}
+                      value={satisfaction}
+                      onChange={(value) => setSatisfaction(value)}
+                      min={1}
+                      max={10}
+                    />
+                    <p>
+                      Current: {satisfaction} -{" "}
+                      {satisfaction <= 3
+                        ? "Low satisfaction"
+                        : satisfaction <= 7
+                        ? "Medium satisfaction"
+                        : "High satisfaction"}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>Time</label>
+                    <Input
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      placeholder="06:36 PM"
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Location</label>
+                    <Input
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="E.g., Balcony, Coffee shop"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Trigger</label>
+                    <Select
+                      style={{
+                        padding: "0px",
+                        borderRadius: "6px",
+                      }}
+                      value={trigger}
+                      onChange={(value) => setTrigger(value)}
+                      options={triggerOptions}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Craving Intensity Level (1-10)</label>
+                    <Slider
+                      style={{
+                        padding: "4px",
+                        border: "0px",
+                      }}
+                      value={cravingIntensity}
+                      onChange={(value) => setCravingIntensity(value)}
+                      min={1}
+                      max={10}
+                    />
+                    <p>
+                      Current: {cravingIntensity} -{" "}
+                      {cravingIntensity <= 3
+                        ? "Low intensity"
+                        : cravingIntensity <= 7
+                        ? "Medium intensity"
+                        : "High intensity"}
+                    </p>
+                  </div>
+                </>
+              )}
               <div className="form-group">
                 <label>Notes</label>
                 <Input.TextArea
@@ -311,7 +478,9 @@ const Tracking = () => {
                 htmlType="submit"
                 className="submit-button"
               >
-                RECORD SMOKING INCIDENT
+                {activityType === "smoking"
+                  ? "RECORD SMOKING INCIDENT"
+                  : "RECORD CRAVING INCIDENT"}
               </Button>
             </form>
           </div>
@@ -323,23 +492,48 @@ const Tracking = () => {
         <p>Better understand your smoking habits</p>
         <Tabs defaultActiveKey="chart">
           <TabPane tab="Chart" key="chart">
-            {renderChart()}
-          </TabPane>
-          <TabPane tab="Log" key="log">
-            <div className="log-header">
+            <div className="chart-header" style={{ marginBottom: "10px" }}>
               <Radio.Group
                 value={activityType}
                 onChange={(e) => setActivityType(e.target.value)}
                 className="activity-type"
+                style={{ marginBottom: "10px" }}
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
+            </div>
+            {renderChart()}
+          </TabPane>
+          <TabPane tab="Log" key="log">
+            <div className="log-header">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <Radio.Group
+                  value={activityType}
+                  onChange={(e) => setActivityType(e.target.value)}
+                  className="activity-type"
+                >
+                  <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                  <Radio.Button value="craving">Craving Incidents</Radio.Button>
+                </Radio.Group>
+                <span style={{ fontSize: "14px", color: "#666" }}>
+                  Week: {selectedDate.clone().startOf("week").format("DD/MM")} -{" "}
+                  {selectedDate.clone().endOf("week").format("DD/MM/YYYY")}
+                </span>
+              </div>
             </div>
             {filteredIncidents.length === 0 ? (
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
-                <p>No smoking incidents recorded yet.</p>
+                <p>No {activityType} incidents recorded yet.</p>
                 <p>Start recording your activities to see the log data.</p>
               </div>
             ) : (
@@ -350,7 +544,11 @@ const Tracking = () => {
                     <th>Time</th>
                     <th>Location</th>
                     <th>Trigger</th>
-                    <th>Intensity</th>
+                    <th>
+                      {activityType === "smoking"
+                        ? "Satisfaction"
+                        : "Intensity"}
+                    </th>
                     <th>Notes</th>
                   </tr>
                 </thead>
@@ -370,7 +568,31 @@ const Tracking = () => {
             )}
           </TabPane>
           <TabPane tab="Triggers" key="triggers">
-            <h3>Most Common Triggers</h3>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Radio.Group
+                  value={activityType}
+                  onChange={(e) => setActivityType(e.target.value)}
+                  className="activity-type"
+                  style={{ marginRight: "15px" }}
+                >
+                  <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                  <Radio.Button value="craving">Craving Incidents</Radio.Button>
+                </Radio.Group>
+                <h3 style={{ margin: 0 }}>Most Common Triggers</h3>
+              </div>
+              <span style={{ fontSize: "14px", color: "#666" }}>
+                Week: {selectedDate.clone().startOf("week").format("DD/MM")} -{" "}
+                {selectedDate.clone().endOf("week").format("DD/MM/YYYY")}
+              </span>
+            </div>
             {incidents.length === 0 ? (
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
@@ -405,7 +627,10 @@ const Tracking = () => {
                     </div>
                   ))}
                 </div>
-                <p>Chart shows the most common triggers leading to smoking</p>
+                <p>
+                  Chart shows the most common triggers leading to{" "}
+                  {activityType === "smoking" ? "smoking" : "craving"}
+                </p>
               </>
             )}
           </TabPane>
@@ -419,13 +644,13 @@ const Tracking = () => {
           <div className="tip-card">
             <h4>The 4D Rule</h4>
             <p>
-              Delay: Wait 5-10 minutes, the craving will pass
+              <span>Delay:</span> Wait 5-10 minutes, the craving will pass
               <br />
-              Deep breathing: Breathe deeply and slowly
+              <span>Deep breathing:</span> Breathe deeply and slowly
               <br />
-              Drink water: Drink a glass of water slowly
+              <span>Drink water:</span> Drink a glass of water slowly
               <br />
-              Do something else: Distract yourself
+              <span>Do something else:</span> Distract yourself
             </p>
           </div>
           <div className="tip-card">

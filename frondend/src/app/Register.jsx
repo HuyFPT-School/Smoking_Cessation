@@ -17,7 +17,12 @@ import { Link as RouterLink } from "react-router";
 import { Link as MuiLink } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import { auth } from "../firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  linkWithPopup,
+} from "firebase/auth";
 import axios from "axios";
 
 const Register = () => {
@@ -84,6 +89,32 @@ const Register = () => {
       // 🔐 Lấy token mới sau khi update profile (đảm bảo name đúng)
       const idToken = await result.user.getIdToken(true);
 
+      // 👇 **AUTO LIÊN KẾT GOOGLE NGAY SAU ĐĂNG KÝ**
+      const provider = new GoogleAuthProvider();
+      try {
+        await linkWithPopup(result.user, provider);
+        showSnackbar(
+          "🎉 Đã liên kết Google thành công! Bạn có thể đăng nhập bằng Google hoặc Email/Password.",
+          "success"
+        );
+      } catch (err) {
+        if (err.code === "auth/popup-closed-by-user") {
+          showSnackbar(
+            "Bạn đã bỏ qua liên kết Google. Bạn có thể liên kết lại trong cài đặt tài khoản.",
+            "info"
+          );
+        } else if (err.code === "auth/credential-already-in-use") {
+          showSnackbar(
+            "Tài khoản Google này đã liên kết với user khác. Hãy đăng nhập Google rồi liên kết lại.",
+            "error"
+          );
+        } else {
+          showSnackbar("Không thể liên kết Google tự động.", "error");
+        }
+      }
+      // 👉 **END AUTO-LINK GOOGLE**
+
+      // Luôn fetch user từ backend dù có liên kết hay không
       await fetchUserFromBackend(idToken);
     } catch (err) {
       console.error(err);
