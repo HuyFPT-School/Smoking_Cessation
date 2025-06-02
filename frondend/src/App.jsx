@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom"; // Sửa "react-router" thành "react-router-dom"
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -11,6 +11,8 @@ import DashboardPage from "./app/DashboardPage";
 import { Layout } from "antd";
 import HomePage from "./app/HomePage";
 import Plan from "./app/Plan";
+import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
+
 function App() {
   const { Content } = Layout;
   return (
@@ -25,6 +27,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/plan" element={<Plan />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/blog" element={<CommunityBlogPage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
 
