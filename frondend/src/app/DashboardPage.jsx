@@ -5,7 +5,11 @@ import { Divider } from "antd"; // Thành phần phân cách của Ant Design
 import { Segmented } from "antd"; // Thành phần Segmented để tạo nút chuyển đổi tab
 import HealthMilestones from "./HealthMilestones";
 import { Link } from "react-router-dom";
-// Nhập component HealthMilestones để hiển thị cột mốc sức khỏe
+import { DatePicker } from 'antd';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+
 
 // Nhập các biểu tượng từ Ant Design Icons
 import {
@@ -14,6 +18,9 @@ import {
   FireOutlined,
   FlagOutlined,
 } from "@ant-design/icons";
+// Quit date:
+dayjs.extend(customParseFormat);
+const dateFormat = 'YYYY-MM-DD';
 
 // Định nghĩa component DashboardPage
 const DashboardPage = () => {
@@ -41,16 +48,26 @@ const DashboardPage = () => {
   return (
     // Container chính của trang Dashboard, chứa toàn bộ nội dung
     <div className="Dashboard-Backgroup">
-      {/* Phần chào mừng người dùng */}
-      <h2 style={{ color: "#262626", marginBottom: "5px" }}>
-        Welcome back, John
-        {/* Tiêu đề chào mừng người dùng, hiển thị tên "John" */}
-      </h2>
-      <p style={{ color: "#595959", marginBottom: "24px" }}>
-        You’ve been smoke-free for 28 days. Keep going!
-        {/* Thông báo động viên, hiển thị số ngày không hút thuốc (28 ngày) */}
-      </p>
-
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+        <div>
+          {/* Phần chào mừng người dùng */}
+          <h2 style={{ color: "#262626", marginBottom: "5px", fontWeight: "700" }}>
+            Welcome back, John
+          </h2>
+          <p style={{ color: "#595959", marginBottom: "24px" }}>
+            You’ve been smoke-free for 28 days. Keep going!
+          </p>
+        </div>
+        
+        <div>
+           <span>Quit date: </span>
+           <DatePicker
+                 defaultValue={dayjs('2019-09-03', dateFormat)}
+                 minDate={dayjs('2019-08-01', dateFormat)}
+                 maxDate={dayjs('2020-10-31', dateFormat)}
+           />
+        </div>
+      </div>
       {/* Hàng các khung thông tin đầu tiên */}
       <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 24]} className="dashboard-row-spacing">
         {/* Sử dụng Row của Ant Design để tạo bố cục lưới, khoảng cách responsive */}
@@ -115,7 +132,7 @@ const DashboardPage = () => {
       <Card
         title="🚬SMOKING STATUS"
         className="smoking-status-card"
-        // Card của Ant Design để hiển thị trạng thái hút thuốc
+      // Card của Ant Design để hiển thị trạng thái hút thuốc
       >
         <div className="card-content">
           {/* Nội dung bên trong card */}
@@ -288,7 +305,7 @@ const DashboardPage = () => {
         )}
       </Col>
       {/* Kết thúc phần thống kê cuối */}
-    </div>
+    </div >
   );
 };
 
