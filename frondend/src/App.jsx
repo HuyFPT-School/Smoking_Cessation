@@ -30,6 +30,7 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/blog" element={<CommunityBlogPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
 
