@@ -343,7 +343,7 @@ const LeaderboardPage = () => {
         options={['This Week', 'This Month', 'All Time']}
         value={timeRange}
         onChange={setTimeRange}
-        style={{ marginBottom: 24 }}
+        style={{ marginTop: '24px', marginBottom:'14px' }} // thêm chút style, nếu merge đừng xóa cái này 
         block
       />
       
