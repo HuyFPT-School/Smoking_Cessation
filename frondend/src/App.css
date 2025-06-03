@@ -4,8 +4,8 @@
   max-width: 1400px; /* Độ rộng tối đa 1400px */
   margin: 20px auto; /* Căn giữa với lề trên/dưới 20px */
   padding: 32px; /* Đệm bên trong 32px */
-  background-color: #f0f2f5; /* Màu nền xám nhạt */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
+  
   margin-top: 0px;
   padding-bottom: 32px;
   box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
@@ -324,6 +324,331 @@
 
 /* ========================================================================================================================================== */
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==============================================================LEADERBOARD=================================================================== */
+/* Container chính của trang Leaderboard */
+.Leaderboard-Backgroup {
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 32px; 
+  margin-bottom: 0px; 
+  margin-top: 0px;
+  padding-bottom: 32px;
+  box-sizing: border-box; 
+}
+
+/* Tiêu đề và mô tả của trang */
+.Leaderboard-Backgroup h2 {
+  color: #262626;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.Leaderboard-Backgroup p {
+  color: #595959;
+  margin: 0;
+}
+
+/* Khoảng cách giữa các nút Filter và Friends */
+.Leaderboard-Backgroup .ant-btn {
+  margin-left: 8px;
+}
+
+/* Thẻ thông tin người dùng hiện tại */
+.user-highlight-card {
+  background-color: #F0FDF4; 
+  border-radius: 8px; 
+  margin-bottom: 24px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Container cho avatar và badge rank */
+.user-avatar-container {
+  position: relative;
+  display: inline-block;
+  margin-right: 16px;
+}
+
+/* Avatar hình tròn với viền xám */
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  border: 2px solid #d9d9d9;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Badge rank hiển thị số thứ hạng */
+.user-rank {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background-color: #52c41a; 
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Thông tin người dùng: tên, tier, ngày */
+.user-info {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Tên người dùng với chữ đậm */
+.user-name {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* Tier của người dùng với màu xanh dương */
+.user-tier {
+  background-color: #fff;
+  color: #000;
+  width: 70px;
+  border: 2px solid #f4f0f0;
+  border-radius: 100cap; 
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 8px 4px 8px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Số ngày không hút thuốc với màu xám */
+.user-days {
+  color: #595959;
+  margin: 0;
+}
+
+/* Nhãn cho điểm số và thứ hạng */
+.user-points-title,
+.user-rank-title {
+  color: #595959;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+/* Giá trị điểm số và thứ hạng với chữ đậm */
+.user-points-value,
+.user-rank-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+}
+
+/* Nút View Profile với màu xanh lá */
+.view-profile-button {
+  background-color: #52c41a;
+  border-color: #52c41a;
+  width: 100%;
+}
+
+.view-profile-button:hover {
+  opacity: 0.8;
+}
+
+/* Badge rank cho top 3 */
+.Rank-avatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: #000;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Container cho bảng xếp hạng */
+.leaderboard-section {
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tiêu đề của bảng xếp hạng */
+.leaderboard-header {
+  font-weight: bold;
+  color: #595959;
+  margin-bottom: 16px;
+}
+
+/* Mỗi hàng trong bảng xếp hạng */
+.leaderboard-card {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  height: 80px;
+}
+
+.leaderboard-card:hover {
+  background-color: #f5f5f5;
+  transition: background-color 0.3s ease;
+}
+
+/* Cột Rank */
+.Rank-list {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-size: 14px !important;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: -15px;
+}
+
+/* Nút chuyển tab cho trang leaderboard */
+.custom-segmented .ant-segmented {
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.custom-segmented .ant-segmented-item {
+  flex: 1;
+  justify-content: center;
+  color: #000;
+}
+
+.custom-segmented .ant-segmented-item-selected {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+/* thẻ Points  */
+.points-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  background-color: #ffffff;
+  width: 100%;
+  margin-top: 40px;
+}
+
+/* Title styling */
+.card-title {
+  color: #262626;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+/* Subtitle styling */
+.card-subtitle {
+  color: #595959;
+  font-size: 14px;
+  margin-bottom: 0;
+  display: block;
+}
+
+/* Column container */
+.points-column {
+  text-align: left;
+  padding: 8px;
+}
+
+/* Icon styling */
+.column-icon {
+  color: #52c41a;
+  font-size: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Column title styling */
+.column-title {
+  color: #262626;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+/* Points list styling */
+.points-list {
+  margin-top: 4px;
+}
+
+/* Individual points item styling */
+.points-item {
+  color: #595959;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+/* Ensure responsiveness */
+@media (max-width: 576px) {
+  .points-card {
+    padding: 12px;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+  }
+
+  .column-title {
+    font-size: 14px;
+  }
+
+  .points-item {
+    font-size: 12px;
+  }
+
+  .column-icon {
+    font-size: 16px;
+  }
+}
+
+
+/* ============================================================================================================================================= */
 .tracking-container {
   max-width: 600px;
   margin: 20px auto;
@@ -428,8 +753,8 @@
 }
 
 .tracking-page {
-  padding: 20px;
-  max-width: 1000px;
+  padding: 20px;  
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -767,4 +1092,9 @@
   width: 120px;
   font-size: 14px;
   color: #333;
+}
+button:hover,
+.ant-btn:hover {
+  filter: brightness(0.9); /* Làm nút tối hơn khi hover */
+  transition: all 0.3s ease;
 }
