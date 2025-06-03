@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom"; // Sửa "react-router" thành "react-router-dom"
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -9,6 +9,9 @@ import Home from "./app/Home";
 import Tracking from "./app/Tracking";
 import DashboardPage from "./app/DashboardPage";
 import { Layout } from "antd";
+import HomePage from "./app/HomePage";
+import Plan from "./app/Plan";
+import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
 
 function App() {
   const { Content } = Layout;
@@ -16,16 +19,18 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Header />
-        <Content className="dashboard-content-wrapper">
-          <Routes>
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/" element={<Home />} />
-          </Routes>
-        </Content>
+
+        <Routes>
+          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/plan" element={<Plan />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/blog" element={<CommunityBlogPage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+
         <Footer />
       </AuthProvider>
     </BrowserRouter>

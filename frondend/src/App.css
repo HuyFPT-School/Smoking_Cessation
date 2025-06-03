@@ -5,7 +5,6 @@
   margin: 20px auto; /* Căn giữa với lề trên/dưới 20px */
   padding: 32px; /* Đệm bên trong 32px */
   margin-bottom: 0px; /* Loại bỏ lề dưới */
-  
   margin-top: 0px;
   padding-bottom: 32px;
   box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
@@ -765,6 +764,7 @@
 .tracking-section h2,
 .data-analysis-section h2,
 .tips-section h2 {
+  font-weight: bold;
   font-size: 24px;
   margin-bottom: 10px;
   color: #333;
@@ -780,6 +780,7 @@
 
 .tracking-content {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
@@ -877,63 +878,56 @@
 .log-table .intensity-8,
 .log-table .intensity-9,
 .log-table .intensity-10 {
-  color: #dc3545; /* Red for high intensity */
+  color: #dc3545;
 }
 
 .log-table .intensity-1,
 .log-table .intensity-2,
 .log-table .intensity-3,
 .log-table .intensity-4 {
-  color: #28a745; /* Green for low intensity */
+  color: #28a745;
 }
 
 .log-table .intensity-5,
 .log-table .intensity-6 {
-  color: #ffc107; /* Yellow for medium intensity */
+  color: #ffc107;
+}
+
+/* Updated Chart Styles to Match Calendar Design */
+.chart-wrapper {
+  background: #fff;
+  border: 4px solid #1e90ff; /* Blue frame */
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 300px; /* Compact width like the calendar */
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  padding: 0 10px;
 }
 
-.chart-legend {
-  display: flex;
-  gap: 15px;
+.chart-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1e90ff; /* Blue color for title */
+  font-family: "Arial", sans-serif;
 }
 
-.legend {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-}
-
-.legend.smoking::before {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  background-color: #ff6b6b;
-  margin-right: 5px;
-}
-
-.legend.craving::before {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  background-color: #4dabf7;
-  margin-right: 5px;
-}
-
-.chart-container {
+.chart-grid {
   display: flex;
   gap: 10px;
   align-items: flex-end;
   height: 150px;
   position: relative;
+  padding: 0 10px;
 }
 
 .chart-bar-group {
@@ -947,19 +941,17 @@
 .chart-bar {
   width: 15px;
   border-radius: 4px;
+  background: #f0f0f0; /* Light gray background for bars */
 }
 
 .chart-bar.smoking {
-  background-color: #ff6b6b;
-}
-
-.chart-bar.craving {
-  background-color: #4dabf7;
+  background-color: #1e90ff; /* Blue for smoking incidents */
 }
 
 .chart-label {
   font-size: 12px;
   color: #666;
+  font-family: "Arial", sans-serif;
 }
 
 .tips-section {
@@ -983,11 +975,13 @@
 .tip-card h4 {
   font-size: 16px;
   margin-bottom: 8px;
+  font-weight: bold;
 }
 
 .tip-card p {
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
+  line-height: 25px;
 }
 
 /* Định dạng cho lịch tùy chỉnh */
@@ -1056,7 +1050,7 @@
   color: white;
   font-weight: bold;
 }
-/* Thêm vào cuối file App.css */
+
 .trigger-chart {
   display: flex;
   flex-direction: column;
@@ -1093,8 +1087,593 @@
   font-size: 14px;
   color: #333;
 }
+
 button:hover,
 .ant-btn:hover {
   filter: brightness(0.9); /* Làm nút tối hơn khi hover */
   transition: all 0.3s ease;
 }
+
+
+@media (max-width: 900px) {
+  .tracking-content {
+    flex-direction: column;
+  }
+
+  .tips-content {
+    flex-direction: column;
+  }
+}
+.chart-container {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 100%;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #16a34a;
+}
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  min-height: 200px; /* Thay đổi từ height thành min-height */
+  max-height: 300px; /* Thêm max-height để giới hạn */
+  gap: 16px;
+  padding-bottom: 10px; /* Thêm padding để tạo khoảng cách */
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end; /* Căn cột xuống dưới */
+}
+
+.bar {
+  width: 20px;
+  background-color: #28a745;
+  border-radius: 5px 5px 0 0;
+  transition: height 0.3s ease;
+  margin-bottom: 5px; /* Tạo khoảng cách với label */
+}
+
+.bar-label {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+.bar-value {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+/* --------------------------------------------------- */
+/* CSS PLAN */
+/* styles.css */
+
+/* Định dạng chính cho container chính */
+.plan-tracking-container {
+  padding: 20px;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding-top: 100px; /* Khoảng cách trên để tránh bị che bởi header */
+  position: relative;
+  font-family: "Arial", sans-serif; /* Font chữ mặc định */
+}
+
+/* Định dạng tiêu đề chính */
+.plan-plan-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng phụ đề */
+.plan-plan-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng thanh tiến trình */
+.plan-progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 40px;
+  padding: 0 10px;
+  width: 80%; /* Chiếm 80% chiều rộng */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tạo đường nối giữa các bước */
+.plan-progress-bar::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  right: 15px;
+  height: 2px;
+  background: #16a34a; /* Màu xanh lá cây cho đường tiến trình */
+  z-index: 0;
+}
+
+/* Định dạng các bước trong thanh tiến trình */
+.plan-step {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  border: 2px solid #16a34a; /* Viền màu xanh lá cây */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #666;
+  z-index: 1;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Định dạng bước đã hoàn thành */
+.plan-step.completed {
+  background: #bbf7d0; /* Màu nền xanh nhạt khi hoàn thành */
+  border-color: #bbf7d0;
+  color: #389e0d;
+}
+
+/* Định dạng bước đang active */
+.plan-step.active {
+  background: #16a34a; /* Màu xanh lá cây khi active */
+  border-color: #16a34a;
+  color: #fff;
+}
+
+/* Định dạng nhãn của các bước */
+.plan-step-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  font-family: "Arial", sans-serif;
+}
+
+.plan-step-labels span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Định dạng container cho từng bước */
+.plan-step-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
+  margin-bottom: 20px;
+  position: relative;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng tiêu đề của bước */
+.plan-step-title {
+  font-size: 22px; /* Font lớn hơn để nhấn mạnh */
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng mô tả của bước */
+.plan-step-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng khung lịch */
+.plan-calendar-wrapper {
+  background: rgba(255, 255, 255, 0.8); /* Nền mờ */
+  border-radius: 8px;
+  padding-right: 800px; /* Padding lớn để căn chỉnh */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d9d9d9;
+  max-width: 400px;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+}
+
+/* Định dạng header của lịch */
+.plan-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Định dạng nút điều hướng lịch */
+.plan-calendar-nav-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 30px;
+}
+
+/* Định dạng tháng và năm trên lịch */
+.plan-calendar-month-year {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng lưới lịch */
+.plan-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-left: 30px;
+}
+
+/* Định dạng các ngày trong tuần trên lịch */
+.plan-calendar-weekday {
+  text-align: center;
+  padding: 5px;
+  font-weight: bold;
+  color: #888;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng các ô ngày trong lịch */
+.plan-calendar-day {
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.plan-calendar-day.plan-current-month {
+  background: #f0f0f0; /* Nền xám nhạt cho ngày trong tháng hiện tại */
+}
+
+.plan-calendar-day.plan-selected-day {
+  background: #16a34a; /* Màu xanh lá cây khi ngày được chọn */
+  color: #fff;
+  border-radius: 3%;
+}
+
+.plan-calendar-day.plan-other-month {
+  visibility: hidden; /* Ẩn các ngày không thuộc tháng hiện tại */
+}
+
+/* Định dạng văn bản ngày được chọn */
+.plan-selected-date-text {
+  font-size: 14px;
+  color: #666;
+  margin-top: 16px;
+  margin-left: 30px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng nhóm form */
+.plan-form-group {
+  margin-bottom: 20px;
+}
+
+/* Định dạng tiêu đề phương pháp cai thuốc */
+.plan-quit-method-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  margin-top: 30px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng wrapper cho các tùy chọn */
+.plan-option-wrapper {
+  border: none;
+  background: transparent;
+  padding: 2px 0;
+  margin: 0;
+  display: block;
+}
+
+.plan-option-wrapper label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Định dạng tiêu đề tùy chọn */
+.plan-option-title {
+  font-size: 15px;
+  font-weight: 400;
+  color: #1a1a1a;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng mô tả tùy chọn */
+.plan-option-description {
+  font-size: 13px;
+  color: #666;
+  margin-left: 0;
+  margin-top: 5px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng container cho các nút điều hướng */
+.plan-nav-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Định dạng nút điều hướng */
+.plan-nav-button {
+  padding: 5px 15px;
+  transition: all 0.3s ease;
+  background-color: #000; /* Màu đen cho nút */
+  color: #fff;
+  border: none;
+}
+
+.plan-nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.plan-nav-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Định dạng nhãn form */
+.plan-form-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng input tùy chỉnh */
+.plan-custom-input {
+  width: 100% !important;
+  max-width: 400px;
+  height: 40px;
+  font-size: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: "Arial", sans-serif;
+}
+
+.plan-custom-input:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Định dạng phần tóm tắt */
+.plan-summary-section {
+  margin-bottom: 16px;
+}
+
+/* Định dạng nhãn tóm tắt */
+.plan-summary-label {
+  font-size: 16px;
+  color: #333;
+  margin-right: 8px;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng phần lời khuyên */
+.plan-advice-section {
+  background: #f0fdf4; /* Nền xanh nhạt */
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+  border: 1px solid #bbf7d0;
+}
+
+/* Định dạng tiêu đề lời khuyên */
+.plan-advice-title {
+  font-size: 18px;
+  color: #1a3c34;
+  margin-bottom: 16px;
+  display: block;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng card lời khuyên */
+.plan-advice-card {
+  background: #fff;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 15px; /* Đảm bảo chiều cao đồng đều */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Định dạng tiêu đề card lời khuyên */
+.plan-advice-card-title {
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+}
+
+/* Định dạng văn bản trong card lời khuyên */
+.plan-advice-card-text {
+  font-size: 14px;
+  color: #333;
+  margin-top: 8px;
+  font-family: "Arial", sans-serif;
+}
+
+/* Ghi đè style của Ant Design */
+.ant-input {
+  margin: 5px 0;
+  font-family: "Arial", sans-serif;
+}
+
+.ant-checkbox-wrapper {
+  margin: 5px 0;
+}
+
+.ant-layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ant-menu-horizontal {
+  line-height: 64px;
+  border-bottom: none;
+}
+
+.ant-menu-item {
+  margin: 0 10px;
+  font-size: 16px;
+  font-family: "Arial", sans-serif;
+}
+
+/* Tùy chỉnh vị trí thông báo */
+.ant-notification-notice {
+  position: absolute !important;
+  bottom: 60px;
+  right: 20px;
+  z-index: 1000;
+  font-family: "Arial", sans-serif;
+}
+
+/* Đảm bảo layout của Row và Col gọn hơn */
+.ant-row {
+  margin-bottom: 0 !important;
+}
+
+/* Định dạng lưới tóm tắt */
+.plan-summary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+/* Định dạng mục tóm tắt */
+.plan-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Định dạng container biểu đồ */
+.chart-container {
+  margin-top: 20px;
+  width: 100%;
+  height: 300px;
+}
+
+/* Định dạng khu vực biểu đồ */
+.plan-chart-section {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.plan-chart-section canvas {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Tùy chỉnh checkbox để trông giống radio button */
+.ant-checkbox-inner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #16a34a;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #d9d9d9;
+  border-color: #010703;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner::after {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 10px;
+  border: solid rgb(25, 10, 10);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Đảm bảo wrapper của checkbox được căn chỉnh đúng */
+.ant-checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 5px 0;
+}
+
+/* Định dạng radio button để đồng bộ */
+.ant-radio-inner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #16a34a;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  background-color: #16a34a;
+  border-color: #16a34a;
+}
+
+.ant-radio-inner::after {
+  background-color: #fff;
+  width: 12px;
+  height: 12px;
+  top: 2px;
+  left: 2px;
+}
+

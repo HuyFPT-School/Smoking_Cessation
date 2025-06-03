@@ -64,7 +64,6 @@ const HealthMilestones = () => {
     <div
       className="health-milestones"
       style={{
-        minHeight: "calc(100vh - 200px)", // Đảm bảo chiều cao tối thiểu trừ 200px
         paddingBottom: "60px", // Thêm đệm dưới để nội dung không sát đáy
       }}
     >
