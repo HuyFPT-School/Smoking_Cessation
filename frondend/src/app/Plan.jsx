@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Thêm useEffect
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
+import axios from "axios"; // Thêm axios
 
 import {
   Row,
@@ -27,6 +28,19 @@ import {
 } from "chart.js"; // Import các thành phần cần thiết để cấu hình Chart.js
 import "../index.css";
 import { Select } from "antd";
+import {
+  DeleteOutlined,
+  PushpinOutlined,
+  GiftOutlined,
+  CalendarOutlined, // Added
+  AimOutlined, // Added
+  AuditOutlined, // Added for cigarettes
+  WarningOutlined, // Added for triggers/info
+  SolutionOutlined, // Added for coping strategies/approved
+  TeamOutlined, // Added for support network
+  ReadOutlined, // Added for notes
+  CheckCircleOutlined, // Added for step title
+} from "@ant-design/icons";
 const { Option } = Select;
 
 const { Text } = Typography;
@@ -46,9 +60,8 @@ ChartJS.register(
 // Component chính để tạo kế hoạch cai thuốc lá
 const Body = () => {
   // State để theo dõi bước hiện tại trong quy trình tạo kế hoạch
-  const [currentStep, setCurrentStep] = useState(1);
-  // State để lưu ngày cai thuốc được chọn, mặc định là 5/6/2025
-  const [selectedDate, setSelectedDate] = useState(new Date("2025-06-05"));
+  const [currentStep, setCurrentStep] = useState(1); // State để lưu ngày cai thuốc được chọn, mặc định là ngày hiện tại
+  const [selectedDate, setSelectedDate] = useState(new Date());
   // State để lưu phương pháp cai thuốc (Cold Turkey, Gradual reduction, v.v.)
   const [quitMethod, setQuitMethod] = useState("");
   // State để lưu số lượng điếu thuốc hút mỗi ngày
@@ -73,20 +86,66 @@ const Body = () => {
   const [showCompleteNotification, setShowCompleteNotification] =
     useState(false);
 
-  // Ngày hiện tại được đặt cố định là 1/5/2025 để tạo lịch
-  const currentDate = new Date(2025, 4, 1);
+  // Function to handle deleting a reward
+  const handleDeleteReward = (indexToDelete) => {
+    setRewards((prevRewards) =>
+      prevRewards.filter((_, index) => index !== indexToDelete)
+    );
+  };
+
+  // Sử dụng tháng hiện tại để tạo lịch
+  const currentDate = new Date();
+  currentDate.setDate(1); // Đặt về ngày đầu tiên của tháng hiện tại
   const days = [];
+
+  // Lấy userId từ localStorage
+  const userStr = localStorage.getItem("user");
+  const userObj = userStr ? JSON.parse(userStr) : null;
+  const userId = userObj ? userObj.id : null;
+
+  // useEffect để lấy dữ liệu kế hoạch khi component được mount hoặc userId thay đổi
+  useEffect(() => {
+    const fetchPlanData = async () => {
+      if (!userId) return;
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/plans/user/${userId}` // Điều chỉnh API endpoint
+        );
+        if (response.status === 200 && response.data) {
+          const plan = response.data;
+          setSelectedDate(new Date(plan.quitDate));
+          setQuitMethod(plan.quitMethod);
+          setCigarettesPerDay(plan.cigarettesPerDay);
+          setTriggers(plan.triggers || []);
+          setCopingStrategies(plan.copingStrategies || []);
+          setSupportNetwork(plan.supportNetwork || []);
+          setAdditionalNotes(plan.additionalNotes || "");
+          setRewards(plan.rewards || []);
+          // If a plan is loaded, navigate to the review step (assumed to be step 5)
+          // so the user can see their existing plan and the timeline.
+          // Please adjust '5' if your review/complete step number is different.
+          setCurrentStep(5);
+        }
+      } catch (error) {
+        console.error("Error fetching plan data:", error);
+        // Xử lý trường hợp không có kế hoạch hoặc lỗi
+      }
+    };
+
+    fetchPlanData();
+  }, [userId]);
 
   // Tạo lịch cho tháng 5 năm 2025
   for (let i = 0; i < 35; i++) {
     const date = new Date(currentDate);
-    date.setDate(currentDate.getDate() + i - currentDate.getDay());
-    // Thêm các ô ngày vào mảng days, với class tương ứng
+    date.setDate(currentDate.getDate() + i - currentDate.getDay()); // Thêm các ô ngày vào mảng days, với class tương ứng
     days.push(
       <div
         key={i}
         className={`plan-calendar-day ${
-          date.getMonth() === 4 ? "plan-current-month" : "plan-other-month"
+          date.getMonth() === currentDate.getMonth()
+            ? "plan-current-month"
+            : "plan-other-month"
         } ${
           date.toDateString() === selectedDate.toDateString()
             ? "plan-selected-day"
@@ -100,7 +159,6 @@ const Body = () => {
   }
 
   // Danh sách các ngày trong tuần để hiển thị trên lịch
-  const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   // Danh sách các yếu tố kích hoạt hút thuốc
   const smokingTriggers = [
@@ -219,27 +277,198 @@ const Body = () => {
   };
 
   // Hàm xử lý khi nhấn nút hoàn thành kế hoạch
-  const handleComplete = () => {
-    setShowCompleteNotification(true); // Hiển thị thông báo hoàn thành
-    setTimeout(() => setShowCompleteNotification(false), 3000); // Ẩn sau 3 giây
+  const handleComplete = async () => {
+    // Thêm async
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      // Optionally, display a message to the user
+      return;
+    }
+
+    const planData = {
+      userId,
+      quitDate: selectedDate.toISOString().split("T")[0], // Format YYYY-MM-DD
+      quitMethod,
+      cigarettesPerDay,
+      triggers,
+      copingStrategies,
+      supportNetwork,
+      additionalNotes,
+      rewards,
+    };
+
+    try {
+      // Kiểm tra xem đã có kế hoạch cho userId này chưa
+      let existingPlan = null;
+      try {
+        const checkResponse = await axios.get(
+          `http://localhost:8080/api/plans/user/${userId}`
+        );
+        if (checkResponse.status === 200 && checkResponse.data) {
+          existingPlan = checkResponse.data;
+        }
+      } catch (error) {
+        // Không tìm thấy kế hoạch, không sao cả, sẽ tạo mới
+        if (error.response && error.response.status !== 404) {
+          console.error("Error checking for existing plan:", error);
+          // Xử lý lỗi khác 404 nếu cần
+        }
+      }
+
+      let response;
+      if (existingPlan && existingPlan.id) {
+        // Nếu có kế hoạch, cập nhật (PUT)
+        response = await axios.put(
+          `http://localhost:8080/api/plans/${existingPlan.id}`, // Giả sử API cập nhật theo planId
+          planData
+        );
+      } else {
+        // Nếu không có, tạo mới (POST)
+        response = await axios.post(
+          "http://localhost:8080/api/plans",
+          planData
+        );
+      }
+
+      if (response.status === 200 || response.status === 201) {
+        setShowCompleteNotification(true); // Hiển thị thông báo hoàn thành
+        setTimeout(() => setShowCompleteNotification(false), 3000); // Ẩn sau 3 giây
+        console.log("Plan saved successfully:", response.data);
+      } else {
+        console.error("Failed to save plan:", response.status, response.data);
+        // Optionally, display an error message to the user
+      }
+    } catch (error) {
+      console.error("Error saving plan:", error);
+      // Optionally, display an error message to the user
+    }
   };
+  // Tính dữ liệu cho biểu đồ dựa trên phương pháp cai thuốc
+  const calculateChartData = () => {
+    const today = new Date();
+    const quitDate = selectedDate;
 
-  // Tính số ngày từ hiện tại đến ngày cai thuốc (không được sử dụng trong code hiện tại)
+    // Tính toán các mốc thời gian
+    const threeDaysAfter = new Date(quitDate);
+    threeDaysAfter.setDate(quitDate.getDate() + 3);
 
-  const quitDate = selectedDate;
+    const oneWeekAfter = new Date(quitDate);
+    oneWeekAfter.setDate(quitDate.getDate() + 7);
+
+    // Format dates for display
+    const formatDate = (date) =>
+      date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+    const labels = [
+      `Today (${formatDate(today)})`,
+      `Quit Date (${formatDate(quitDate)})`,
+      `3 days (${formatDate(threeDaysAfter)})`,
+      `1 week (${formatDate(oneWeekAfter)})`,
+    ];
+
+    // Tính toán số ngày từ hôm nay đến ngày cai thuốc
+    const daysUntilQuit = Math.ceil((quitDate - today) / (1000 * 60 * 60 * 24));
+
+    let data = []; // Xác định dữ liệu dựa trên phương pháp cai thuốc và thời gian
+
+    switch (quitMethod) {
+      case "Cold Turkey": {
+        if (daysUntilQuit <= 0) {
+          // Nếu quit date là hôm nay hoặc trong quá khứ
+          data = [cigarettesPerDay, 0, 0, 0];
+        } else {
+          // Nếu quit date trong tương lai, vẫn duy trì số điếu hiện tại đến ngày cai thuốc, sau đó giảm đột ngột
+          data = [cigarettesPerDay, 0, 0, 0];
+        }
+        break;
+      }
+      case "Gradual reduction": {
+        const midPoint = Math.ceil(cigarettesPerDay / 2);
+
+        if (daysUntilQuit <= 0) {
+          // Nếu đã đến ngày cai thuốc
+          data = [cigarettesPerDay, midPoint, Math.floor(midPoint / 2), 0];
+        } else {
+          // Nếu chưa đến, giảm dần đều từ hôm nay đến ngày cai thuốc
+          const dailyReduction = Math.max(
+            1,
+            (cigarettesPerDay - midPoint) / Math.max(daysUntilQuit, 1)
+          );
+          const quitDayValue = Math.max(
+            Math.round(cigarettesPerDay - dailyReduction * daysUntilQuit),
+            midPoint
+          );
+
+          data = [
+            cigarettesPerDay,
+            quitDayValue,
+            Math.floor(quitDayValue / 2),
+            0,
+          ];
+        }
+        break;
+      }
+      case "Nicotine Replacement Therapy (NRT)": {
+        // Với NRT, số điếu giảm nhanh vào ngày cai thuốc nhưng không triệt để
+        const quitDayValue = Math.round(cigarettesPerDay * 0.2);
+        const threeDaysValue = Math.round(cigarettesPerDay * 0.1);
+
+        if (daysUntilQuit <= 0) {
+          // Nếu đã đến hoặc qua ngày cai thuốc
+          data = [cigarettesPerDay, quitDayValue, threeDaysValue, 0];
+        } else if (daysUntilQuit <= 3) {
+          // Nếu còn 1-3 ngày trước ngày cai thuốc, đã bắt đầu sử dụng NRT với liều lượng thấp
+          const preQuitReduction = cigarettesPerDay * 0.9;
+          data = [
+            Math.round(preQuitReduction),
+            quitDayValue,
+            threeDaysValue,
+            0,
+          ];
+        } else {
+          // Nếu còn hơn 3 ngày trước ngày cai thuốc
+          data = [cigarettesPerDay, quitDayValue, threeDaysValue, 0];
+        }
+        break;
+      }
+      case "Prescription medication": {
+        // Với thuốc kê đơn, bắt đầu giảm từ trước ngày cai thuốc
+        let todayValue = cigarettesPerDay;
+
+        // Nếu dùng thuốc, có thể đã bắt đầu giảm từ trước ngày cai thuốc
+        if (daysUntilQuit > 7) {
+          // Nếu còn hơn 1 tuần trước ngày cai thuốc
+          todayValue = Math.round(cigarettesPerDay * 0.85);
+        } else if (daysUntilQuit > 0) {
+          // Nếu còn ít hơn 1 tuần trước ngày cai thuốc
+          todayValue = Math.round(cigarettesPerDay * 0.7);
+        }
+
+        data = [
+          todayValue,
+          Math.round(cigarettesPerDay * 0.4),
+          Math.round(cigarettesPerDay * 0.15),
+          0,
+        ];
+        break;
+      }
+      default: {
+        // Nếu không chọn phương pháp, mặc định là Cold Turkey
+        data = [cigarettesPerDay, 0, 0, 0];
+      }
+    }
+    return { labels, data };
+  };
+  // Lấy dữ liệu biểu đồ từ hàm tính toán
+  const chartDataValues = calculateChartData();
 
   // Dữ liệu cho biểu đồ hiển thị lộ trình cai thuốc
   const chartData = {
-    labels: [
-      "Today",
-      `Quit Date (${quitDate.toLocaleDateString("en-US")})`,
-      "3 days",
-      "1 week",
-    ],
+    labels: chartDataValues.labels,
     datasets: [
       {
         label: "Cigarettes per day",
-        data: [cigarettesPerDay, 0, 0, 0], // Giảm từ số điếu hiện tại xuống 0
+        data: chartDataValues.data,
         borderColor: "#16A34A",
         backgroundColor: "rgba(22, 163, 74, 0.2)",
         fill: true,
@@ -267,7 +496,10 @@ const Body = () => {
   };
 
   return (
-    <div className="plan-tracking-container">
+    <div
+      className="plan-tracking-container"
+      style={{ backgroundColor: "#F9FAFB" }}
+    >
       {/* Tiêu đề và phụ đề của kế hoạch */}
       <Text strong className="plan-plan-title">
         Create a Quit Plan
@@ -625,24 +857,43 @@ const Body = () => {
                 No rewards added yet. Add rewards to create motivation!
               </Text>
             ) : (
-              <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-                {rewards.map((item, index) => (
-                  <li key={index} style={{ marginBottom: 12 }}>
+              <div style={{ marginTop: "20px" }}>
+                <Typography.Title level={4}>Your Reward:</Typography.Title>
+                {rewards.map((rewardItem, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: "10px",
+                      border: "1px solid #d9d9d9",
+                      borderRadius: "4px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <div>
-                      <span role="img" aria-label="milestone">
-                        📍
-                      </span>{" "}
-                      <Text strong>Milestone:</Text> {item.milestone}
+                      <Text strong>
+                        <PushpinOutlined style={{ marginRight: "8px" }} />
+                        Milestone:
+                      </Text>{" "}
+                      {rewardItem.milestone} <br />
+                      <Text strong>
+                        <GiftOutlined style={{ marginRight: "8px" }} />
+                        Reward:
+                      </Text>{" "}
+                      {rewardItem.reward}
                     </div>
-                    <div>
-                      <span role="img" aria-label="reward">
-                        🎁
-                      </span>{" "}
-                      <Text strong>Reward:</Text> {item.reward}
-                    </div>
-                  </li>
+                    <Button
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteReward(index)} // Correctly call handleDeleteReward
+                      danger
+                      aria-label="Delete reward"
+                    />
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
 
@@ -737,94 +988,234 @@ const Body = () => {
       )}
       {/* // Bước 5: Xem lại và Hoàn thành */}
       {currentStep === 5 && (
-        <div className="plan-step-container">
-          <Text strong className="plan-step-title">
-            Quit plan summary
-          </Text>
-          <Text className="plan-step-description">
-            Review your quit plan before completing
-          </Text>
+        <div className="plan-container" style={{ padding: "20px" }}>
+          <Typography.Title level={2} style={{ textAlign: "center" }}>
+            <CheckCircleOutlined
+              style={{ marginRight: "8px", color: "#52c41a" }}
+            />
+            Review quit plan
+          </Typography.Title>
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "20px",
+              border: "1px solid #f0f0f0",
+              borderRadius: "8px",
+              backgroundColor: "#fafafa",
+            }}
+          >
+            <Typography.Paragraph
+              style={{ fontSize: "16px", marginBottom: "12px" }}
+            >
+              <Text style={{ fontSize: "16px" }} strong>
+                <CalendarOutlined
+                  style={{
+                    marginRight: "8px",
+                    color: "#16A34A",
+                    fontSize: "16px",
+                  }}
+                />
+                Start date:
+              </Text>{" "}
+              <br />
+              {selectedDate.toLocaleDateString("vi-VN")}
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              style={{ fontSize: "16px", marginBottom: "12px" }}
+            >
+              <Text style={{ fontSize: "16px" }} strong>
+                <AimOutlined
+                  style={{
+                    fontSize: "16px",
+                    marginRight: "8px",
+                    color: "#16A34A",
+                  }}
+                />
+                Methods of quitting smoking:
+              </Text>{" "}
+              <br />
+              {quitMethod || "Chưa chọn"}
+            </Typography.Paragraph>
+            <Typography.Paragraph
+              style={{ fontSize: "16px", marginBottom: "12px" }}
+            >
+              <Text style={{ fontSize: "16px" }} strong>
+                <AuditOutlined
+                  style={{
+                    marginRight: "8px",
+                    color: "#16A34A",
+                    fontSize: "16px",
+                  }}
+                />
+                Number of cigarettes per day (before quitting):
+              </Text>{" "}
+              <br />
+              {cigarettesPerDay} cigarettes every day
+            </Typography.Paragraph>
 
-          <div className="plan-summary-grid">
-            <div className="plan-summary-item">
-              <span role="img" aria-label="calendar">
-                📅
-              </span>
-              <Text strong className="plan-summary-label">
-                Quit date:
-              </Text>
-              <Text>{selectedDate.toLocaleDateString("en-US")}</Text>
-            </div>
+            <Typography.Title
+              level={4}
+              style={{
+                marginTop: "25px",
+                marginBottom: "10px",
+                fontSize: "16px",
+              }}
+            >
+              <WarningOutlined
+                style={{
+                  marginRight: "8px",
+                  color: "#16A34A",
+                }}
+              />
+              Triggers:
+            </Typography.Title>
+            {triggers.length > 0 ? (
+              <ul
+                style={{
+                  listStyleType: "none",
+                  paddingLeft: "20px",
+                  fontSize: "16px",
+                }}
+              >
+                {triggers.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "#FEF2F2",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Text italic> No triggers are selected.</Text>
+            )}
 
-            <div className="plan-summary-item">
-              <span role="img" aria-label="target">
-                🎯
-              </span>
-              <Text strong className="plan-summary-label">
-                Quit method:
-              </Text>
-              <Text>{quitMethod || "Not selected"}</Text>
-            </div>
+            <Typography.Title
+              level={4}
+              style={{
+                marginTop: "25px",
+                marginBottom: "10px",
+                fontSize: "16px",
+              }}
+            >
+              <SolutionOutlined
+                style={{ marginRight: "8px", color: "#16A34A" }}
+              />
+              Coping strategies:
+            </Typography.Title>
+            {copingStrategies.length > 0 ? (
+              <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
+                {copingStrategies.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "#F0FDF4",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Text italic> No coping strategy was selected.</Text>
+            )}
 
-            <div className="plan-summary-item">
-              <span role="img" aria-label="cigarette">
-                🚬
-              </span>
-              <Text strong className="plan-summary-label">
-                Current cigarettes:
-              </Text>
-              <Text>{cigarettesPerDay} cigarettes per day</Text>
-            </div>
+            <Typography.Title
+              level={4}
+              style={{
+                marginTop: "25px",
+                marginBottom: "10px",
+                fontSize: "16px",
+              }}
+            >
+              <TeamOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
+              Support Network:
+            </Typography.Title>
+            {supportNetwork.length > 0 ? (
+              <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
+                {supportNetwork.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "rgb(249, 249, 190)",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Text italic> No support network selected.</Text>
+            )}
 
-            <div className="plan-summary-item">
-              <span role="img" aria-label="info">
-                ℹ️
-              </span>
-              <Text strong className="plan-summary-label">
-                Triggers:
-              </Text>
-              <Text>
-                {triggers.length > 0
-                  ? triggers.join(", ")
-                  : "No triggers selected"}
-              </Text>
-            </div>
+            <Typography.Title
+              level={4}
+              style={{
+                marginTop: "25px",
+                marginBottom: "10px",
+                fontSize: "16px",
+              }}
+            >
+              <GiftOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
+              Reward:
+            </Typography.Title>
+            {rewards.length > 0 ? (
+              rewards.map((rewardItem, index) => (
+                <div
+                  key={index}
+                  style={{ paddingLeft: "20px", marginBottom: "10px" }}
+                >
+                  <Text strong>
+                    <PushpinOutlined style={{ marginRight: "8px" }} />
+                    Milestone:
+                  </Text>{" "}
+                  {rewardItem.milestone} <br />
+                  <Text strong>
+                    <GiftOutlined style={{ marginRight: "8px" }} />
+                    Reward:
+                  </Text>{" "}
+                  {rewardItem.reward}
+                </div>
+              ))
+            ) : (
+              <Text italic> No rewards are set.</Text>
+            )}
 
-            <div className="plan-summary-item">
-              <span role="img" aria-label="check">
-                ✅
-              </span>
-              <Text strong className="plan-summary-label">
-                Coping strategies:
-              </Text>
-              <Text>
-                {copingStrategies.length > 0
-                  ? copingStrategies.join(", ")
-                  : "No coping strategies selected"}
-              </Text>
-            </div>
-
-            <div className="plan-summary-item">
-              <span role="img" aria-label="gift">
-                🎁
-              </span>
-              <Text strong className="plan-summary-label">
-                Rewards:
-              </Text>
-              {rewards.length > 0 ? (
-                <ul>
-                  {rewards.map((item, index) => (
-                    <li key={index}>
-                      <Text strong>{item.milestone}</Text> – {item.reward}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <Text>No rewards set up</Text>
-              )}
-            </div>
+            <Typography.Title
+              level={4}
+              style={{
+                marginTop: "25px",
+                marginBottom: "10px",
+                fontSize: "16px",
+              }}
+            >
+              <ReadOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
+              Notes:
+            </Typography.Title>
+            <Text italic>{additionalNotes || "No additional notes"}</Text>
           </div>
 
+          {/* Chart display */}
           <div className="plan-chart-section">
             <Line data={chartData} options={chartOptions} />
           </div>
@@ -910,4 +1301,4 @@ const Body = () => {
   );
 };
 
-export default Body;
+export default Body; // Đảm bảo export đúng component

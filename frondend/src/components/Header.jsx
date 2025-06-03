@@ -52,9 +52,11 @@ const Header = () => {
       position="sticky"
       sx={{
         bgcolor: "white",
-        boxShadow: 2,
+        boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
         top: 0,
         zIndex: 1000,
+        backgroundColor: " rgba(255, 255, 255, 0.7)",
+        backdropFilter: "blur(10px)",
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
