@@ -12,6 +12,7 @@ import { Layout } from "antd";
 import HomePage from "./app/HomePage";
 import Plan from "./app/Plan";
 import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
+import LeaderboardPage from "./app/LeaderboardPage";
 
 function App() {
   const { Content } = Layout;
@@ -28,6 +29,7 @@ function App() {
           <Route path="/plan" element={<Plan />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/blog" element={<CommunityBlogPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
 
