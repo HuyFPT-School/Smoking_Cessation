@@ -104,7 +104,7 @@ const Header = () => {
               { label: "Plan", path: "/plan" },
               { label: "Tracking", path: "/tracking" },
               { label: "Leaderboard", path: "/leaderboard" },
-              { label: "Blog", path: "/blog" },
+              { label: "Blog", path: "/profile" },
             ].map((item) => (
               <MuiLink
                 key={item.label}
