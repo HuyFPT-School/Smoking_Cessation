@@ -13,7 +13,7 @@ import HomePage from "./app/HomePage";
 import Plan from "./app/Plan";
 import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
 import LeaderboardPage from "./app/LeaderboardPage";
-
+import Profile from "./app/Profile";
 function App() {
   const { Content } = Layout;
   return (
@@ -29,6 +29,7 @@ function App() {
           <Route path="/plan" element={<Plan />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/blog" element={<CommunityBlogPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />

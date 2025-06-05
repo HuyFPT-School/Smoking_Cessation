@@ -1677,4 +1677,216 @@ button:hover,
   top: 2px;
   left: 2px;
 }
+/* ----------------------------------------------------- */
+/* CSS Profile */
+.profile-container {
+  font-family: 'Segoe UI', sans-serif;
+}
 
+.cover-photo {
+  background: linear-gradient(to right, #94e5a3, #8ec6f8);
+  height: 180px;
+  position: relative;
+  padding: 16px;
+  border-radius: 4px;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.change-cover-btn {
+  position: absolute;
+  top: 16px;
+  right: 120px;
+  z-index: 2;
+}
+
+.settings-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: -90px;
+  padding-left: 40px;
+}
+
+.avatar-wrapper {
+  display: inline-block;
+  border: 4px solid white;
+  border-radius: 50%;
+  background: white;
+  margin-right: 20px;
+  margin-top: -30px;
+}
+
+.text-content {
+  text-align: left;
+  margin-top: 0;
+}
+
+/* Styling cho tên người dùng và mô tả */
+.user-name {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  margin-top: 120px;
+}
+
+.user-description {
+  display: block;
+  color: #34495e;
+  font-style: italic;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 9px;
+}
+
+/* Styling cho user-info-display */
+.info-card {
+  margin: 24px auto;
+  width: 80%;
+  text-align: left;
+  padding: 24px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-info-display {
+  margin-top: 24px;
+}
+
+.info-section {
+  margin-bottom: 8px; /* Giảm từ 16px xuống 8px để các bảng gần nhau hơn */
+  padding: 16px;
+  border-radius: 8px;
+  background: #ffffff; /* Nền trắng */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+}
+
+.basic-info {
+  border: 2px solid #a3cffa; /* Viền xanh dương nhạt */
+}
+
+.address-info {
+  border: 2px solid #a3faaf; /* Viền xanh lá nhạt */
+}
+
+.contact-info {
+  border: 2px solid #faa3c0; /* Viền hồng nhạt */
+}
+
+.info-section Title {
+  color: #333;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.info-section Title svg {
+  margin-right: 8px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.info-grid .label {
+  font-weight: 700; /* Nhãn đậm */
+  color: #333;
+}
+
+.info-grid .value {
+  color: #666; /* Giá trị màu nhạt hơn */
+  font-weight: 400;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.open-settings-btn {
+  margin-top: 16px;
+}
+
+/* Styling cho modal */
+.ant-modal {
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f4f8, #e0e8f0);
+}
+
+.ant-modal-content {
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ant-modal-header {
+  background: #4a90e2;
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 16px;
+}
+
+.ant-modal-title {
+  color: white;
+  font-weight: 600;
+}
+
+.ant-modal-body {
+  padding: 24px;
+}
+
+.ant-form-item-label {
+  color: #333;
+  font-weight: 500;
+}
+
+.ant-input {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  transition: border-color 0.3s;
+}
+
+.ant-input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.ant-select-selector {
+  border-radius: 6px !important;
+  border: 1px solid #ccc !important;
+  padding: 6px 12px !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: #4a90e2 !important;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5) !important;
+}
+
+.ant-btn-primary {
+  background: #4a90e2;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  transition: background 0.3s;
+}
+
+.ant-btn-primary:hover {
+  background: #357abd;
+}
