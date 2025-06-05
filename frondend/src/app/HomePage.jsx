@@ -3,7 +3,6 @@ import { Typography, Button, Row, Col, Card } from "antd";
 import { RiseOutlined, TeamOutlined, BookOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 
-
 const { Title, Paragraph, Text } = Typography;
 
 const stats = [
@@ -54,9 +53,9 @@ const StatsSection = () => (
 );
 
 const SupportSection = () => (
-  <div style={{ padding: "80px 24px", background: "#f5f7fa" }}>
+  <div style={{ padding: "150px 24px", background: "#f5f7fa" }}>
     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-      <Title level={2} style={{ textAlign: "center", fontWeight: 700 }}>
+      <Title level={1} style={{ textAlign: "center", fontWeight: 700 }}>
         How We Support Your Journey
       </Title>
       <Paragraph
@@ -64,7 +63,7 @@ const SupportSection = () => (
           textAlign: "center",
           color: "#8c8c8c",
           marginBottom: "48px",
-          fontSize: "16px",
+          fontSize: "20px",
         }}
       >
         Our comprehensive approach combines technology, community, and
@@ -74,7 +73,7 @@ const SupportSection = () => (
         <Col xs={24} md={8}>
           <Card variant="borderless" style={cardStyle}>
             <RiseOutlined style={iconStyle} />
-            <Title level={4}>Progress Tracking</Title>
+            <Title level={3}>Progress Tracking</Title>
             <Paragraph>
               Monitor your smoke-free days, health improvements, and money
               saved.
@@ -85,7 +84,7 @@ const SupportSection = () => (
         <Col xs={24} md={8}>
           <Card variant="borderless" style={cardStyle}>
             <TeamOutlined style={iconStyle} />
-            <Title level={4}>Community Support</Title>
+            <Title level={3}>Community Support</Title>
             <Paragraph>
               Connect with others on the same journey to stay motivated.
             </Paragraph>
@@ -95,7 +94,7 @@ const SupportSection = () => (
         <Col xs={24} md={8}>
           <Card variant="borderless" style={cardStyle}>
             <BookOutlined style={iconStyle} />
-            <Title level={4}>Expert Resources</Title>
+            <Title level={3}>Expert Resources</Title>
             <Paragraph>
               Access evidence-based articles, videos, and practical tips.
             </Paragraph>
@@ -115,14 +114,19 @@ const SuccessStories = ({ onNavigate }) => (
         style={{
           textAlign: "center",
           fontWeight: 700,
-          fontSize: "32px",
+          fontSize: "45px",
           marginBottom: "8px",
         }}
       >
         Success Stories
       </Title>
       <Paragraph
-        style={{ textAlign: "center", color: "#595959", marginBottom: "48px" }}
+        style={{
+          textAlign: "center",
+          color: "#595959",
+          marginBottom: "48px",
+          fontSize: "20px",
+        }}
       >
         Hear from people who have successfully quit smoking with our platform.
       </Paragraph>
@@ -135,7 +139,7 @@ const SuccessStories = ({ onNavigate }) => (
         }}
       >
         <Card variant="borderless" style={storyCardStyle}>
-          <Title level={4} style={{ marginBottom: 0 }}>
+          <Title level={3} style={{ marginBottom: 0 }}>
             Michael, 42
           </Title>
           <Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
@@ -149,7 +153,7 @@ const SuccessStories = ({ onNavigate }) => (
           </Paragraph>
         </Card>
         <Card variant="borderless" style={storyCardStyle}>
-          <Title level={4} style={{ marginBottom: 0 }}>
+          <Title level={3} style={{ marginBottom: 0 }}>
             Sarah, 35
           </Title>
           <Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
@@ -168,7 +172,7 @@ const SuccessStories = ({ onNavigate }) => (
     <div
       style={{
         marginTop: "72px",
-        padding: "64px 24px",
+        padding: "100px 24px",
         background: "#16A34A",
         textAlign: "center",
         width: "100vw",
@@ -178,10 +182,13 @@ const SuccessStories = ({ onNavigate }) => (
       }}
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        <Title level={2} style={{ color: "#fff", fontSize: "28px" }}>
+        <Title
+          level={2}
+          style={{ color: "#fff", fontSize: "50px", fontWeight: 700 }}
+        >
           Ready to Begin?
         </Title>
-        <Paragraph style={{ color: "#fff", fontSize: "15px" }}>
+        <Paragraph style={{ color: "#fff", fontSize: "20px" }}>
           Join thousands who have successfully quit smoking with our support.
         </Paragraph>
         <div
@@ -195,9 +202,7 @@ const SuccessStories = ({ onNavigate }) => (
           <Button
             type="primary"
             style={ctaButtonStyle}
-
             onClick={() => onNavigate("/register")}
-
           >
             Create Free Account
           </Button>
@@ -212,7 +217,7 @@ const HeroSection = () => (
   <div
     style={{
       background: "linear-gradient(to bottom, #f0fff4, #ffffff)",
-      padding: "96px 24px",
+      padding: "200px 24px",
     }}
   >
     <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -270,14 +275,14 @@ const cardStyle = {
 };
 
 const iconStyle = {
-  fontSize: "28px",
+  fontSize: "40px",
   color: "#52c41a",
   marginBottom: "12px",
 };
 
 const storyCardStyle = {
   borderRadius: "12px",
-  width: "360px",
+  width: "450px",
   maxWidth: "100%",
   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
 };
@@ -286,8 +291,8 @@ const ctaButtonStyle = {
   background: "#fff",
   color: "#21252B",
   borderColor: "#fff",
-  borderRadius: "24px",
-  padding: "8px 20px",
+  borderRadius: "6px",
+  padding: "20px 32px",
   fontWeight: 600,
 };
 
