@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Row, Col, Typography, Space } from "antd";
+import { Layout, Row, Col, Typography, Space, Divider } from "antd";
 import { CopyrightOutlined, HeartOutlined } from "@ant-design/icons";
 
 const { Footer: AntFooter } = Layout;
@@ -7,7 +7,9 @@ const { Title, Text, Link } = Typography;
 
 function Footer() {
   return (
-    <AntFooter style={{ background: "#f5f5f5", padding: "40px 80px" }}>
+    <AntFooter
+      style={{ background: "#f5f5f5", padding: "40px 80px 20px 80px" }}
+    >
       <Row gutter={[32, 32]}>
         <Col xs={24} sm={12} md={8} lg={6}>
           <Space direction="vertical">
@@ -40,32 +42,132 @@ function Footer() {
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Platform</Title>
           <Space direction="vertical">
-            <Link href="#">Dashboard</Link>
-            <Link href="#">Plan</Link>
-            <Link href="#">Tracking</Link>
-            <Link href="#">Blog</Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Plan
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Tracking
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Blog
+            </Link>
           </Space>
         </Col>
 
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Company</Title>
           <Space direction="vertical">
-            <Link href="#">Contact</Link>
-            <Link href="#">Careers</Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Contact
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Careers
+            </Link>
           </Space>
         </Col>
 
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Legal</Title>
           <Space direction="vertical">
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Terms of Service</Link>
-            <Link href="#">Cookie Policy</Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="#"
+              style={{
+                color: "#71717A",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.color = "#09090B")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
+            >
+              Cookie Policy
+            </Link>
           </Space>
         </Col>
       </Row>
+      <Divider style={{ borderColor: "#e5e7eb" }} />
 
-      <div style={{ textAlign: "center", marginTop: "40px" }}>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
         <Text type="secondary">
           <CopyrightOutlined /> 2025 BreatheFree. All rights reserved.
         </Text>

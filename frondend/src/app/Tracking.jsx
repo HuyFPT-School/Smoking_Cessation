@@ -474,7 +474,7 @@ const Tracking = () => {
                 />
               </div>
               <Button
-                type="primary"
+                style={{ backgroundColor: "#16A34A", color: "#fff" }}
                 htmlType="submit"
                 className="submit-button"
               >

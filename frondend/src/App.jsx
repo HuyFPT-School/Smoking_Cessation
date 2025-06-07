@@ -12,7 +12,9 @@ import Plan from "./app/Plan";
 import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
 import LeaderboardPage from "./app/LeaderboardPage";
 import Profile from "./app/Profile";
+
 import CoachChat from "./app/CoachChat"; // 6/7/2025 thêm import cho CoachChat
+
 function App() {
   return (
     <BrowserRouter>

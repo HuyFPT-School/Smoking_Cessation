@@ -58,7 +58,7 @@ ChartJS.register(
 );
 
 // Component chính để tạo kế hoạch cai thuốc lá
-const Body = () => {
+const Plan = () => {
   // State để theo dõi bước hiện tại trong quy trình tạo kế hoạch
   const [currentStep, setCurrentStep] = useState(1); // State để lưu ngày cai thuốc được chọn, mặc định là ngày hiện tại
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -639,6 +639,7 @@ const Body = () => {
             <Button
               type="primary"
               className="plan-nav-button"
+              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
               onClick={() => setCurrentStep(2)}
             >
               Next
@@ -702,12 +703,19 @@ const Body = () => {
               type="default"
               className="plan-nav-button"
               onClick={() => setCurrentStep(1)}
+              style={{
+                backgroundColor: "#F3F4F6",
+                borderColor: "#fff",
+                color: "#111827",
+                padding: "0 20px",
+              }}
             >
               Back
             </Button>
             <Button
               type="primary"
               className="plan-nav-button"
+              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
               onClick={() => setCurrentStep(3)}
             >
               Next
@@ -793,12 +801,19 @@ const Body = () => {
               type="default"
               className="plan-nav-button"
               onClick={() => setCurrentStep(2)}
+              style={{
+                backgroundColor: "#F3F4F6",
+                borderColor: "#fff",
+                color: "#111827",
+                padding: "0 20px",
+              }}
             >
               Back
             </Button>
             <Button
               type="primary"
               className="plan-nav-button"
+              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
               onClick={() => setCurrentStep(4)}
             >
               Next
@@ -831,6 +846,12 @@ const Body = () => {
                 type="primary"
                 className="plan-nav-button"
                 onClick={handleAddReward}
+                style={{
+                  backgroundColor: "#F3F4F6",
+                  borderColor: "#fff",
+                  color: "#111827",
+                  padding: "0 20px",
+                }}
               >
                 Add reward
               </Button>
@@ -973,12 +994,19 @@ const Body = () => {
               type="default"
               className="plan-nav-button"
               onClick={() => setCurrentStep(3)}
+              style={{
+                backgroundColor: "#F3F4F6",
+                borderColor: "#fff",
+                color: "#111827",
+                padding: "0 20px",
+              }}
             >
               Back
             </Button>
             <Button
               type="primary"
               className="plan-nav-button"
+              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
               onClick={() => setCurrentStep(5)}
             >
               Next
@@ -1226,6 +1254,12 @@ const Body = () => {
               type="default"
               className="plan-nav-button"
               onClick={() => setCurrentStep(4)}
+              style={{
+                backgroundColor: "#F3F4F6",
+                borderColor: "#fff",
+                color: "#111827",
+                padding: "0 20px",
+              }}
             >
               Back
             </Button>
@@ -1233,6 +1267,7 @@ const Body = () => {
               type="primary"
               className="plan-nav-button"
               onClick={handleComplete}
+              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
             >
               Complete
             </Button>
@@ -1301,4 +1336,4 @@ const Body = () => {
   );
 };
 
-export default Body; // Đảm bảo export đúng component
+export default Plan; // Đảm bảo export đúng component
