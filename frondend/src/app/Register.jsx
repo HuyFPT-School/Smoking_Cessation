@@ -1,183 +1,224 @@
+// Import các thư viện cần thiết cho component đăng ký
 import React, { useContext, useState } from "react";
+// Import các component giao diện từ Material-UI
 import {
-  Box,
-  Button,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  Link,
-  TextField,
-  Typography,
-  Paper,
-  Snackbar,
-  Alert,
+  Box, // Container để bố trí layout
+  Button, // Nút bấm
+  Checkbox, // Ô tick đồng ý điều khoản
+  Container, // Container chính của trang
+  FormControlLabel, // Label cho checkbox
+  Link, // Liên kết
+  TextField, // Ô nhập liệu
+  Typography, // Text và tiêu đề
+  Paper, // Khung nền với shadow
+  Snackbar, // Thông báo popup
+  Alert, // Thông báo cảnh báo
 } from "@mui/material";
+// Import hook để điều hướng trang
 import { useNavigate } from "react-router";
 import { Link as RouterLink } from "react-router";
 import { Link as MuiLink } from "@mui/material";
+// Import context quản lý trạng thái đăng nhập
 import { AuthContext } from "../context/AuthContext";
+// Import cấu hình Firebase
 import { auth } from "../firebase";
+// Import các hàm xác thực từ Firebase
 import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  GoogleAuthProvider,
-  linkWithPopup,
+  createUserWithEmailAndPassword, // Tạo tài khoản bằng email/password
+  updateProfile, // Cập nhật thông tin profile
+  GoogleAuthProvider, // Nhà cung cấp đăng nhập Google
+  linkWithPopup, // Liên kết tài khoản với popup
 } from "firebase/auth";
+// Import thư viện gọi API
 import axios from "axios";
 
+// Component chính cho trang đăng ký tài khoản
 const Register = () => {
-  const [Username, setUserName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  // Các state (trạng thái) để lưu thông tin người dùng nhập vào form
+  const [Username, setUserName] = useState(""); // Tên đăng nhập
+  const [email, setEmail] = useState(""); // Email
+  const [password, setPassword] = useState(""); // Mật khẩu
+  const [agreeTerms, setAgreeTerms] = useState(false); // Có đồng ý điều khoản không
 
-  const [open, setOpen] = useState(false);
-  const [snackbarMsg, setSnackbarMsg] = useState("");
-  const [snackbarType, setSnackbarType] = useState("success");
+  // Các state để quản lý thông báo (snackbar)
+  const [open, setOpen] = useState(false); // Có hiển thị thông báo không
+  const [snackbarMsg, setSnackbarMsg] = useState(""); // Nội dung thông báo
+  const [snackbarType, setSnackbarType] = useState("success"); // Loại thông báo (success/error/warning)
 
+  // Hook để chuyển hướng trang
   const navigate = useNavigate();
+  // Lấy hàm setUser từ AuthContext để cập nhật thông tin người dùng đã đăng nhập
   const { setUser } = useContext(AuthContext);
-
+  // Hàm hiển thị thông báo cho người dùng
   const showSnackbar = (message, type = "success") => {
-    setSnackbarMsg(message);
-    setSnackbarType(type);
-    setOpen(true);
+    setSnackbarMsg(message); // Đặt nội dung thông báo
+    setSnackbarType(type); // Đặt loại thông báo (success/error/warning)
+    setOpen(true); // Hiển thị thông báo
   };
-
+  // Hàm gọi API backend để lấy thông tin chi tiết của user sau khi đăng ký thành công
   const fetchUserFromBackend = async (idToken) => {
     try {
+      // Gọi API để lấy thông tin user từ backend
       const res = await axios.post(
-        "http://localhost:8080/api/user/me",
-        { name: Username }, // Gửi tên người dùng vào body
+        "http://localhost:8080/api/user/me", // Endpoint API
+        { name: Username }, // Gửi tên người dùng vào body request
         {
           headers: {
-            Authorization: `Bearer ${idToken}`,
+            Authorization: `Bearer ${idToken}`, // Đính kèm token xác thực
           },
         }
       );
+      // Lấy dữ liệu user từ response (có thể có format khác nhau)
       const user = res.data.user || res.data; // đề phòng 2 format khác nhau
+      // Lưu thông tin user vào localStorage để duy trì đăng nhập
       localStorage.setItem("user", JSON.stringify(user));
+      // Cập nhật thông tin user trong context
       setUser(user);
-      showSnackbar("✅ Registration successful!", "success");
+      // Hiển thị thông báo thành công
+      showSnackbar(" Registration successful!", "success");
+      // Chuyển hướng về trang chủ
       navigate("/home");
     } catch (err) {
+      // Xử lý lỗi khi gọi API
       console.error("Error fetching user:", err);
       showSnackbar("Failed to load user info", "error");
     }
   };
-
+  // Hàm xử lý khi người dùng submit form đăng ký
   async function handleSubmit(event) {
+    // Ngăn chặn hành vi mặc định của form (reload trang)
     event.preventDefault();
+
+    // Kiểm tra xem người dùng đã đồng ý điều khoản chưa
     if (!agreeTerms) {
       showSnackbar("⚠️ You must agree to the terms and policies.", "warning");
-      return;
+      return; // Dừng thực hiện nếu chưa đồng ý
     }
 
     try {
+      // Tạo tài khoản mới bằng Firebase Authentication
       const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
+        auth, // Firebase auth instance
+        email, // Email người dùng nhập
+        password // Password người dùng nhập
       );
+
+      // Cập nhật tên hiển thị cho user vừa tạo
       await updateProfile(result.user, {
-        displayName: Username,
+        displayName: Username, // Đặt tên hiển thị
       });
 
-      // 🔁 Đợi Firebase cập nhật profile
+      //  Đợi Firebase cập nhật profile hoàn tất
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // 🔐 Lấy token mới sau khi update profile (đảm bảo name đúng)
+      //  Lấy token mới sau khi update profile (đảm bảo name đúng)
       const idToken = await result.user.getIdToken(true);
 
-      // 👇 **AUTO LIÊN KẾT GOOGLE NGAY SAU ĐĂNG KÝ**
-      const provider = new GoogleAuthProvider();
+      //  **TỰ ĐỘNG LIÊN KẾT GOOGLE NGAY SAU ĐĂNG KÝ**
+      const provider = new GoogleAuthProvider(); // Tạo provider Google
       try {
+        // Thử liên kết tài khoản với Google
         await linkWithPopup(result.user, provider);
         showSnackbar(
           "🎉 Đã liên kết Google thành công! Bạn có thể đăng nhập bằng Google hoặc Email/Password.",
           "success"
         );
       } catch (err) {
+        // Xử lý các lỗi có thể xảy ra khi liên kết Google
         if (err.code === "auth/popup-closed-by-user") {
+          // Người dùng đóng popup
           showSnackbar(
             "Bạn đã bỏ qua liên kết Google. Bạn có thể liên kết lại trong cài đặt tài khoản.",
             "info"
           );
         } else if (err.code === "auth/credential-already-in-use") {
+          // Tài khoản Google đã được liên kết với user khác
           showSnackbar(
             "Tài khoản Google này đã liên kết với user khác. Hãy đăng nhập Google rồi liên kết lại.",
             "error"
           );
         } else {
+          // Lỗi khác
           showSnackbar("Không thể liên kết Google tự động.", "error");
         }
       }
-      // 👉 **END AUTO-LINK GOOGLE**
+      //  **KẾT THÚC TỰ ĐỘNG LIÊN KẾT GOOGLE**
 
-      // Luôn fetch user từ backend dù có liên kết hay không
+      // Luôn fetch thông tin user từ backend dù có liên kết Google hay không
       await fetchUserFromBackend(idToken);
     } catch (err) {
+      // Xử lý lỗi khi đăng ký
       console.error(err);
       if (err.code === "auth/email-already-in-use") {
+        // Email đã được sử dụng
         showSnackbar(
-          "❌ Email already exists. Please use another email.",
+          " Email already exists. Please use another email.",
           "error"
         );
       } else {
+        // Lỗi khác
         showSnackbar("Registration failed. Please try again.", "error");
       }
     }
-  }
-
+  } // Render giao diện của trang đăng ký
   return (
     <Container maxWidth="sm">
+      {/* Paper tạo khung với shadow và padding */}
       <Paper elevation={3} sx={{ p: 4, mt: 8, mb: 8, borderRadius: 3 }}>
+        {/* Phần header của form */}
         <Box sx={{ textAlign: "center", mb: 3 }}>
+          {/* Tiêu đề chính */}
           <Typography variant="h5" fontWeight="bold">
             Create an account
           </Typography>
+          {/* Mô tả phụ */}
           <Typography variant="body2" color="text.secondary">
             Fill in your details to register
           </Typography>
         </Box>
 
+        {/* Form đăng ký với sự kiện onSubmit */}
         <form onSubmit={handleSubmit}>
+          {/* Ô nhập Username */}
           <TextField
-            fullWidth
-            label="Username"
-            margin="normal"
-            value={Username}
-            onChange={(e) => setUserName(e.target.value)}
-            required
+            fullWidth // Chiếm toàn bộ chiều rộng
+            label="Username" // Nhãn hiển thị
+            margin="normal" // Margin bình thường
+            value={Username} // Giá trị hiện tại
+            onChange={(e) => setUserName(e.target.value)} // Cập nhật state khi thay đổi
+            required // Bắt buộc phải nhập
           />
 
+          {/* Ô nhập Email */}
           <TextField
             fullWidth
             label="Email"
-            type="email"
+            type="email" // Kiểu input là email
             margin="normal"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
 
+          {/* Ô nhập Password */}
           <TextField
             fullWidth
             label="Password"
-            type="password"
+            type="password" // Kiểu input là password (ẩn ký tự)
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            helperText="Password must be more 5 characters"
+            helperText="Password must be more 5 characters" // Text hướng dẫn
             required
           />
 
+          {/* Checkbox đồng ý điều khoản */}
           <FormControlLabel
             control={
               <Checkbox
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                color="success"
+                checked={agreeTerms} // Trạng thái được tick hay không
+                onChange={(e) => setAgreeTerms(e.target.checked)} // Cập nhật khi thay đổi
+                color="success" // Màu xanh lá
               />
             }
             label={
@@ -202,28 +243,30 @@ const Register = () => {
                 </Link>
               </Typography>
             }
-            sx={{ mt: 1 }}
+            sx={{ mt: 1 }} // Margin top
           />
 
+          {/* Nút Register */}
           <Button
             fullWidth
-            type="submit"
-            variant="contained"
+            type="submit" // Kiểu submit để trigger form onSubmit
+            variant="contained" // Nút nền đầy
             sx={{
-              mt: 2,
-              bgcolor: "#16A34A",
-              "&:hover": { bgcolor: "#15803d" },
+              mt: 2, // Margin top
+              bgcolor: "#16A34A", // Màu nền xanh lá
+              "&:hover": { bgcolor: "#15803d" }, // Màu khi hover
             }}
           >
             Register
           </Button>
         </form>
 
+        {/* Phần footer với link đến trang đăng nhập */}
         <Typography align="center" variant="body2" mt={3}>
           Already have an account?{" "}
           <MuiLink
-            component={RouterLink}
-            to="/login"
+            component={RouterLink} // Sử dụng RouterLink để điều hướng
+            to="/login" // Đường dẫn đến trang login
             underline="none"
             color="inherit"
             sx={{ color: "#16A34A", fontWeight: "bold" }}
@@ -233,22 +276,24 @@ const Register = () => {
         </Typography>
       </Paper>
 
+      {/* Snackbar để hiển thị thông báo */}
       <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={() => setOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={open} // Có hiển thị hay không
+        autoHideDuration={3000} // Tự động ẩn sau 3 giây
+        onClose={() => setOpen(false)} // Đóng thông báo
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Vị trí hiển thị
       >
         <Alert
-          severity={snackbarType}
-          onClose={() => setOpen(false)}
+          severity={snackbarType} // Loại alert (success/error/warning)
+          onClose={() => setOpen(false)} // Đóng khi click X
           sx={{ width: "100%" }}
         >
-          {snackbarMsg}
+          {snackbarMsg} {/* Nội dung thông báo */}
         </Alert>
       </Snackbar>
     </Container>
   );
 };
 
+// Export component Register để sử dụng ở nơi khác
 export default Register;
