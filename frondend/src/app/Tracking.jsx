@@ -6,220 +6,320 @@ import "antd/dist/reset.css";
 import "../App.css";
 const { TabPane } = Tabs;
 
-// Khởi tạo danh sách các tùy chọn cho trigger
+// Khai báo một mảng các lựa chọn (options) để dùng cho select, checkbox, radio,...
 const triggerOptions = [
-  { label: "Stress", value: "stress" },
-  { label: "Social", value: "social" },
-  { label: "Habit", value: "habit" },
-  { label: "Breath time", value: "breathtime" },
-  { label: "After meals", value: "aftermeals" },
-  { label: "Drinking Coffee", value: "drinkingcoffee" },
-  { label: "Drinking Alcohol", value: "drinkingalcohol" },
-  { label: "Boredom", value: "boredom" },
-  { label: "Social Interaction", value: "socialinteraction" },
-  { label: "Other", value: "other" },
+  { label: "Stress", value: "stress" }, // Nhãn hiển thị: Stress | Giá trị lưu: stress
+  { label: "Social", value: "social" }, // Nhãn hiển thị: Social | Giá trị lưu: social
+  { label: "Habit", value: "habit" }, // Nhãn hiển thị: Habit | Giá trị lưu: habit
+  { label: "Breath time", value: "breathtime" }, // Nhãn hiển thị: Breath time | Giá trị lưu: breathtime
+  { label: "After meals", value: "aftermeals" }, // Nhãn hiển thị: After meals | Giá trị lưu: aftermeals
+  { label: "Drinking Coffee", value: "drinkingcoffee" }, // Nhãn hiển thị: Drinking Coffee | Giá trị lưu: drinkingcoffee
+  { label: "Drinking Alcohol", value: "drinkingalcohol" }, // Nhãn hiển thị: Drinking Alcohol | Giá trị lưu: drinkingalcohol
+  { label: "Boredom", value: "boredom" }, // Nhãn hiển thị: Boredom | Giá trị lưu: boredom
+  { label: "Social Interaction", value: "socialinteraction" }, // Nhãn hiển thị: Social Interaction | Giá trị lưu: socialinteraction
+  { label: "Other", value: "other" }, // Nhãn hiển thị: Other | Giá trị lưu: other
 ];
 
 // Ánh xạ các giá trị trigger
 const triggerLabels = {
-  stress: "Stress",
-  social: "Social",
-  habit: "Habit",
-  other: "Other",
-  breathtime: "Breath time",
-  aftermeals: "After meals",
-  drinkingcoffee: "Drinking Coffee",
-  drinkingalcohol: "Drinking Alcohol",
-  boredom: "Boredom",
-  socialinteraction: "Social Interaction",
+  stress: "Stress", // Gây căng thẳng
+  social: "Social", // Liên quan xã hội
+  habit: "Habit", // Thói quen
+  other: "Other", // Khác
+  breathtime: "Breath time", // Thời gian hít thở
+  aftermeals: "After meals", // Sau khi ăn
+  drinkingcoffee: "Drinking Coffee", // Uống cà phê
+  drinkingalcohol: "Drinking Alcohol", // Uống rượu/bia
+  boredom: "Boredom", // Buồn chán
+  socialinteraction: "Social Interaction", // Tương tác xã hội
 };
 
 const Tracking = () => {
+  // Khởi tạo state lưu ngày được chọn (mặc định là ngày hiện tại)
   const [selectedDate, setSelectedDate] = useState(moment());
+
+  // Khởi tạo state lưu tháng hiện tại đang hiển thị trong lịch (mặc định là tháng hiện tại)
   const [currentMonth, setCurrentMonth] = useState(moment());
+
+  // Khởi tạo state lưu giờ hiện tại (theo định dạng hh:mm A, ví dụ: 08:30 AM)
   const [time, setTime] = useState(moment().format("hh:mm A"));
+
+  // Khởi tạo state lưu địa điểm nhập từ người dùng (mặc định là gợi ý ví dụ)
   const [location, setLocation] = useState("E.g., Balcony, Coffee shop");
+
+  // Khởi tạo state lưu nguyên nhân kích hoạt hành vi (trigger), mặc định là "stress"
   const [trigger, setTrigger] = useState("stress");
+
+  // Khởi tạo state lưu mức độ hài lòng sau hành vi, mặc định là 10 (thang điểm)
   const [satisfaction, setSatisfaction] = useState(10);
+
+  // Khởi tạo state lưu mức độ thèm muốn (craving), mặc định là 5
   const [cravingIntensity, setCravingIntensity] = useState(5);
+
+  // Khởi tạo state lưu ghi chú người dùng nhập vào
   const [notes, setNotes] = useState("");
+
+  // Khởi tạo state lưu loại hoạt động (ví dụ: smoking), mặc định là "smoking"
   const [activityType, setActivityType] = useState("smoking");
-  // Thay đổi: Bắt đầu với mảng rỗng thay vì dữ liệu mẫu
+
+  // Khởi tạo state lưu danh sách các sự kiện (incidents), ban đầu là mảng rỗng
   const [incidents, setIncidents] = useState([]);
+
+  // Lấy chuỗi thông tin user từ localStorage (nếu có)
   const userStr = localStorage.getItem("user");
+
+  // Parse chuỗi JSON thành object, nếu không có thì null
   const userObj = userStr ? JSON.parse(userStr) : null;
+
+  // Lấy userId từ object user nếu tồn tại, nếu không thì null
   const userId = userObj ? userObj.id : null;
+
   useEffect(() => {
+    // Hàm bất đồng bộ để gọi dữ liệu tracking từ backend
     const fetchTrackingData = async () => {
+      // Nếu chưa có userId thì không thực hiện gì cả
       if (!userId) return;
+
       try {
-        // GỌI API backend lấy log theo userId (ví dụ: /api/tracking/user/{userId})
+        // Gọi API GET đến backend để lấy dữ liệu log của userId
         const response = await axios.get(
           `http://localhost:8080/api/tracking/user/${userId}`
         );
+
+        // Nếu phản hồi thành công (status code = 200)
         if (response.status === 200) {
-          setIncidents(response.data); // data trả về phải là array các incident
+          // Cập nhật state incidents bằng dữ liệu trả về từ server
+          setIncidents(response.data); // Dữ liệu là một array các incident
         } else {
-          setIncidents([]); // Không có data thì set rỗng
+          // Nếu không thành công thì gán mảng incidents thành rỗng
+          setIncidents([]);
         }
       } catch (error) {
-        setIncidents([]);
-        console.error("Error fetching tracking data:", error);
+        // Nếu có lỗi xảy ra khi gọi API (mạng, server lỗi,...)
+        setIncidents([]); // Gán dữ liệu là mảng rỗng để tránh lỗi
+        console.error("Error fetching tracking data:", error); // Ghi log lỗi ra console
       }
     };
 
+    // Gọi hàm fetchTrackingData khi component mount hoặc userId thay đổi
     fetchTrackingData();
-  }, [userId]);
+  }, [userId]); // useEffect sẽ chạy lại mỗi khi userId thay đổi
 
   const handleSubmit = async (e) => {
-    // Mark function as async
-    e.preventDefault();
+    // Đánh dấu đây là một hàm bất đồng bộ (async)
+    e.preventDefault(); // Ngăn trình duyệt reload lại trang khi submit form
+
+    // Kiểm tra xem userId có tồn tại không
     if (!userId) {
-      console.error("User ID not found in localStorage");
-      // Optionally, display a message to the user
-      return;
+      console.error("User ID not found in localStorage"); // Ghi log lỗi
+      // Tùy chọn: Có thể hiển thị thông báo lỗi cho người dùng
+      return; // Không thực hiện gì thêm nếu không có userId
     }
 
+    // Tạo đối tượng mới chứa thông tin sự kiện (incident) từ dữ liệu người dùng nhập
     const newIncident = {
-      date: selectedDate.format("YYYY-MM-DD"),
-      time,
-      location,
-      trigger,
+      date: selectedDate.format("YYYY-MM-DD"), // Format ngày thành chuỗi YYYY-MM-DD
+      time, // Giờ đã chọn (định dạng: hh:mm AM/PM)
+      location, // Địa điểm nhập vào
+      trigger, // Nguyên nhân gây hành vi (stress, habit,...)
       satisfaction:
-        activityType === "smoking" ? satisfaction : cravingIntensity, // Lưu giá trị phù hợp theo loại
-      type: activityType,
-      notes,
-      userId: userId,
+        activityType === "smoking" ? satisfaction : cravingIntensity,
+      // Nếu loại hành vi là "smoking" thì lưu mức độ hài lòng (satisfaction)
+      // Nếu là loại khác thì lưu mức độ thèm muốn (cravingIntensity)
+      type: activityType, // Loại hoạt động (smoking, vaping,...)
+      notes, // Ghi chú người dùng nhập
+      userId: userId, // ID người dùng lấy từ localStorage
     };
 
     try {
-      // Replace 'YOUR_BACKEND_API_ENDPOINT' with your actual API endpoint
+      // Gửi dữ liệu newIncident lên server thông qua POST request
       const response = await axios.post(
-        "http://localhost:8080/api/tracking",
-        newIncident
+        "http://localhost:8080/api/tracking", // API endpoint trên backend
+        newIncident // Dữ liệu gửi đi
       );
 
+      // Nếu response trả về thành công (status code 200 hoặc 201)
       if (response.status === 200 || response.status === 201) {
-        // Check for successful response
+        // Cập nhật state incidents bằng cách thêm sự kiện mới vào mảng hiện có
         setIncidents([...incidents, newIncident]);
-        // Reset form
+
+        // Reset lại form về trạng thái mặc định sau khi submit thành công
         setTime(moment().format("hh:mm A"));
         setLocation("E.g., Balcony, Coffee shop");
         setTrigger("stress");
         setSatisfaction(10);
         setCravingIntensity(5);
         setNotes("");
-        console.log("Incident recorded successfully:", response.data);
+
+        console.log("Incident recorded successfully:", response.data); // In log thành công
       } else {
+        // Nếu response không thành công, ghi log lỗi kèm status và nội dung
         console.error(
           "Failed to record incident:",
           response.status,
           response.data
         );
-        // Optionally, display an error message to the user
+        // Tùy chọn: Hiển thị thông báo lỗi cho người dùng
       }
     } catch (error) {
+      // Nếu có lỗi xảy ra khi gửi dữ liệu (ví dụ server không chạy hoặc mất mạng)
       console.error("Error submitting incident:", error);
-      // Optionally, display an error message to the user
+      // Tùy chọn: Hiển thị thông báo lỗi cho người dùng
     }
   };
 
   const getChartDataFromIncidents = () => {
-    // Lấy ngày bắt đầu tuần (Chủ nhật) từ ngày được chọn
+    // Lấy ngày bắt đầu của tuần hiện tại dựa trên ngày đang được chọn (selectedDate)
+    // Mặc định startOf("week") là Chủ nhật (theo moment.js)
     const weekStart = selectedDate.clone().startOf("week");
+
+    // Mảng chứa tên các ngày trong tuần để dùng làm nhãn trên biểu đồ
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+    // Duyệt qua từng ngày trong tuần để tính số lượng sự kiện (incident)
     return weekDays.map((day, index) => {
-      // Tính ngày cho từng ngày trong tuần
+      // Tính ngày cụ thể ứng với chỉ số index (0 là Chủ nhật, 1 là Thứ 2, ...)
       const date = weekStart.clone().add(index, "days");
+
+      // Định dạng ngày thành chuỗi YYYY-MM-DD để so sánh với dữ liệu trong incidents
       const dateStr = date.format("YYYY-MM-DD");
+
+      // Lọc danh sách incidents để đếm số lượng sự kiện xảy ra đúng ngày và đúng loại hoạt động (activityType)
       const count = incidents.filter((incident) => {
         return incident.date === dateStr && incident.type === activityType;
       }).length;
+
+      // Trả về đối tượng chứa tên ngày, số lần hoạt động (smoking), và chuỗi ngày
       return { day, smoking: count, date: dateStr };
     });
   };
 
   const generateCalendarDays = () => {
+    // Lấy ngày đầu tiên trong tháng hiện tại (ví dụ: 1/6/2025)
     const startOfMonth = currentMonth.clone().startOf("month");
+
+    // Lấy ngày cuối cùng trong tháng hiện tại (ví dụ: 30/6/2025)
     const endOfMonth = currentMonth.clone().endOf("month");
+
+    // Lấy thứ trong tuần của ngày đầu tiên trong tháng (0 = Chủ nhật, 1 = Thứ hai, ..., 6 = Thứ bảy)
     const startDay = startOfMonth.day();
+
+    // Lấy số ngày trong tháng hiện tại (ví dụ: 30 cho tháng 6)
     const daysInMonth = endOfMonth.date();
 
+    // Tính số ô trống phía trước ngày đầu tiên của tháng trong calendar (chuyển Chủ nhật thành 6, các ngày khác trừ 1)
+    // Mục đích: để calendar bắt đầu từ Thứ Hai (startOffset là số ô trống cần thêm)
     const startOffset = startDay === 0 ? 6 : startDay - 1;
+
+    // Tổng số ô trong calendar cho tháng này (bao gồm cả các ô trống trước và các ngày thực của tháng)
     const totalDays = daysInMonth + startOffset;
+
+    // Tính số tuần cần hiển thị (làm tròn lên để đủ các ô ngày trong tuần)
     const weeks = Math.ceil(totalDays / 7);
+
+    // Mảng lưu các ngày sẽ được hiển thị trên calendar (cả ngày trong tháng và các ngày từ tháng trước, tháng sau)
     const days = [];
 
+    // Vòng lặp tạo các ô ngày "mượn" từ tháng trước để lấp đầy các ô trống đầu tháng
     for (let i = 0; i < startOffset; i++) {
+      // Tính ngày của tháng trước tương ứng với ô trống hiện tại (ví dụ: nếu startOffset = 3, i=0 là ngày -3, i=1 là ngày -2, ...)
       const prevMonthDay = startOfMonth
         .clone()
         .subtract(startOffset - i, "days");
+      // Đẩy ngày này vào mảng ngày với isCurrentMonth = false (không phải tháng hiện tại)
       days.push({ date: prevMonthDay, isCurrentMonth: false });
     }
 
+    // Vòng lặp tạo các ô ngày thực sự trong tháng hiện tại, từ ngày 1 đến ngày cuối cùng
     for (let i = 1; i <= daysInMonth; i++) {
+      // Tạo ngày hiện tại của tháng, ví dụ 1/6, 2/6, ..., 30/6
       const day = startOfMonth.clone().date(i);
+      // Đẩy ngày này vào mảng ngày với isCurrentMonth = true
       days.push({ date: day, isCurrentMonth: true });
     }
 
+    // Tính số ô ngày còn thiếu để đủ hoàn thành các tuần (7 ngày mỗi tuần)
     const remainingDays = weeks * 7 - days.length;
+
+    // Vòng lặp tạo các ô ngày "mượn" từ tháng sau để lấp đầy phần cuối calendar
     for (let i = 1; i <= remainingDays; i++) {
+      // Tính ngày tương ứng từ tháng sau, bắt đầu từ ngày đầu tiên sau ngày cuối tháng
       const nextMonthDay = endOfMonth.clone().add(i, "days");
+      // Đẩy ngày này vào mảng ngày với isCurrentMonth = false
       days.push({ date: nextMonthDay, isCurrentMonth: false });
     }
 
+    // Trả về mảng các ngày đã được chuẩn bị đầy đủ cho calendar (bao gồm cả ngày của tháng trước và tháng sau)
     return days;
   };
 
   const renderCalendar = () => {
+    // Gọi hàm generateCalendarDays() để lấy danh sách các ngày cần hiển thị trong calendar
     const days = generateCalendarDays();
+
+    // Mảng tên các ngày trong tuần, bắt đầu từ Thứ Hai đến Chủ Nhật
     const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+    // Trả về JSX để render calendar
     return (
       <div className="calendar-wrapper">
+        {/* Phần header của calendar chứa nút điều hướng và thông tin tháng, năm */}
         <div className="calendar-header">
+          {/* Nút quay lại tháng trước */}
           <button
             className="calendar-nav-button"
             onClick={() =>
+              // Khi click, thay đổi state currentMonth về tháng trước (clone để không làm thay đổi gốc)
               setCurrentMonth(currentMonth.clone().subtract(1, "month"))
             }
           >
-            &lt;
+            &lt; {/* Dấu < */}
           </button>
+          {/* Hiển thị tháng và năm hiện tại theo định dạng: Month 6 Year 2025 */}
           <span className="calendar-month-year">
             Month {currentMonth.format("M")} Year {currentMonth.format("YYYY")}
           </span>
+          {/* Nút chuyển sang tháng kế tiếp */}
           <button
             className="calendar-nav-button"
             onClick={() =>
+              // Khi click, thay đổi state currentMonth về tháng tiếp theo
               setCurrentMonth(currentMonth.clone().add(1, "month"))
             }
           >
-            &gt;
+            &gt; {/* Dấu > */}
           </button>
         </div>
+
+        {/* Phần lưới calendar hiển thị các ngày trong tuần và các ngày của tháng */}
         <div className="calendar-grid">
+          {/* Render các ngày trong tuần (Mon, Tue, ...) */}
           {weekdays.map((day, index) => (
             <div key={index} className="calendar-weekday">
               {day}
             </div>
           ))}
+          {/* Render từng ngày trong mảng days trả về từ generateCalendarDays */}
           {days.map((day, index) => (
             <div
               key={index}
+              // Gán class để phân biệt ngày trong tháng hiện tại hay ngày mượn từ tháng khác,
+              // và đánh dấu ngày được chọn
               className={`calendar-day ${
                 day.isCurrentMonth ? "current-month" : "other-month"
               } ${selectedDate.isSame(day.date, "day") ? "selected-day" : ""}`}
               onClick={() => {
+                // Khi click vào 1 ngày, cập nhật ngày được chọn và cập nhật luôn tháng hiện tại
                 setSelectedDate(day.date);
                 setCurrentMonth(day.date);
               }}
             >
+              {/* Hiển thị số ngày (ví dụ: 1, 2, ..., 30) */}
               {day.date.date()}
             </div>
           ))}
         </div>
+        {/* Hiển thị ngày được chọn theo định dạng DD/MM/YYYY */}
         <p>Selected Date: {selectedDate.format("DD/MM/YYYY")}</p>
       </div>
     );
