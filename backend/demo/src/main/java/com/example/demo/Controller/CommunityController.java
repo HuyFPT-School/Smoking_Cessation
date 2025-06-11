@@ -256,9 +256,7 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error fetching comments: " + e.getMessage()));
         }
-    }
-
-    // Helper method to convert Post to PostDTO
+    }    // Helper method to convert Post to PostDTO
     private PostDTO convertToPostDTO(Post post, Integer currentUserId) {
         UserDTO authorDTO = new UserDTO(
                 post.getUser().getId(),
@@ -278,10 +276,13 @@ public class CommunityController {
                 authorDTO
         );
 
-        // Check if current user has liked this post
+        // Check if current user has liked this post (only if user is logged in)
         if (currentUserId != null) {
             boolean isLiked = postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
             postDTO.setLikedByCurrentUser(isLiked);
+        } else {
+            // User not logged in, set to false
+            postDTO.setLikedByCurrentUser(false);
         }
 
         // Get comments for this post
