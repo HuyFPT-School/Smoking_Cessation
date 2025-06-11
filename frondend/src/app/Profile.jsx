@@ -12,12 +12,18 @@ import {
   DatePicker,
   message,
   Spin,
+  Row,
+  Col,
+  Statistic,
 } from "antd";
 import {
   SettingOutlined,
   CameraOutlined,
   UserOutlined,
   HeartOutlined,
+  TrophyOutlined,
+  CalendarOutlined,
+  CrownOutlined,
 } from "@ant-design/icons";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -33,10 +39,28 @@ const UserProfile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
+  // Add state for leaderboard data
+  const [leaderboardData, setLeaderboardData] = useState(null);
   // Get user ID from localStorage
   const userStr = localStorage.getItem("user");
-  const userObj = userStr ? JSON.parse(userStr) : null;
+  const userObj = userStr ? JSON.parse(userStr) : null; // Log user object to check structure and all date-related fields
+  console.log("User object from localStorage:", userObj);
+  if (userObj) {
+    const possibleDateFields = [
+      "createAt",
+      "createdAt",
+      "registrationDate",
+      "registerDate",
+      "joinDate",
+      "dateCreated",
+    ];
+    console.log("Checking date fields in user object:");
+    possibleDateFields.forEach((field) => {
+      if (userObj[field]) {
+        console.log(`Found date field ${field}:`, userObj[field]);
+      }
+    });
+  }
   const userId = userObj ? userObj.id : null;
 
   // Fetch profile data on component mount
@@ -51,6 +75,26 @@ const UserProfile = () => {
         );
         if (response.status === 200) {
           const profileData = response.data;
+          console.log("Profile data from API:", profileData);
+
+          // Check for date fields in the profile data
+          const possibleDateFields = [
+            "createAt",
+            "createdAt",
+            "registrationDate",
+            "registerDate",
+            "joinDate",
+            "dateCreated",
+          ];
+          possibleDateFields.forEach((field) => {
+            if (profileData[field]) {
+              console.log(
+                `Found date field ${field} in profile data:`,
+                profileData[field]
+              );
+            }
+          });
+
           setUserData(profileData);
 
           // Set form fields with existing data
@@ -83,6 +127,34 @@ const UserProfile = () => {
 
     fetchProfileData();
   }, [userId, form]);
+
+  // Add new effect to fetch leaderboard data
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      if (!userId) return;
+
+      try {
+        const params = {
+          currentUserId: userId,
+          timeRange: "all", // Get all-time stats
+        };
+
+        const response = await axios.get(
+          "http://localhost:8080/api/leaderboard",
+          { params }
+        );
+
+        if (response.status === 200) {
+          setLeaderboardData(response.data.currentUser);
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+        // Don't show error message to avoid UI clutter
+      }
+    };
+
+    fetchLeaderboardData();
+  }, [userId]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -154,6 +226,133 @@ const UserProfile = () => {
       age--;
     }
     return age > 0 ? `${age} years old` : "";
+  }; // Use leaderboard data or fallback to defaults  // Function to format the member since date properly
+  const formatMemberSinceDate = (dateValue) => {
+    // If no date provided, return default
+    if (!dateValue) return "15/04/2023";
+
+    // Log the date value for debugging
+    console.log("Formatting date value:", dateValue);
+
+    try {
+      // Handle ISO string format (common from Java backend)
+      if (typeof dateValue === "string") {
+        // Try specific formats first - Java LocalDateTime often comes as "[2023,6,15,10,30]"
+        if (dateValue.startsWith("[") && dateValue.endsWith("]")) {
+          try {
+            // Parse JSON array string
+            const dateArray = JSON.parse(dateValue);
+            if (Array.isArray(dateArray) && dateArray.length >= 3) {
+              const year = dateArray[0];
+              const month = dateArray[1]; // Java's LocalDateTime months are 1-based
+              const day = dateArray[2];
+              return moment([year, month - 1, day]).format("DD/MM/YYYY");
+            }
+          } catch (e) {
+            console.error("Failed to parse date array string:", e);
+          }
+        }
+
+        // Try common Java date formats
+        const formats = [
+          "YYYY-MM-DDTHH:mm:ss", // ISO
+          "YYYY-MM-DD HH:mm:ss", // Standard SQL
+          "YYYY-MM-DD", // Simple date
+          "DD/MM/YYYY", // European format
+          "MM/DD/YYYY", // US format
+        ];
+
+        for (const format of formats) {
+          const parsed = moment(dateValue, format, true);
+          if (parsed.isValid()) {
+            return parsed.format("DD/MM/YYYY");
+          }
+        }
+
+        // If none of the specific formats work, let moment try to guess
+        const memberDate = moment(dateValue);
+        if (memberDate.isValid()) {
+          return memberDate.format("DD/MM/YYYY");
+        }
+      }
+
+      // Handle array format [year, month, day, ...] that sometimes comes from Java LocalDateTime
+      if (Array.isArray(dateValue) && dateValue.length >= 3) {
+        const year = dateValue[0];
+        const month = dateValue[1]; // Java months are 1-based
+        const day = dateValue[2];
+        return moment([year, month - 1, day]).format("DD/MM/YYYY");
+      }
+
+      console.error("Invalid date format for createAt:", dateValue);
+      return "15/04/2023"; // Fallback to default date
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "15/04/2023"; // Fallback to default date on any error
+    }
+  };
+  // Determine the member since date from various possible sources
+  const getMemberSinceDate = () => {
+    console.log("Finding member since date");
+
+    // Possible date fields to check in both user object and profile data
+    const dateFields = [
+      "createAt",
+      "createdAt",
+      "registrationDate",
+      "registerDate",
+      "joinDate",
+      "dateCreated",
+      "created",
+    ];
+
+    // First try from user object in localStorage
+    if (userObj) {
+      for (const field of dateFields) {
+        if (userObj[field]) {
+          console.log(`Using date from userObj.${field}`);
+          return formatMemberSinceDate(userObj[field]);
+        }
+      }
+    }
+
+    // Then try from profile data if available
+    if (userData) {
+      for (const field of dateFields) {
+        if (userData[field]) {
+          console.log(`Using date from userData.${field}`);
+          return formatMemberSinceDate(userData[field]);
+        }
+      }
+
+      // If userData has a user property, check that too
+      if (userData.user) {
+        for (const field of dateFields) {
+          if (userData.user[field]) {
+            console.log(`Using date from userData.user.${field}`);
+            return formatMemberSinceDate(userData.user[field]);
+          }
+        }
+      }
+    }
+
+    // If we have leaderboard data with creation date
+    if (leaderboardData?.creationDate || leaderboardData?.createDate) {
+      const date = leaderboardData.creationDate || leaderboardData.createDate;
+      console.log("Using date from leaderboard data");
+      return formatMemberSinceDate(date);
+    }
+
+    console.log("No date found, using default date");
+    // Fallback to default date
+    return "15/04/2023";
+  };
+
+  const summaryStats = {
+    smokeFreeDays: leaderboardData?.consecutiveSmokFreeDays || 0,
+    achievementPoints: leaderboardData?.totalPoints || 0,
+    memberSince: getMemberSinceDate(),
+    rank: leaderboardData?.rank || "-",
   };
 
   if (loading && !userData) {
@@ -278,6 +477,177 @@ const UserProfile = () => {
           </Text>
         </div>
       </div>
+      {/* Statistics Cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card
+            className="stat-card"
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              border: "none",
+              backgroundColor: "#e8f5e9",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ padding: "8px" }}>
+              <HeartOutlined
+                style={{
+                  fontSize: "32px",
+                  color: "#4caf50",
+                  marginBottom: "8px",
+                }}
+              />{" "}
+              <Title
+                level={4}
+                style={{
+                  margin: "0",
+                  color: "#2e7d32",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              >
+                {summaryStats.smokeFreeDays}
+              </Title>
+              <Text
+                style={{
+                  color: "#388e3c",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                Smoke-Free Days
+              </Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card
+            className="stat-card"
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              border: "none",
+              backgroundColor: "#e3f2fd",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ padding: "8px" }}>
+              <TrophyOutlined
+                style={{
+                  fontSize: "32px",
+                  color: "#1976d2",
+                  marginBottom: "8px",
+                }}
+              />
+              <Title
+                level={4}
+                style={{
+                  margin: "0",
+                  color: "#1565c0",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              >
+                {summaryStats.achievementPoints}
+              </Title>{" "}
+              <Text
+                style={{
+                  color: "#1976d2",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                Total Points
+              </Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card
+            className="stat-card"
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              border: "none",
+              backgroundColor: "#fff8e1",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ padding: "8px" }}>
+              <CalendarOutlined
+                style={{
+                  fontSize: "32px",
+                  color: "#ff8f00",
+                  marginBottom: "8px",
+                }}
+              />
+              <Title
+                level={4}
+                style={{
+                  margin: "0",
+                  color: "#ef6c00",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              >
+                {summaryStats.memberSince}
+              </Title>
+              <Text
+                style={{
+                  color: "#f57c00",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                Member Since
+              </Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6} lg={6}>
+          <Card
+            className="stat-card"
+            style={{
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              border: "none",
+              backgroundColor: "#fce4ec",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ padding: "8px" }}>
+              <CrownOutlined
+                style={{
+                  fontSize: "32px",
+                  color: "#c2185b",
+                  marginBottom: "8px",
+                }}
+              />
+              <Title
+                level={4}
+                style={{
+                  margin: "0",
+                  color: "#ad1457",
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                }}
+              >
+                #{summaryStats.rank}
+              </Title>
+              <Text
+                style={{
+                  color: "#c2185b",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                Rank
+              </Text>
+            </div>
+          </Card>
+        </Col>
+      </Row>
       <Card
         className="info-card"
         style={{

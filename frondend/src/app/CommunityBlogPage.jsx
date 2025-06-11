@@ -210,7 +210,17 @@ const ShareBlock = ({ onAddPost }) => {
   const [postContent, setPostContent] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Get current user info
+  const userStr = localStorage.getItem("user");
+  const userObj = userStr ? JSON.parse(userStr) : null;
+  const isLoggedIn = !!userObj;
+
   const handlePost = async () => {
+    if (!isLoggedIn) {
+      message.warning("Please log in to create a post");
+      return;
+    }
+
     if (postTitle.trim() && postContent.trim()) {
       setLoading(true);
       try {
@@ -249,18 +259,28 @@ const ShareBlock = ({ onAddPost }) => {
         >
           {" "}
           <Input
-            placeholder="Enter your post title..."
+            placeholder={
+              isLoggedIn
+                ? "Enter your post title..."
+                : "Log in to create a post"
+            }
             className="share-block-title-input"
             value={postTitle}
             onChange={(e) => setPostTitle(e.target.value)}
             style={{ marginBottom: "12px" }}
+            disabled={!isLoggedIn}
           />
           <TextArea
-            placeholder="Share your thoughts, experiences, or ask for support..."
+            placeholder={
+              isLoggedIn
+                ? "Share your thoughts, experiences, or ask for support..."
+                : "Log in to share your thoughts"
+            }
             rows={4}
             className="share-block-textarea"
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
+            disabled={!isLoggedIn}
           />
           <div className="share-block-button-container">
             {" "}
@@ -269,9 +289,9 @@ const ShareBlock = ({ onAddPost }) => {
               className="share-block-button"
               onClick={handlePost}
               loading={loading}
-              disabled={!postTitle.trim() || !postContent.trim()}
+              disabled={!isLoggedIn || !postTitle.trim() || !postContent.trim()}
             >
-              Post
+              {isLoggedIn ? "Post" : "Log in to Post"}
             </Button>
           </div>
         </Card>
@@ -337,12 +357,18 @@ const CommunityBlogPage = () => {
   const fetchPosts = useCallback(
     async (page = 0, append = false) => {
       try {
+        const params = {
+          page: page,
+          size: 10,
+        };
+
+        // Only add currentUserId if user is logged in
+        if (currentUserId) {
+          params.currentUserId = currentUserId;
+        }
+
         const response = await axios.get(`${API_BASE_URL}/posts`, {
-          params: {
-            page: page,
-            size: 10,
-            currentUserId: currentUserId,
-          },
+          params: params,
         });
 
         if (response.status === 200) {
@@ -358,7 +384,7 @@ const CommunityBlogPage = () => {
             likes: post.likesCount,
             comments: post.commentsCount,
             time: formatTimeAgo(new Date(post.createdAt)),
-            likedByCurrentUser: post.likedByCurrentUser,
+            likedByCurrentUser: post.likedByCurrentUser || false,
             timestamp: new Date(post.createdAt),
             commentsList: post.comments.map((comment) => ({
               author: comment.author,
@@ -400,10 +426,9 @@ const CommunityBlogPage = () => {
     return `${diffDays} days ago`;
   };
   useEffect(() => {
-    if (currentUserId) {
-      fetchPosts();
-    }
-  }, [currentUserId, fetchPosts]);
+    // Always fetch posts, even if user is not logged in
+    fetchPosts();
+  }, [fetchPosts]);
 
   // Handle adding a new post
   const handleAddPost = async (postData) => {
