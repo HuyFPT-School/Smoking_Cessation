@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Button, Row, Col, Card } from "antd";
 import { RiseOutlined, TeamOutlined, BookOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Paragraph, Text } = Typography;
 
