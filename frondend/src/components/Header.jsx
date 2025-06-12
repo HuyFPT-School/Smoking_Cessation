@@ -11,7 +11,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 

@@ -15,8 +15,8 @@ import {
   Alert, // Thông báo cảnh báo
 } from "@mui/material";
 // Import hook để điều hướng trang
-import { useNavigate } from "react-router";
-import { Link as RouterLink } from "react-router";
+import { useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
 // Import context quản lý trạng thái đăng nhập
 import { AuthContext } from "../context/AuthContext";
