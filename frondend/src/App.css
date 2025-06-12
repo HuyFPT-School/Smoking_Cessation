@@ -633,13 +633,12 @@
 
 /* ============================================================================================================================================= */
 
-
-
-
 /*======================================================COACH CHAT======================================================================  */
 
 /* Thêm phần này để đảm bảo chiều cao của các phần cha */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -654,7 +653,6 @@ html, body, #root {
   flex-direction: column;
   margin-bottom: 80px;
   /* Nếu cần, đổi height: 100%; để full height */
-  
 }
 
 .chat-title {
@@ -668,7 +666,6 @@ html, body, #root {
   display: flex;
   gap: 10px;
   height: 100%; /* Thêm để flexbox con có chiều cao chính xác */
- 
 }
 
 .coach-profile-col {
@@ -684,7 +681,6 @@ html, body, #root {
   flex: 1;
   height: 100%; /* Chiếm toàn bộ chiều cao của cột */
   height: 620px;
-  
 }
 
 .chat-box-card {
@@ -739,7 +735,6 @@ html, body, #root {
   padding: 8px;
   overflow-y: auto;
 }
-
 
 /* =================================================================================================================================-- */
 .tracking-container {
@@ -901,7 +896,7 @@ html, body, #root {
 
 .custom-calendar {
   width: 100%;
-  display: none;
+  display: block;
 }
 
 .record-section {
@@ -1986,4 +1981,807 @@ button:hover,
 
 .ant-btn-primary:hover {
   background: #357abd;
+}
+
+/* ========== css BlogPage  ========== */
+
+.community-blog-page {
+  max-width: 65vw;
+  margin: 0 auto;
+}
+
+/* CommunityHeader */
+.community-header {
+  margin-bottom: 32px;
+}
+
+.community-header-title {
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1f1f1f;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+
+.community-header-description {
+  color: #595959;
+  font-size: clamp(12px, 3vw, 14px);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ShareAndStats */
+.share-and-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.share-block {
+  width: calc(100% - 304px);
+  min-width: 280px;
+}
+
+.share-block-card {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.share-block-title {
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 18px);
+  color: #1f1f1f;
+  margin-bottom: 2px;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.share-block-description {
+  font-size: clamp(12px, 3vw, 13px);
+  color: #8c8c8c;
+  margin-top: 0;
+}
+
+.share-block-textarea {
+  margin-bottom: 6px;
+  font-size: clamp(13px, 3vw, 14px);
+}
+
+.share-block-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.share-block-button {
+  background-color: #28a745;
+  border-color: #28a745;
+  border-radius: 4px;
+  padding: 0 24px;
+  height: 32px;
+  font-size: clamp(13px, 3vw, 14px);
+}
+
+.stats-block {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.stats-block-card {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-block-title {
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 18px);
+  color: #1f1f1f;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.stats-block-item {
+  display: flex;
+  align-items: center;
+}
+
+.stats-block-item-margin {
+  margin-bottom: 12px;
+}
+
+.stats-block-icon-container {
+  margin-right: 10px;
+}
+
+.stats-block-icon {
+  font-size: 18px;
+  color: #52c41a;
+}
+
+.stats-block-value {
+  font-weight: 600;
+  font-size: clamp(14px, 3vw, 15px);
+}
+
+.stats-block-label {
+  font-size: clamp(11px, 2.5vw, 12px);
+  color: #8c8c8c;
+  margin-top: -2px;
+}
+
+/* DiscussionsAndGroups */
+.discussions-and-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: center;
+}
+
+.tabs {
+  display: flex;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 360px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 6px 20px;
+  border-radius: 6px;
+}
+
+.tab-button.active {
+  background-color: #fff;
+  font-weight: 600;
+  color: #000;
+}
+
+.tab-button:not(.active) {
+  background-color: transparent;
+  font-weight: 400;
+  color: #8c8c8c;
+}
+
+.tab-button .anticon {
+  color: inherit;
+}
+
+.discussions-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.discussions-search {
+  width: 100%;
+  max-width: 400px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.discussions-new-button {
+  background-color: #28a745;
+  border-color: #28a745;
+  flex-shrink: 0;
+}
+
+.discussion-item-wrapper {
+  margin-bottom: 16px;
+}
+
+.discussions-load-more {
+  text-align: center;
+  margin-top: -10px;
+}
+
+.load-more-button {
+  padding: 6px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* DiscussionItem */
+.discussion-item-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.discussion-item-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.discussion-item-author {
+  display: flex;
+  gap: 12px;
+}
+
+.discussion-item-avatar {
+  background-color: #f0f0f0;
+  color: #555;
+  font-weight: 600;
+}
+
+.discussion-item-author-name {
+  font-weight: 600;
+}
+
+.discussion-item-status {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.discussion-item-meta {
+  text-align: right;
+  color: #8c8c8c;
+  font-size: 12px;
+}
+
+.discussion-item-report {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  color: #595959;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.discussion-item-title {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+
+.discussion-item-content {
+  font-size: 14px;
+  color: #595959;
+  margin-top: 4px;
+}
+
+.discussion-item-tags {
+  margin-top: 12px;
+}
+
+.discussion-item-tag {
+  border-radius: 16px;
+  padding: 2px 12px;
+  font-size: 12px;
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+
+.discussion-item-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.discussion-item-stats {
+  display: flex;
+  gap: 16px;
+  color: #595959;
+}
+
+.discussion-item-icon {
+  margin-right: 4px;
+}
+
+/* SupportGroups */
+.support-groups-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.support-group-item-wrapper {
+  flex: 1 1 300px;
+  min-width: 260px;
+}
+
+/* SupportGroupItem */
+.support-group-item-card {
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  min-height: 193px;
+  display: flex;
+  flex-direction: column;
+}
+
+.support-group-item-content {
+  flex-grow: 1;
+}
+
+.support-group-item-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.support-group-item-avatar {
+  background-color: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.support-group-item-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.support-group-item-description {
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-top: 2px;
+  line-height: 1.4;
+  min-height: 36px;
+}
+
+.support-group-item-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #595959;
+  margin-bottom: 16px;
+}
+
+.support-group-item-button {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+/* StartSupportGroup */
+.start-support-group-card {
+  background-color: #f6ffed;
+  border-color: #b7eb8f;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: -40px;
+}
+
+.start-support-group-card .ant-card-head {
+  background-color: #f6ffed;
+  border-bottom: 1px solid #b7eb8f;
+}
+
+.start-support-group-text {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.start-support-group-button {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #fff;
+}
+
+/*=====================CSS ProgressPage========================*/
+/* Global Ant Design overrides */
+.ant-picker-calendar-mode-switch {
+  display: none !important;
+}
+.ant-picker-calendar {
+  overflow: hidden;
+  border-radius: 8px;
+}
+.ant-slider-track {
+  background-color: #000 !important;
+}
+.ant-slider-handle {
+  background-color: #fff !important;
+}
+.ant-slider-handle:hover,
+.ant-slider-handle:focus {
+  background-color: #fff !important;
+  border-color: #000 !important;
+}
+
+/* Page container */
+.progress-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Section title and description */
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.section-description {
+  color: #888;
+  margin-bottom: 20px;
+}
+
+/* Summary row */
+.summary-row {
+  margin-bottom: 20px !important;
+}
+.summary-card {
+  border-radius: 8px;
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.card-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 13px;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+.card-icon {
+  font-size: 16px;
+}
+.card-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-note {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  line-height: 16px;
+}
+
+/* Check-in row */
+.checkin-row {
+  margin-bottom: 20px;
+}
+.calendar-card,
+.checkin-card {
+  border-radius: 8px;
+  height: 100%;
+}
+.card-description {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+.custom-calendar {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 8px;
+}
+.calendar-header {
+  padding: 8px;
+  display: flex;
+  justify-content: center; /* Căn giữa các ô select */
+  gap: 4px; /* Khoảng cách nhỏ giữa hai ô */
+}
+.calendar-select {
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 80px; /* Đảm bảo kích thước đồng đều */
+}
+.selected-date {
+  color: #888;
+  margin-top: 10px;
+}
+.slider-container {
+  margin-bottom: 16px;
+}
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.slider-labels {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+}
+.symptoms-label {
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.notes-label {
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+.notes-textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #d9d9d9;
+  resize: vertical;
+  min-height: 80px;
+}
+.submit-button {
+  width: 100%;
+  margin-top: 16px;
+  background-color: #16a34a; /* Cùng màu với Record Smoking Incident */
+  color: #fff; /* Chữ màu trắng */
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.submit-button:hover {
+  background-color: #14532d; /* Màu tối hơn khi hover */
+}
+
+/* Progress section */
+.progress-card {
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  margin-top: 20px; /* Thêm margin-top để cách "Smoking Progress" 20px */
+}
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.progress-title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 600;
+}
+.progress-description {
+  color: #888;
+  margin-top: 4px;
+}
+.filter-button {
+  background: #f6ffed;
+  color: #389e0d;
+  font-weight: 500;
+  border: 1px solid #b7eb8f;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.tab-container {
+  display: inline-flex;
+  gap: 0;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.tab-button {
+  border: none;
+  background: #f5f5f5;
+  color: #888;
+  font-weight: 500;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-button.active {
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+}
+.chart-container {
+  height: 300px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+}
+.chart-placeholder {
+  height: 100%;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
+/* Health Improvements section */
+.improvements-card {
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid #d9d9d9;
+}
+.improvements-header {
+  margin-bottom: 16px;
+}
+.improvements-title {
+  font-size: 27px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.improvements-description {
+  color: #888;
+  font-size: 17px;
+  margin: 0;
+}
+.improvements-content {
+  font-size: 112%;
+}
+.improvements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.improvement-item {
+  background: #fcfcfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.improvement-item.done {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.item-info {
+  display: flex;
+  gap: 12px;
+}
+.item-icon {
+  background: #f0f0f0;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.item-icon.done {
+  background: #e6ffed;
+}
+.item-icon .anticon {
+  font-size: 16px;
+  color: #555;
+}
+.item-icon.done .anticon {
+  color: #52c41a;
+}
+.item-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #000;
+  font-size: 105%;
+}
+.item-description {
+  color: #555;
+  font-size: 105%;
+}
+.item-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+.time-badge {
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #000;
+  font-weight: 600;
+  font-size: 95%;
+}
+.status-text {
+  color: #888;
+  font-size: 95%;
+}
+.status-text.done {
+  color: #389e0d;
+}
+.progress-container {
+  margin-top: 8px;
+}
+.progress-label {
+  font-size: 90%;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+/* Health Benefits section */
+.benefits-card {
+  background: #e6f4ea; /* Cập nhật màu nền giống Tips to Overcome Cravings */
+  border: 1px solid #b7eb8f;
+  border-radius: 12px;
+  padding: 24px;
+}
+.benefits-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.benefits-description {
+  color: #888;
+  margin-bottom: 24px;
+}
+.benefit-item {
+  border-radius: 8px;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+}
+.benefit-header {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.benefit-icon .anticon {
+  color: #52c41a;
+  font-size: 18px;
+}
+.benefit-list {
+  padding-left: 18px;
+  margin: 0;
+  color: #444;
+}
+.benefit-point {
+  margin-bottom: 4px;
+  font-size: 14px;
 }

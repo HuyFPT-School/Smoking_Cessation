@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Input, Button, Card, Avatar, Tag, message } from "antd";
 import { MessageOutlined, LikeOutlined } from "@ant-design/icons";
 import axios from "axios";
-import "../index.css";
+import "../App.css";
 
 const { TextArea } = Input;
 
