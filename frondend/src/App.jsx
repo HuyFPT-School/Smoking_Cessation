@@ -12,8 +12,8 @@ import Plan from "./app/Plan";
 import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho CommunityBlogPage
 import LeaderboardPage from "./app/LeaderboardPage";
 import Profile from "./app/Profile";
-
 import CoachChat from "./app/CoachChat"; // 6/7/2025 thêm import cho CoachChat
+import ProgressPage from "./app/ProgressPage"; // Thêm import cho ProgressPage
 
 function App() {
   return (
@@ -32,6 +32,7 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/coachchat" element={<CoachChat />} />
+          <Route path="/progress" element={<ProgressPage />} />
         </Routes>
         <Footer />
       </AuthProvider>
