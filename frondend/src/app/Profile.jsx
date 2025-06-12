@@ -34,7 +34,7 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const UserProfile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -194,6 +194,18 @@ const UserProfile = () => {
 
       if (response.status === 200) {
         setUserData(response.data);
+
+        // Update user state in AuthContext if name was updated
+        if (values.name && values.name !== user?.name) {
+          const updatedUser = {
+            ...user,
+            name: values.name,
+          };
+          setUser(updatedUser);
+          // Also update localStorage
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+
         setIsModalVisible(false);
         message.success("Profile updated successfully!");
       }
