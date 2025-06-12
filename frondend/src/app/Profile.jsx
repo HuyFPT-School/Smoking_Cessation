@@ -10,12 +10,12 @@ import {
   Select,
   Upload,
   DatePicker,
-  message,
   Spin,
   Row,
   Col,
   Statistic,
 } from "antd";
+import { Snackbar, Alert } from "@mui/material";
 import {
   SettingOutlined,
   CameraOutlined,
@@ -24,8 +24,11 @@ import {
   TrophyOutlined,
   CalendarOutlined,
   CrownOutlined,
+  GoogleOutlined,
 } from "@ant-design/icons";
 import { AuthContext } from "../context/AuthContext";
+import { auth } from "../firebase";
+import { GoogleAuthProvider, linkWithPopup } from "firebase/auth";
 import axios from "axios";
 import moment from "moment";
 import "../App.css";
@@ -40,7 +43,32 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   // Add state for leaderboard data
-  const [leaderboardData, setLeaderboardData] = useState(null);
+  const [leaderboardData, setLeaderboardData] = useState(null); // Google account linking state
+  const [linkingGoogle, setLinkingGoogle] = useState(false);
+
+  // Snackbar state for notifications
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info", // 'success', 'error', 'warning', 'info'
+  });
+
+  // Helper function to show snackbar
+  const showSnackbar = (message, severity = "info") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  // Helper function to close snackbar
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
   // Get user ID from localStorage
   const userStr = localStorage.getItem("user");
   const userObj = userStr ? JSON.parse(userStr) : null; // Log user object to check structure and all date-related fields
@@ -118,7 +146,7 @@ const UserProfile = () => {
           console.log("No profile found, user can create one");
         } else {
           console.error("Error fetching profile data:", error);
-          message.error("Failed to load profile data");
+          showSnackbar("Failed to load profile data", "error");
         }
       } finally {
         setLoading(false);
@@ -170,7 +198,7 @@ const UserProfile = () => {
   };
   const handleFinish = async (values) => {
     if (!userId) {
-      message.error("User ID not found");
+      showSnackbar("User ID not found", "error");
       return;
     }
 
@@ -205,15 +233,74 @@ const UserProfile = () => {
           // Also update localStorage
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
-
         setIsModalVisible(false);
-        message.success("Profile updated successfully!");
+        showSnackbar("Profile updated successfully!", "success");
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      message.error("Failed to save profile. Please try again.");
+      showSnackbar("Failed to save profile. Please try again.", "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Google account linking function
+  const handleLinkGoogleAccount = async () => {
+    if (!auth.currentUser) {
+      showSnackbar("Please log in first", "error");
+      return;
+    }
+
+    setLinkingGoogle(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await linkWithPopup(auth.currentUser, provider);
+
+      // Get updated token with Google info
+      const idToken = await result.user.getIdToken(true);
+
+      // Update backend with new Google info
+      const response = await axios.post(
+        "http://localhost:8080/api/user/me",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedUser = response.data.user || response.data;
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        showSnackbar(
+          "🎉 Google account linked successfully! You can now login with Google or Email/Password.",
+          "success"
+        );
+      }
+    } catch (error) {
+      console.error("Error linking Google account:", error);
+      if (error.code === "auth/popup-closed-by-user") {
+        showSnackbar("Google linking cancelled.", "info");
+      } else if (error.code === "auth/credential-already-in-use") {
+        showSnackbar(
+          "This Google account is already linked to another user.",
+          "error"
+        );
+      } else if (error.code === "auth/provider-already-linked") {
+        showSnackbar(
+          "Google account is already linked to your account.",
+          "info"
+        );
+      } else {
+        showSnackbar(
+          "Failed to link Google account. Please try again.",
+          "error"
+        );
+      }
+    } finally {
+      setLinkingGoogle(false);
     }
   };
   const calculateAge = (birthdate) => {
@@ -420,6 +507,26 @@ const UserProfile = () => {
           }}
         >
           Settings
+        </Button>
+
+        {/* Google Account Link Button */}
+        <Button
+          icon={<GoogleOutlined />}
+          className="google-link-btn"
+          onClick={handleLinkGoogleAccount}
+          loading={linkingGoogle}
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "120px",
+            backgroundColor: "rgba(234, 67, 53, 0.9)",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: "500",
+          }}
+        >
+          Link Google
         </Button>
       </div>
       <div
@@ -1041,9 +1148,25 @@ const UserProfile = () => {
               <Option value="fair">Fair</Option>
               <Option value="poor">Poor</Option>
             </Select>
-          </Form.Item>
+          </Form.Item>{" "}
         </Form>
       </Modal>
+      {/* MUI Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

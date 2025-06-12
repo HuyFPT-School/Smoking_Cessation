@@ -45,17 +45,33 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 String picture = decodedToken.getPicture();
 
                 // Tìm user, nếu chưa có thì tạo mới
-                User user = userRepo.findByEmail(email);
-
+                User user = userRepo.findByEmail(email);                
                 if (user == null) {
                     user = new User();
                     user.setEmail(email);
-                    user.setName(name != null ? name : "Anonymous");
-                    user.setAvatarUrl(picture);
+                    String userName = name != null ? name : "Anonymous User";
+                    user.setName(userName);
+                    
+                    // ✅ SỬA: Logic chọn avatar
+                    if (picture != null && !picture.isBlank()) {
+                        // Có avatar từ Google/Firebase → dùng avatar đó
+                        user.setAvatarUrl(picture);
+                    } else {
+                        // Không có avatar từ Google → dùng DiceBear
+                        String diceBearAvatar = "https://api.dicebear.com/7.x/initials/svg?seed=" + userName;
+                        user.setAvatarUrl(diceBearAvatar);
+                    }
+                    
                     user.setPassword(null);
                     user.setRole(Role.USER);
                     user.setCreateAt(LocalDateTime.now());
                     user = userRepo.save(user);
+                } else {
+                    // ✅ THÊM: Cập nhật avatar nếu user link với Google
+                    if (picture != null && !picture.equals(user.getAvatarUrl())) {
+                        user.setAvatarUrl(picture);
+                        userRepo.save(user);
+                    }
                 }
 
                 UsernamePasswordAuthenticationToken authentication =
