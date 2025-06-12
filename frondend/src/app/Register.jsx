@@ -26,8 +26,6 @@ import { auth } from "../firebase";
 import {
   createUserWithEmailAndPassword, // Tạo tài khoản bằng email/password
   updateProfile, // Cập nhật thông tin profile
-  GoogleAuthProvider, // Nhà cung cấp đăng nhập Google
-  linkWithPopup, // Liên kết tài khoản với popup
 } from "firebase/auth";
 // Import thư viện gọi API
 import axios from "axios";
@@ -109,50 +107,26 @@ const Register = () => {
       });
 
       //  Đợi Firebase cập nhật profile hoàn tất
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      //  Lấy token mới sau khi update profile (đảm bảo name đúng)
+      await new Promise((resolve) => setTimeout(resolve, 500)); //  Lấy token mới sau khi update profile (đảm bảo name đúng)
       const idToken = await result.user.getIdToken(true);
 
-      //  **TỰ ĐỘNG LIÊN KẾT GOOGLE NGAY SAU ĐĂNG KÝ**
-      const provider = new GoogleAuthProvider(); // Tạo provider Google
-      try {
-        // Thử liên kết tài khoản với Google
-        await linkWithPopup(result.user, provider);
-        showSnackbar(
-          "🎉 Đã liên kết Google thành công! Bạn có thể đăng nhập bằng Google hoặc Email/Password.",
-          "success"
-        );
-      } catch (err) {
-        // Xử lý các lỗi có thể xảy ra khi liên kết Google
-        if (err.code === "auth/popup-closed-by-user") {
-          // Người dùng đóng popup
-          showSnackbar(
-            "Bạn đã bỏ qua liên kết Google. Bạn có thể liên kết lại trong cài đặt tài khoản.",
-            "info"
-          );
-        } else if (err.code === "auth/credential-already-in-use") {
-          // Tài khoản Google đã được liên kết với user khác
-          showSnackbar(
-            "Tài khoản Google này đã liên kết với user khác. Hãy đăng nhập Google rồi liên kết lại.",
-            "error"
-          );
-        } else {
-          // Lỗi khác
-          showSnackbar("Không thể liên kết Google tự động.", "error");
-        }
-      }
-      //  **KẾT THÚC TỰ ĐỘNG LIÊN KẾT GOOGLE**
+      // LOẠI BỎ: Không tự động link Google nữa
+      // Chỉ đăng ký email/password thuần túy
 
-      // Luôn fetch thông tin user từ backend dù có liên kết Google hay không
+      // Gọi backend để tạo user trong database
       await fetchUserFromBackend(idToken);
     } catch (err) {
       // Xử lý lỗi khi đăng ký
-      console.error(err);
+      console.error("Registration error:", err);
       if (err.code === "auth/email-already-in-use") {
         // Email đã được sử dụng
         showSnackbar(
           " Email already exists. Please use another email.",
+          "error"
+        );
+      } else if (err.code === "auth/weak-password") {
+        showSnackbar(
+          "Password is too weak. Please use a stronger password.",
           "error"
         );
       } else {
@@ -208,8 +182,9 @@ const Register = () => {
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            helperText="Password must be more 5 characters" // Text hướng dẫn
+            helperText="Password must be more than 6 characters" // Text hướng dẫn
             required
+            error={password.length > 0 && password.length < 6}
           />
 
           {/* Checkbox đồng ý điều khoản */}
