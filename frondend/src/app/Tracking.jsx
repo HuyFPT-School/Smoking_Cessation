@@ -326,11 +326,13 @@ const Tracking = () => {
   };
 
   const renderChart = () => {
-    const chartData = getChartDataFromIncidents();
-    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0);
+    const chartData = getChartDataFromIncidents(); // Lấy dữ liệu biểu đồ từ danh sách các sự kiện (incidents)
+    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0); // Tính tổng số lần hút thuốc trong dữ liệu biểu đồ
     // Hiển thị khoảng tuần
     const weekStart = selectedDate.clone().startOf("week").format("DD/MM");
+    // Lấy ngày bắt đầu của tuần từ ngày được chọn và định dạng là "DD/MM"
     const weekEnd = selectedDate.clone().endOf("week").format("DD/MM/YYYY");
+    // Lấy ngày kết thúc của tuần từ ngày được chọn và định dạng là "DD/MM/YYYY"
 
     return (
       <div className="chart-container">
@@ -352,8 +354,10 @@ const Tracking = () => {
         ) : (
           <div className="chart-bars">
             {chartData.map((data, index) => {
-              const heightPx = data.smoking * 20;
+              //lặp qua chartData bằng map()
+              const heightPx = data.smoking * 20; // tính chều cao cột dựa trên số lần hút thuốc
               // Highlight cột nếu là ngày đang chọn
+              //isSelected có giá trị true nếu ngày đang chọn (selectedDate) trùng với ngày của data.date
               const isSelected =
                 selectedDate.format("YYYY-MM-DD") === data.date;
               return (
@@ -361,18 +365,19 @@ const Tracking = () => {
                   <div
                     className="bar smoking"
                     style={{
-                      height: `${heightPx}px`,
-                      minHeight: data.smoking > 0 ? "20px" : "2px",
-                      background: isSelected ? "#1890ff" : undefined,
-                      border: isSelected ? "0px solid #0050b3" : undefined,
+                      height: `${heightPx}px`, //Gán chiều cao của cột dựa trên giá trị heightPx đã tính trước đó (số lần hút thuốc * 20px)
+                      minHeight: data.smoking > 0 ? "20px" : "2px", // nếu có hút thuốc thì height tối thiểu là 20px, ko có : 2px
+                      background: isSelected ? "#1890ff" : undefined, //if cột đang đc chọn thì màu xanh, ko thì màu css
+                      border: isSelected ? "0px solid #0050b3" : undefined, // giống trên
                     }}
                   />
-                  <span className="bar-label">{data.day}</span>
+                  <span className="bar-label">{data.day}</span>{" "}
+                  {/* hiển thị ngày trong tuần*/}
                   <span
                     className="bar-value"
                     style={{ fontSize: "12px", color: "#666" }}
                   >
-                    {data.smoking}
+                    {data.smoking} {/* hiển thị số lần hút thuốc*/}
                   </span>
                 </div>
               );
@@ -380,6 +385,7 @@ const Tracking = () => {
           </div>
         )}
         <div style={{ marginTop: "10px", fontSize: "12px", color: "#666" }}>
+          {/* Hiển thị tổng số sự kiện (hút thuốc hoặc thèm thuốc) trong tuần */}
           Total {activityType} incidents this week: {totalIncidents}
         </div>
       </div>
@@ -388,23 +394,26 @@ const Tracking = () => {
 
   // Lọc các sự kiện theo tuần của ngày đang chọn
   const getWeekIncidents = () => {
-    const weekStart = selectedDate.clone().startOf("week");
-    const weekEnd = selectedDate.clone().endOf("week");
-
+    const weekStart = selectedDate.clone().startOf("week"); // Lấy ngày bắt đầu của tuần từ ngày được chọn (selectedDate)
+    const weekEnd = selectedDate.clone().endOf("week"); // Lấy ngày kết thúc của tuần từ ngày được chọn
+    {
+      /*Duyệt qua toàn bộ mảng incidents (danh sách các sự kiện), và lọc lại những sự kiện thỏa điều kiện bên dưới*/
+    }
     return incidents.filter((incident) => {
-      const incidentDate = moment(incident.date);
+      const incidentDate = moment(incident.date); //Tạo một đối tượng thời gian từ incident.date bằng thư viện moment
       return (
-        incidentDate.isSameOrAfter(weekStart, "day") &&
-        incidentDate.isSameOrBefore(weekEnd, "day") &&
-        incident.type === activityType
+        incidentDate.isSameOrAfter(weekStart, "day") && //Kiểm tra xem sự kiện có xảy ra sau hoặc đúng ngày bắt đầu tuần hay không
+        incidentDate.isSameOrBefore(weekEnd, "day") && //Và sự kiện cũng phải xảy ra trước hoặc đúng ngày kết thúc tuần
+        incident.type === activityType //Đồng thời, loại sự kiện (type) phải trùng với loại hoạt động được chọn
       );
     });
   };
 
-  // Sử dụng các sự kiện đã lọc theo tuần thay vì toàn bộ
+  // Gọi hàm getWeekIncidents() để lấy danh sách các sự kiện xảy ra trong tuần đã chọn
   const filteredIncidents = getWeekIncidents();
 
   const countTriggers = () => {
+    //triggerCount chứa các loại nguyên nhân phổ biến, giá trị ban đầu = 0
     const triggerCount = {
       stress: 0,
       social: 0,
@@ -418,17 +427,22 @@ const Tracking = () => {
       socialinteraction: 0,
     };
 
-    // Chỉ đếm triggers từ các sự kiện trong tuần được chọn
+    // Gọi hàm getWeekIncidents() để lấy các sự kiện xảy ra trong tuần hiện tại
     const weekIncidents = getWeekIncidents();
     weekIncidents.forEach((incident) => {
+      //Duyệt qua từng phần tử (incident) trong mảng weekIncidents
       if (incident.trigger in triggerCount) {
+        // kiểm tra xem cái skien hiện tại có trong triggerCount ko , có thì tăng số đếm
         triggerCount[incident.trigger]++;
       }
     });
     return triggerCount;
   };
-
+  // Gọi hàm countTriggers() để lấy số lần xuất hiện của từng trigger trong tuần
   const triggerCounts = countTriggers();
+
+  // Duyệt qua tất cả các key (tức là các loại trigger) trong triggerCounts bằng Object.keys(...), và
+  // dùng .map() để chuyển mỗi trigger thành một object mới có định dạng { label, value }.
   const triggersData = Object.keys(triggerCounts).map((key) => ({
     label: triggerLabels[key],
     value: triggerCounts[key],
@@ -444,25 +458,29 @@ const Tracking = () => {
             <h3>Select Date</h3>
             <p>Choose a date to record activity or view data</p>
             {renderCalendar()}
+            {/*hiển thị giao diện chọn ngày*/}
           </div>
           <div className="record-section">
             <h3>Record Activity</h3>
             <p>Log a smoking incident</p>
             <form onSubmit={handleSubmit} className="tracking-form">
+              {/*gọi hàm handleSubmit khi người dùng nhấn nút submit */}
               <Radio.Group
-                value={activityType}
-                onChange={(e) => setActivityType(e.target.value)}
+                value={activityType} // Giá trị hiện tại của lựa chọn (được lưu trong state activityType)
+                onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn một lựa chọn mới, cập nhật activityType
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                {/*tạo 2 sự lựa chọn để ngdungf chọn */}
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
-              {activityType === "smoking" ? (
+              {activityType === "smoking" ? ( // nếu activityType đang là "smoking" thì hiện giao diện cho smoking
                 <>
                   <div className="form-group">
                     <label>Time</label>
                     <Input
                       value={time}
+                      //Cập nhật giá trị time trong state mỗi khi người dùng thay đổi nội dung trong ô nhập thời gian.
                       onChange={(e) => setTime(e.target.value)}
                       placeholder="06:36 PM"
                       readOnly
@@ -472,7 +490,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      onChange={(e) => setLocation(e.target.value)} // cho ng dùng nhập địa điểm xảy ra sự liện
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -484,7 +502,7 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)}
+                      onChange={(value) => setTrigger(value)} // cho ng dùng chọn cái nguyên nhân xảy ra hành vi bằng option
                       options={triggerOptions}
                     />
                   </div>
@@ -496,12 +514,13 @@ const Tracking = () => {
                         border: "0px",
                       }}
                       value={satisfaction}
-                      onChange={(value) => setSatisfaction(value)}
+                      onChange={(value) => setSatisfaction(value)} // ng dùng chọn mức độ hài lòng bằng thanh kéo
                       min={1}
                       max={10}
                     />
                     <p>
                       Current: {satisfaction} -{" "}
+                      {/*nếu <=3 mức độ hài lòng là low , <=7 thì medium, còn lại thì là hight */}
                       {satisfaction <= 3
                         ? "Low satisfaction"
                         : satisfaction <= 7
@@ -516,6 +535,7 @@ const Tracking = () => {
                     <label>Time</label>
                     <Input
                       value={time}
+                      //Cập nhật giá trị time trong state mỗi khi người dùng thay đổi nội dung trong ô nhập thời gian.
                       onChange={(e) => setTime(e.target.value)}
                       placeholder="06:36 PM"
                       readOnly
@@ -525,7 +545,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      onChange={(e) => setLocation(e.target.value)} // cho ng dùng nhập địa điểm xảy ra sự liện
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -537,23 +557,25 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)}
+                      onChange={(value) => setTrigger(value)} // cho ng dùng chọn cái nguyên nhân xảy ra hành vi bằng option
                       options={triggerOptions}
                     />
                   </div>
                   <div className="form-group">
                     <label>Craving Intensity Level (1-10)</label>
+                    {/*đánh giá mức độ cơn thèm thuốc*/}
                     <Slider
                       style={{
                         padding: "4px",
                         border: "0px",
                       }}
-                      value={cravingIntensity}
-                      onChange={(value) => setCravingIntensity(value)}
+                      value={cravingIntensity} //Gán giá trị hiện tại của thanh trượt (lưu trong state cravingIntensity).
+                      onChange={(value) => setCravingIntensity(value)} //Cập nhật state khi người dùng thay đổi giá trị slider.
                       min={1}
                       max={10}
                     />
                     <p>
+                      {/*nếu <=3 mức độ cơn thèm thuốc là low , <=7 thì medium, còn lại thì là hight */}
                       Current: {cravingIntensity} -{" "}
                       {cravingIntensity <= 3
                         ? "Low intensity"
@@ -566,19 +588,22 @@ const Tracking = () => {
               )}
               <div className="form-group">
                 <label>Notes</label>
+                {/*Ô nhập nhiều dòng, phù hợp văn bnr dài */}
                 <Input.TextArea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  value={notes} //Hiển thị nội dung hiện tại từ biến notes.
+                  onChange={(e) => setNotes(e.target.value)} //Cập nhật notes khi người dùng nhập.
                   placeholder="Emotions, thoughts, effectiveness of coping strategy..."
                   rows={3}
                 />
               </div>
               <Button
+                //Gửi thông tin đã nhập vào biểu mẫu (thời gian, địa điểm, trigger, ghi chú...)
+                // để ghi lại một hành vi hút thuốc hoặc cơn thèm thuốc.
                 style={{ backgroundColor: "#16A34A", color: "#fff" }}
                 htmlType="submit"
                 className="submit-button"
               >
-                {activityType === "smoking"
+                {activityType === "smoking" // hiển thị đúng loại sự kiện (hút thuốc, thèm thuốc)
                   ? "RECORD SMOKING INCIDENT"
                   : "RECORD CRAVING INCIDENT"}
               </Button>
@@ -594,15 +619,17 @@ const Tracking = () => {
           <TabPane tab="Chart" key="chart">
             <div className="chart-header" style={{ marginBottom: "10px" }}>
               <Radio.Group
-                value={activityType}
-                onChange={(e) => setActivityType(e.target.value)}
+                value={activityType} //Gắn giá trị hiện tại (state) để hiển thị lựa chọn đang chọn.
+                onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn mục khác → cập nhật lại activityType.
                 className="activity-type"
                 style={{ marginBottom: "10px" }}
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                {/*hiển thị 2 lựa chọn*/}
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
             </div>
+            {/* Gọi hàm renderChart để hiển thị biểu đồ tùy theo lựa chọn (smoking hoặc craving).*/}
             {renderChart()}
           </TabPane>
           <TabPane tab="Log" key="log">
@@ -616,20 +643,23 @@ const Tracking = () => {
                 }}
               >
                 <Radio.Group
-                  value={activityType}
-                  onChange={(e) => setActivityType(e.target.value)}
+                  value={activityType} //Gắn giá trị hiện tại (state) để hiển thị lựa chọn đang chọn.
+                  onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn mục khác → cập nhật lại activityType.
                   className="activity-type"
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                  {/*hiển thị 2 lựa chọn*/}
                   <Radio.Button value="craving">Craving Incidents</Radio.Button>
                 </Radio.Group>
                 <span style={{ fontSize: "14px", color: "#666" }}>
                   Week: {selectedDate.clone().startOf("week").format("DD/MM")} -{" "}
+                  {/*lấy ngày bắt đầu tuần*/}
                   {selectedDate.clone().endOf("week").format("DD/MM/YYYY")}
+                  {/*lấy ngày bắt đầu tuần*/}
                 </span>
               </div>
             </div>
-            {filteredIncidents.length === 0 ? (
+            {filteredIncidents.length === 0 ? ( //Kiểm tra xem danh sách sự kiện đã lọc trong tuần hiện tại có rỗng không.
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -637,6 +667,7 @@ const Tracking = () => {
                 <p>Start recording your activities to see the log data.</p>
               </div>
             ) : (
+              // Nếu có dữ liệu, hiển thị bảng ghi chép chi tiết các sự kiện
               <table className="log-table">
                 <thead>
                   <tr>
@@ -645,6 +676,7 @@ const Tracking = () => {
                     <th>Location</th>
                     <th>Trigger</th>
                     <th>
+                      {/*// Tùy theo loại hoạt động, tiêu đề sẽ là 'Satisfaction' (nếu hút thuốc) hoặc 'Intensity' (nếu thèm thuốc)*/}
                       {activityType === "smoking"
                         ? "Satisfaction"
                         : "Intensity"}
@@ -653,16 +685,28 @@ const Tracking = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredIncidents.map((incident, index) => (
-                    <tr key={index}>
-                      <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
-                      <td>{incident.time}</td>
-                      <td>{incident.location || "-"}</td>
-                      <td>{incident.trigger}</td>
-                      <td>{incident.satisfaction}/10</td>
-                      <td>{incident.notes}</td>
-                    </tr>
-                  ))}
+                  {filteredIncidents.map(
+                    (
+                      incident,
+                      index //Lặp qua các sự kiện đã lọc trong tuần (filteredIncidents)
+                    ) => (
+                      <tr key={index}>
+                        {/*Tạo 1 dòng trong bảng cho mỗi sự kiện (mỗi incident).*/}
+                        <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
+                        {/*ngày sự kiện*/}
+                        <td>{incident.time}</td>
+                        {/*Thời gian diễn ra sự kiện*/}
+                        <td>{incident.location || "-"}</td>
+                        {/*nơi diễn ra*/}
+                        <td>{incident.trigger}</td>
+                        {/*nguyên nhân*/}
+                        <td>{incident.satisfaction}/10</td>
+                        {/* mức độ hài lòng*/}
+                        <td>{incident.notes}</td>
+                        {/*ghi chú*/}
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             )}
@@ -678,22 +722,25 @@ const Tracking = () => {
             >
               <div style={{ display: "flex", alignItems: "center" }}>
                 <Radio.Group
-                  value={activityType}
-                  onChange={(e) => setActivityType(e.target.value)}
+                  value={activityType} //Liên kết trạng thái hiện tại (activityType) với nhóm radio.
+                  onChange={(e) => setActivityType(e.target.value)} //Cập nhật trạng thái khi người dùng thay đổi lựa chọn.
                   className="activity-type"
                   style={{ marginRight: "15px" }}
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
+                  {/*2 sự lựa chọn*/}
                   <Radio.Button value="craving">Craving Incidents</Radio.Button>
                 </Radio.Group>
                 <h3 style={{ margin: 0 }}>Most Common Triggers</h3>
               </div>
               <span style={{ fontSize: "14px", color: "#666" }}>
                 Week: {selectedDate.clone().startOf("week").format("DD/MM")} -{" "}
+                {/*Tạo một bản sao của selectedDate và chuyển nó về ngày đầu tuần(t2)*/}
                 {selectedDate.clone().endOf("week").format("DD/MM/YYYY")}
+                {/*cuối tuần*/}
               </span>
             </div>
-            {incidents.length === 0 ? (
+            {incidents.length === 0 ? ( //Kiểm tra nếu không có dữ liệu sự kiện nào
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -703,32 +750,41 @@ const Tracking = () => {
             ) : (
               <>
                 <div className="trigger-chart">
-                  {triggersData.map((trigger, index) => (
-                    <div key={index} className="trigger-bar-group">
-                      <span className="trigger-label">{trigger.label}</span>
-                      <div
-                        className="trigger-bar"
-                        style={{
-                          width: `${
-                            trigger.value > 0
-                              ? (trigger.value /
-                                  Math.max(
-                                    ...triggersData.map((t) => t.value),
-                                    1
-                                  )) *
-                                100
-                              : 0
-                          }%`,
-                          backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
-                        }}
-                      >
-                        <span className="trigger-value">{trigger.value}</span>
+                  {triggersData.map(
+                    (
+                      trigger,
+                      index // Duyệt qua mảng triggersData để vẽ từng thanh trigger
+                    ) => (
+                      <div key={index} className="trigger-bar-group">
+                        <span className="trigger-label">{trigger.label}</span>
+                        {/*Nhãn trigger (ví dụ: Stress, Habit, ... ) */}
+                        <div
+                          // Thanh thể hiện độ dài tỉ lệ theo số lượng trigger
+                          className="trigger-bar"
+                          style={{
+                            width: `${
+                              trigger.value > 0
+                                ? (trigger.value /
+                                    Math.max(
+                                      ...triggersData.map((t) => t.value),
+                                      1
+                                    )) *
+                                  100
+                                : 0
+                            }%`, // Tính chiều dài thanh theo phần trăm
+                            backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                          }}
+                        >
+                          <span className="trigger-value">{trigger.value}</span>
+                          {/* Số lượng trigger hiển thị trên thanh */}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
                 <p>
                   Chart shows the most common triggers leading to{" "}
+                  {/* Nếu activityType là "smoking" thì hiển thị "smoking", ngược lại hiển thị "craving" */}
                   {activityType === "smoking" ? "smoking" : "craving"}
                 </p>
               </>
