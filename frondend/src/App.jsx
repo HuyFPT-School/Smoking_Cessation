@@ -32,7 +32,6 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/coachchat" element={<CoachChat />} />
-          <Route path="/progress" element={<ProgressPage />} />
         </Routes>
         <Footer />
       </AuthProvider>
