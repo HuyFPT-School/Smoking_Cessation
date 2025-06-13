@@ -106,7 +106,6 @@ const Header = () => {
               { label: "Leaderboard", path: "/leaderboard" },
               { label: "Blog", path: "/blog" },
               { label: "CoachChat", path: "/coachchat" },
-              { label: "Progress", path: "/progress" },
             ].map((item) => (
               <MuiLink
                 key={item.label}
