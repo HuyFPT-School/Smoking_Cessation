@@ -6,15 +6,13 @@ import { useNavigate } from "react-router-dom";
 const { Title, Paragraph, Text } = Typography;
 
 const stats = [
-  // Định nghĩa mảng tĩnh chứa các số liệu thống kê (data mẫu).
-  { value: "70%", description: "of smokers want to quit" }, // Số liệu 1: 70% người hút thuốc muốn bỏ.
-  { value: "20 min", description: "to see health improvements" }, // Số liệu 2: Cải thiện sức khỏe sau 20 phút.
-  { value: "10 years", description: "to reduce lung cancer risk by half" }, // Số liệu 3: Giảm nguy cơ ung thư phổi sau 10 năm.
-  { value: "$2,000+", description: "saved annually by quitting" }, // Số liệu 4: Tiết kiệm trên $2000/năm khi bỏ thuốc.
+  { value: "70%", description: "of smokers want to quit" },
+  { value: "20 min", description: "to see health improvements" },
+  { value: "10 years", description: "to reduce lung cancer risk by half" },
+  { value: "$2,000+", description: "saved annually by quitting" },
 ];
 
 const StatsSection = () => (
-  // Component con hiển thị section số liệu thống kê.
   <div style={{ background: "#fff", padding: "60px 24px" }}>
     <div
       style={{
@@ -64,7 +62,6 @@ const StatsSection = () => (
 );
 
 const SupportSection = () => (
-  // Component con hiển thị section hỗ trợ.
   <div style={{ padding: "150px 24px", background: "#f5f7fa" }}>
     {/* Container với padding lớn, nền xám nhạt */}
     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
