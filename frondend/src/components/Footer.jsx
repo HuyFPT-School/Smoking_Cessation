@@ -1,7 +1,8 @@
 import React from "react";
 import { Layout, Row, Col, Typography, Space, Divider } from "antd";
 import { CopyrightOutlined, HeartOutlined } from "@ant-design/icons";
-
+import { Link as MuiLink } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 const { Footer: AntFooter } = Layout;
 const { Title, Text, Link } = Typography;
 
@@ -10,10 +11,13 @@ function Footer() {
     <AntFooter
       style={{ background: "#f5f5f5", padding: "40px 80px 20px 80px" }}
     >
+      {/* Grid layout với 4 cột thông tin */}
       <Row gutter={[32, 32]}>
+        {/* Cột 1: Logo và mô tả ứng dụng */}
         <Col xs={24} sm={12} md={8} lg={6}>
           <Space direction="vertical">
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {/* SVG Logo hình lá - biểu tượng của ứng dụng */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="28"
@@ -32,6 +36,7 @@ function Footer() {
                 BreatheFree
               </Title>
             </div>
+            {/* Mô tả ngắn về ứng dụng */}
             <Text type="secondary">
               Supporting your journey to a smoke-free life with evidence-based
               tools and community support.
@@ -39,11 +44,14 @@ function Footer() {
           </Space>
         </Col>
 
+        {/* Cột 2: Các liên kết điều hướng trong ứng dụng */}
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Platform</Title>
           <Space direction="vertical">
-            <Link
-              href="#"
+            {/* Sử dụng MuiLink với RouterLink để điều hướng nội bộ */}
+            <MuiLink
+              component={RouterLink}
+              to="/Dashboard"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -53,9 +61,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Dashboard
-            </Link>
-            <Link
-              href="#"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/Plan"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -65,9 +74,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Plan
-            </Link>
-            <Link
-              href="#"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/Tracking"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -77,9 +87,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Tracking
-            </Link>
-            <Link
-              href="#"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/Blog"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -89,13 +100,15 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Blog
-            </Link>
+            </MuiLink>
           </Space>
         </Col>
 
+        {/* Cột 3: Các liên kết về công ty */}
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Company</Title>
           <Space direction="vertical">
+            {/* Links đến trang contact và careers (hiện đang là placeholder) */}
             <Link
               href="#"
               style={{
@@ -123,9 +136,11 @@ function Footer() {
           </Space>
         </Col>
 
+        {/* Cột 4: Các liên kết pháp lý */}
         <Col xs={24} sm={12} md={8} lg={6}>
           <Title level={5}>Legal</Title>
           <Space direction="vertical">
+            {/* Links đến các trang điều khoản pháp lý (hiện đang là placeholder) */}
             <Link
               href="#"
               style={{
@@ -165,8 +180,10 @@ function Footer() {
           </Space>
         </Col>
       </Row>
+      {/* Đường kẻ phân cách */}
       <Divider style={{ borderColor: "#e5e7eb" }} />
 
+      {/* Footer copyright - phần cuối cùng */}
       <div style={{ marginTop: "20px", textAlign: "center" }}>
         <Text type="secondary">
           <CopyrightOutlined /> 2025 BreatheFree. All rights reserved.
