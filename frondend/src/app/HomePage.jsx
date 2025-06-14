@@ -16,9 +16,7 @@ const stats = [
 const StatsSection = () => (
   // Component con hiển thị section số liệu thống kê.
   <div style={{ background: "#fff", padding: "60px 24px" }}>
-    {" "}
-    // Container với nền trắng, padding 60px trên/dưới, 24px trái/phải.
-    <div // Container con giới hạn chiều rộng, căn giữa, và hỗ trợ responsive.
+    <div
       style={{
         maxWidth: "1200px",
         margin: "0 auto",
@@ -33,22 +31,21 @@ const StatsSection = () => (
           item,
           index // Lặp qua mảng stats để render từng số liệu.
         ) => (
-          <div // Container cho từng số liệu, responsive với flex-basis.
-            key={index} // Key duy nhất cho mỗi phần tử trong map.
+          <div
+            key={index}
             style={{
-              flexBasis: "calc((100% - 45%) / 4)", // Chia đều 4 cột, trừ khoảng cách.
+              flexBasis: "calc((100% - 45%) / 4)",
               textAlign: "center",
-              minWidth: "160px", // Độ rộng tối thiểu để tránh co quá nhỏ.
+              minWidth: "160px",
             }}
           >
             <Text
               style={{ fontSize: "36px", fontWeight: "700", color: "#000" }}
             >
-              {" "}
-              // Hiển thị giá trị số liệu, cỡ chữ 36px, đậm, màu đen.
+              {/* Hiển thị giá trị số liệu, cỡ chữ 36px, đậm, màu đen */}
               {item.value}
             </Text>
-            <Text // Hiển thị mô tả, cỡ chữ 16px, màu xám, xuống dòng.
+            <Text
               style={{
                 fontSize: "16px",
                 color: "#595959",
@@ -56,6 +53,7 @@ const StatsSection = () => (
                 display: "block",
               }}
             >
+              {/* Hiển thị mô tả, cỡ chữ 16px, màu xám, xuống dòng */}
               {item.description}
             </Text>
           </div>
@@ -68,16 +66,14 @@ const StatsSection = () => (
 const SupportSection = () => (
   // Component con hiển thị section hỗ trợ.
   <div style={{ padding: "150px 24px", background: "#f5f7fa" }}>
-    {" "}
-    // Container với padding lớn, nền xám nhạt.
+    {/* Container với padding lớn, nền xám nhạt */}
     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-      {" "}
-      // Giới hạn chiều rộng, căn giữa.
+      {/* Giới hạn chiều rộng, căn giữa */}
       <Title level={1} style={{ textAlign: "center", fontWeight: 700 }}>
-        {" "}
-        // Tiêu đề level 1, căn giữa, đậm. How We Support Your Journey
+        {/* Tiêu đề level 1, căn giữa, đậm */}
+        How We Support Your Journey
       </Title>
-      <Paragraph // Mô tả, căn giữa, màu xám, khoảng cách dưới 48px.
+      <Paragraph
         style={{
           textAlign: "center",
           color: "#8c8c8c",
@@ -85,32 +81,29 @@ const SupportSection = () => (
           fontSize: "20px",
         }}
       >
+        {/* Mô tả, căn giữa, màu xám, khoảng cách dưới 48px */}
         Our comprehensive approach combines technology, community, and
         evidence-based methods.
       </Paragraph>
       <Row gutter={[24, 24]} justify="center">
-        {" "}
-        // Lưới Ant Design với khoảng cách 24px, căn giữa.
+        {/* Lưới Ant Design với khoảng cách 24px, căn giữa */}
         <Col xs={24} md={8}>
-          {" "}
-          // Cột responsive (toàn màn hình trên mobile, 1/3 trên desktop).
+          {/* Cột responsive (toàn màn hình trên mobile, 1/3 trên desktop) */}
           <Card variant="borderless" style={cardStyle}>
-            {" "}
-            // Card không viền, sử dụng style từ biến cardStyle.
-            <RiseOutlined style={iconStyle} /> // Icon biểu thị tiến trình.
-            <Title level={3}>Progress Tracking</Title> // Tiêu đề level 3.
+            {/* Card không viền, sử dụng style từ biến cardStyle */}
+            <RiseOutlined style={iconStyle} /> {/* Icon biểu thị tiến trình */}
+            <Title level={3}>Progress Tracking</Title> {/* Tiêu đề level 3 */}
             <Paragraph>
-              {" "}
-              // Mô tả chức năng. Monitor your smoke-free days, health
-              improvements, and money saved.
+              {/* Mô tả chức năng */}
+              Monitor your smoke-free days, health improvements, and money
+              saved.
             </Paragraph>
-            <Button type="link">Learn more</Button> // Nút liên kết để biết
-            thêm.
+            <Button type="link">Learn more</Button> {/* Nút liên kết */}
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card variant="borderless" style={cardStyle}>
-            <TeamOutlined style={iconStyle} /> // Icon biểu thị cộng đồng.
+            <TeamOutlined style={iconStyle} /> {/* Icon biểu thị cộng đồng */}
             <Title level={3}>Community Support</Title>
             <Paragraph>
               Connect with others on the same journey to stay motivated.
@@ -120,7 +113,7 @@ const SupportSection = () => (
         </Col>
         <Col xs={24} md={8}>
           <Card variant="borderless" style={cardStyle}>
-            <BookOutlined style={iconStyle} /> // Icon biểu thị tài nguyên.
+            <BookOutlined style={iconStyle} /> {/* Icon biểu thị tài nguyên */}
             <Title level={3}>Expert Resources</Title>
             <Paragraph>
               Access evidence-based articles, videos, and practical tips.
