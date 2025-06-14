@@ -5,7 +5,9 @@ import com.example.demo.entity.Tracking;
 import com.example.demo.entity.User;
 import com.example.demo.Repo.TrackingRepo;
 import com.example.demo.Repo.UserRepo;
+import com.example.demo.utils.DataUpdatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class TrackingController {
 
     @Autowired
     private UserRepo userRepo; // Assuming you have a UserRepo
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @PostMapping
     public ResponseEntity<?> createTracking(@RequestBody TrackingDTO trackingDTO) {
@@ -42,6 +47,7 @@ public class TrackingController {
         tracking.setUser(userOptional.get());
 
         Tracking savedTracking = trackingRepo.save(tracking);
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.valueOf(trackingDTO.getUserId())));
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(savedTracking));
     }
 
