@@ -88,15 +88,19 @@ const Plan = () => {
 
   // Function to handle deleting a reward
   const handleDeleteReward = (indexToDelete) => {
-    setRewards((prevRewards) =>
-      prevRewards.filter((_, index) => index !== indexToDelete)
+    // nhận vào 1 index của phần thưởng bạn muốn xóa
+    //Hàm cập nhật rewards
+    setRewards(
+      (
+        prevRewards //	Callback nhận state cũ và trả về state mới, luôn trả về giá trị mới nhất của state
+      ) => prevRewards.filter((_, index) => index !== indexToDelete)
+      //duyệt qua các ptu trong prevRewards, giữ lại các ptu khác indexToDelete, trả về mảng mới đã xóa những ptu cần xóa
     );
   };
 
-  // Sử dụng tháng hiện tại để tạo lịch
-  const currentDate = new Date();
+  const currentDate = new Date(); // tạo Date đại diện cho ngày và giờ hiện tại
   currentDate.setDate(1); // Đặt về ngày đầu tiên của tháng hiện tại
-  const days = [];
+  const days = []; // chuỗi rỗng lưu các ngày trong tháng
 
   // Lấy userId từ localStorage
   const userStr = localStorage.getItem("user");
@@ -113,7 +117,7 @@ const Plan = () => {
         );
         if (response.status === 200 && response.data) {
           const plan = response.data;
-          setSelectedDate(new Date(plan.quitDate));
+          setSelectedDate(new Date(plan.quitDate)); // lấy data từ backend và gán dữ liệu vào các state
           setQuitMethod(plan.quitMethod);
           setCigarettesPerDay(plan.cigarettesPerDay);
           setTriggers(plan.triggers || []);
@@ -121,10 +125,8 @@ const Plan = () => {
           setSupportNetwork(plan.supportNetwork || []);
           setAdditionalNotes(plan.additionalNotes || "");
           setRewards(plan.rewards || []);
-          // If a plan is loaded, navigate to the review step (assumed to be step 5)
-          // so the user can see their existing plan and the timeline.
-          // Please adjust '5' if your review/complete step number is different.
-          setCurrentStep(5);
+
+          setCurrentStep(5); // đưa ng dùng đến bước xem lại kế hoạch
         }
       } catch (error) {
         console.error("Error fetching plan data:", error);
@@ -137,28 +139,27 @@ const Plan = () => {
 
   // Tạo lịch cho tháng 5 năm 2025
   for (let i = 0; i < 35; i++) {
-    const date = new Date(currentDate);
-    date.setDate(currentDate.getDate() + i - currentDate.getDay()); // Thêm các ô ngày vào mảng days, với class tương ứng
+    // tại mỗi ô lặp tạo 1 date đại diện cho từng ô ngày
+    const date = new Date(currentDate); //Tạo một bản sao của currentDaten tránh sửa trực tiếp của currentDate
+    date.setDate(currentDate.getDate() + i - currentDate.getDay()); //Tính ngày thực sự hiển thị cho ô i
     days.push(
       <div
         key={i}
         className={`plan-calendar-day ${
           date.getMonth() === currentDate.getMonth()
-            ? "plan-current-month"
-            : "plan-other-month"
+            ? "plan-current-month" // ngày thuộc tháng hiện tại
+            : "plan-other-month" // ngày thuộc tháng trước hoặc sau
         } ${
           date.toDateString() === selectedDate.toDateString()
-            ? "plan-selected-day"
+            ? "plan-selected-day" // ngày đang được chọn
             : ""
         }`}
-        onClick={() => setSelectedDate(date)}
+        onClick={() => setSelectedDate(date)} // chọn ngày khi click
       >
         {date.getDate()}
       </div>
     );
   }
-
-  // Danh sách các ngày trong tuần để hiển thị trên lịch
 
   // Danh sách các yếu tố kích hoạt hút thuốc
   const smokingTriggers = [
@@ -176,15 +177,18 @@ const Plan = () => {
 
   // Chia danh sách yếu tố kích hoạt thành hai cột để hiển thị
   const half = Math.ceil(smokingTriggers.length / 2);
-  const leftColumnTriggers = smokingTriggers.slice(0, half);
-  const rightColumnTriggers = smokingTriggers.slice(half);
+  const leftColumnTriggers = smokingTriggers.slice(0, half); // hiển thị bên trái
+  const rightColumnTriggers = smokingTriggers.slice(half); // hiển thị bên phải
 
   // Hàm xử lý khi chọn hoặc bỏ chọn yếu tố kích hoạt
   const handleTriggerChange = (trigger) => {
+    // hàm nhận vào trigger
     if (triggers.includes(trigger)) {
-      setTriggers(triggers.filter((t) => t !== trigger));
+      // trigger đã tồn tại trong danh sách (đã chọn)
+      setTriggers(triggers.filter((t) => t !== trigger)); //xóa nó ra khỏi mảng (bỏ chọn)
     } else {
-      setTriggers([...triggers, trigger]);
+      //setTriggers(...) để cập nhật state.
+      setTriggers([...triggers, trigger]); //Thêm trigger vào mảng
     }
   };
 
@@ -204,15 +208,18 @@ const Plan = () => {
 
   // Chia danh sách chiến lược đối phó thành hai cột
   const halfCoping = Math.ceil(copingStrategiesList.length / 2);
-  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping);
-  const rightCopingStrategies = copingStrategiesList.slice(halfCoping);
+  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping); //cột trái
+  const rightCopingStrategies = copingStrategiesList.slice(halfCoping); // cột phải
 
   // Hàm xử lý khi chọn hoặc bỏ chọn chiến lược đối phó
   const handleCopingStrategyChange = (strategy) => {
+    // hàm nhận vào strategy
     if (copingStrategies.includes(strategy)) {
-      setCopingStrategies(copingStrategies.filter((s) => s !== strategy));
+      // strategy đã tồn tại trong danh sách (đã chọn)
+      setCopingStrategies(copingStrategies.filter((s) => s !== strategy)); //xóa nó ra khỏi mảng (bỏ chọn)
     } else {
-      setCopingStrategies([...copingStrategies, strategy]);
+      //setCopingStrategies(...) để cập nhật state.
+      setCopingStrategies([...copingStrategies, strategy]); //Thêm strategy vào mảng
     }
   };
 
@@ -242,22 +249,23 @@ const Plan = () => {
 
   // Hàm xử lý thay đổi phương pháp cai thuốc
   const handleQuitMethodChange = (method) => {
-    setQuitMethod(method);
+    // tham số ng dùng chọn : method
+    setQuitMethod(method); //  cập nhật state
   };
 
   // Hàm hiển thị modal khi nhấn nút "Add reward"
   const handleAddReward = () => {
-    setIsModalVisible(true);
+    setIsModalVisible(true); // khi isModalVisible là true thì giao diện add reward sẽ hiện
   };
 
-  // Hàm xử lý khi xác nhận thêm phần thưởng trong modal
+  // Hàm  xác nhận thêm phần thưởng trong modal khi nhấn add reward
   const handleModalOk = () => {
     form
-      .validateFields()
+      .validateFields() // check xem các ô nhập có hợp lệ ko, Trả về Promise chứa values nếu hợp lệ
       .then((values) => {
-        // Thêm phần thưởng mới vào danh sách
         setRewards([
-          ...rewards,
+          // Thêm phần thưởng mới vào danh sách
+          ...rewards, // copy mảng cũ
           { milestone: values.milestone, reward: values.reward },
         ]);
         setIsModalVisible(false); // Đóng modal
@@ -272,11 +280,11 @@ const Plan = () => {
 
   // Hàm xử lý khi hủy modal
   const handleModalCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
+    setIsModalVisible(false); // ẩn modal
+    form.resetFields(); // xóa dữ liệu trong form
   };
 
-  // Hàm xử lý khi nhấn nút hoàn thành kế hoạch
+  // Khi người dùng nhấn nút "Complete" để hoàn tất kế hoạch cai thuốc, hàm này sẽ được gọi để gửi kế hoạch lên backend.
   const handleComplete = async () => {
     // Thêm async
     if (!userId) {
@@ -284,7 +292,7 @@ const Plan = () => {
       // Optionally, display a message to the user
       return;
     }
-
+    //Tạo planData chứa all kế hoạch cai thuốc, để gửi lên backend
     const planData = {
       userId,
       quitDate: selectedDate.toISOString().split("T")[0], // Format YYYY-MM-DD
@@ -1336,4 +1344,4 @@ const Plan = () => {
   );
 };
 
-export default Plan; // Đảm bảo export đúng component
+export default Plan;
