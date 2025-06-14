@@ -22,10 +22,4 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     // Find posts by user ID (without pagination)
     List<Post> findByUserIdOrderByCreatedAtDesc(Integer userId);
 
-    // Search posts by title or content
-    @Query("SELECT p FROM Post p WHERE " +
-            "LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(p.content) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "ORDER BY p.createdAt DESC")
-    Page<Post> searchPosts(@Param("searchTerm") String searchTerm, Pageable pageable);
 }

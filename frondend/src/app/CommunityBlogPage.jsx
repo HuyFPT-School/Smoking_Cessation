@@ -6,6 +6,36 @@ import "../App.css";
 
 const { TextArea } = Input;
 
+// Helper function to format time ago
+const formatTimeAgo = (date) => {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  return `${diffDays} days ago`;
+};
+
+// Helper function to generate user initials from name
+const getUserInitials = (name) => {
+  if (!name) return "";
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+};
+
+// Helper function to get user avatar URL
+const getUserAvatarUrl = (user) => {
+  if (!user) return "";
+  return user.avatar || user.avatarUrl || user.profilePicture || "";
+};
+
 // DiscussionItem Component
 const DiscussionItem = ({
   id,
@@ -13,7 +43,7 @@ const DiscussionItem = ({
   status,
   title,
   content,
-  tags,
+  time,
   likes,
   comments,
   likedByCurrentUser,
@@ -21,12 +51,6 @@ const DiscussionItem = ({
   commentsList = [],
   onAddComment,
 }) => {
-  const initials = author.name
-    .split(" ")
-    .map((name) => name[0])
-    .join("")
-    .toUpperCase();
-
   // Get current user info
   const userStr = localStorage.getItem("user");
   const userObj = userStr ? JSON.parse(userStr) : null;
@@ -41,7 +65,9 @@ const DiscussionItem = ({
         await onLike(id);
       } catch (error) {
         console.error("Error liking post:", error);
-        message.error("Failed to like/unlike post");
+        message.error(
+          error.response?.data?.message || "Failed to like/unlike post"
+        );
       }
     }
   };
@@ -53,7 +79,7 @@ const DiscussionItem = ({
         setNewComment("");
       } catch (error) {
         console.error("Error adding comment:", error);
-        message.error("Failed to add comment");
+        message.error(error.response?.data?.message || "Failed to add comment");
       }
     }
   };
@@ -62,43 +88,31 @@ const DiscussionItem = ({
       <div className="discussion-item-header">
         <div className="discussion-item-author">
           <Avatar src={author.avatarUrl} className="discussion-item-avatar">
-            {!author.avatarUrl && initials}
+            {!author.avatarUrl && getUserInitials(author.name)}
           </Avatar>
           <div>
             <div className="discussion-item-author-name">{author.name}</div>
             <div className="discussion-item-status">{status}</div>
-          </div>{" "}
+            <div className="discussion-item-time">{time}</div>
+          </div>
         </div>
       </div>
       <div className="discussion-item-title">{title}</div>
       <div className="discussion-item-content">{content}</div>
-      <div className="discussion-item-tags">
-        {tags &&
-          tags.map((tag) => (
-            <Tag key={tag} color="green" className="discussion-item-tag">
-              {tag}
-            </Tag>
-          ))}
-      </div>{" "}
       <div className="discussion-item-footer">
         <div className="discussion-item-stats">
-          {" "}
           <span
             onClick={handleLikeClick}
-            style={{
-              cursor: currentUserId ? "pointer" : "default",
-              color: likedByCurrentUser ? "#1890ff" : "inherit",
-              opacity: currentUserId ? 1 : 0.6,
-            }}
+            className={`like-button ${
+              !currentUserId ? "like-button-disabled" : ""
+            } ${likedByCurrentUser ? "like-button-active" : ""}`}
           >
             <LikeOutlined className="discussion-item-icon" />
             {likes}
           </span>
           <span
             onClick={() => setShowComments(!showComments)}
-            style={{
-              cursor: "pointer",
-            }}
+            className="comment-button"
           >
             <MessageOutlined className="discussion-item-icon" />
             {comments}
@@ -107,65 +121,29 @@ const DiscussionItem = ({
       </div>
       {/* Comments Section */}
       {showComments && (
-        <div
-          className="comments-section"
-          style={{
-            marginTop: "16px",
-            borderTop: "1px solid #f0f0f0",
-            paddingTop: "16px",
-          }}
-        >
-          {" "}
+        <div className="comments-section">
           {/* Display existing comments */}
           {commentsList.map((comment, index) => (
-            <div
-              key={index}
-              className="comment-item"
-              style={{ marginBottom: "12px", display: "flex", gap: "8px" }}
-            >
+            <div key={index} className="comment-item">
               <Avatar src={comment.author.avatarUrl} size="small">
                 {!comment.author.avatarUrl &&
-                  comment.author.name
-                    .split(" ")
-                    .map((name) => name[0])
-                    .join("")
-                    .toUpperCase()}
+                  getUserInitials(comment.author.name)}
               </Avatar>
               <div>
-                <div style={{ fontWeight: "500", fontSize: "14px" }}>
-                  {comment.author.name}
-                </div>
-                <div style={{ fontSize: "14px", color: "#666" }}>
-                  {comment.content}
-                </div>
+                <div className="comment-author">{comment.author.name}</div>
+                <div className="comment-content">{comment.content}</div>
+                <div className="comment-time">{comment.time}</div>
               </div>
             </div>
           ))}
           {/* Add new comment */}
           {currentUserId && (
-            <div
-              className="add-comment"
-              style={{ marginTop: "12px", display: "flex", gap: "8px" }}
-            >
-              <Avatar
-                src={
-                  userObj?.avatar ||
-                  userObj?.avatarUrl ||
-                  userObj?.profilePicture ||
-                  ""
-                }
-                size="small"
-              >
-                {!userObj?.avatar &&
-                  !userObj?.avatarUrl &&
-                  !userObj?.profilePicture &&
-                  (userObj?.name || userObj?.username || "A")
-                    .split(" ")
-                    .map((name) => name[0])
-                    .join("")
-                    .toUpperCase()}
+            <div className="add-comment">
+              <Avatar src={getUserAvatarUrl(userObj)} size="small">
+                {!getUserAvatarUrl(userObj) &&
+                  getUserInitials(userObj?.name || userObj?.username || "A")}
               </Avatar>
-              <div style={{ flex: 1 }}>
+              <div className="add-comment-input">
                 <Input
                   placeholder="Write a comment..."
                   value={newComment}
@@ -233,15 +211,15 @@ const ShareBlock = ({ onAddPost }) => {
         message.success("Post created successfully!");
       } catch (error) {
         console.error("Error creating post:", error);
-        message.error("Failed to create post");
+        message.error(error.response?.data?.message || "Failed to create post");
       } finally {
         setLoading(false);
       }
     }
   };
   return (
-    <div className="share-and-stats" style={{ width: "100%" }}>
-      <div className="share-block" style={{ width: "100%" }}>
+    <div className="share-and-stats full-width">
+      <div className="share-block full-width">
         <Card
           title={
             <div>
@@ -252,22 +230,19 @@ const ShareBlock = ({ onAddPost }) => {
               </div>
             </div>
           }
-          className="share-block-card"
+          className="share-block-card full-width"
           headStyle={{ borderBottom: "none", padding: "10px 20px 4px" }}
           bodyStyle={{ padding: "4px 20px 10px" }}
-          style={{ width: "100%" }}
         >
-          {" "}
           <Input
             placeholder={
               isLoggedIn
                 ? "Enter your post title..."
                 : "Log in to create a post"
             }
-            className="share-block-title-input"
+            className="share-block-title-input post-title-input"
             value={postTitle}
             onChange={(e) => setPostTitle(e.target.value)}
-            style={{ marginBottom: "12px" }}
             disabled={!isLoggedIn}
           />
           <TextArea
@@ -283,7 +258,6 @@ const ShareBlock = ({ onAddPost }) => {
             disabled={!isLoggedIn}
           />
           <div className="share-block-button-container">
-            {" "}
             <Button
               type="primary"
               className="share-block-button"
@@ -312,7 +286,6 @@ const DiscussionsAndGroups = ({
   return (
     <div className="discussions-and-groups">
       <div className="discussions-list">
-        {" "}
         {discussions.map((item, index) => (
           <div key={item.id || index} className="discussion-item-wrapper">
             <DiscussionItem
@@ -324,7 +297,7 @@ const DiscussionsAndGroups = ({
         ))}
       </div>
       {hasMorePosts && (
-        <div className="discussions-load-more" style={{ marginBottom: "16px" }}>
+        <div className="discussions-load-more">
           <Button
             type="default"
             className="load-more-button"
@@ -376,16 +349,13 @@ const CommunityBlogPage = () => {
           const newPosts = data.posts.map((post) => ({
             id: post.id,
             author: post.author,
-            avatarUrl: post.author.avatarUrl,
             status: "Community member", // You can modify this based on user data
             title: post.title,
             content: post.content,
-            tags: [],
             likes: post.likesCount,
             comments: post.commentsCount,
             time: formatTimeAgo(new Date(post.createdAt)),
             likedByCurrentUser: post.likedByCurrentUser || false,
-            timestamp: new Date(post.createdAt),
             commentsList: post.comments.map((comment) => ({
               author: comment.author,
               content: comment.content,
@@ -404,7 +374,7 @@ const CommunityBlogPage = () => {
         }
       } catch (error) {
         console.error("Error fetching posts:", error);
-        message.error("Failed to load posts");
+        message.error(error.response?.data?.message || "Failed to load posts");
       } finally {
         setLoadingMore(false);
       }
@@ -412,19 +382,6 @@ const CommunityBlogPage = () => {
     [currentUserId]
   );
 
-  // Helper function to format time ago
-  const formatTimeAgo = (date) => {
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return `${diffDays} days ago`;
-  };
   useEffect(() => {
     // Always fetch posts, even if user is not logged in
     fetchPosts();
@@ -450,6 +407,7 @@ const CommunityBlogPage = () => {
       }
     } catch (error) {
       console.error("Error creating post:", error);
+      message.error(error.response?.data?.message || "Failed to create post");
       throw error;
     }
   };
@@ -491,6 +449,9 @@ const CommunityBlogPage = () => {
       }
     } catch (error) {
       console.error("Error liking post:", error);
+      message.error(
+        error.response?.data?.message || "Failed to like/unlike post"
+      );
       throw error;
     }
   };
@@ -524,11 +485,7 @@ const CommunityBlogPage = () => {
                       author: {
                         id: currentUserId,
                         name: userObj?.name || userObj?.username || "Unknown",
-                        avatarUrl:
-                          userObj?.avatar ||
-                          userObj?.avatarUrl ||
-                          userObj?.profilePicture ||
-                          "",
+                        avatarUrl: getUserAvatarUrl(userObj),
                       },
                       content: content,
                       time: "Just now",
@@ -541,22 +498,15 @@ const CommunityBlogPage = () => {
       }
     } catch (error) {
       console.error("Error adding comment:", error);
+      message.error(error.response?.data?.message || "Failed to add comment");
       throw error;
     }
   };
-
   return (
-    <div
-      style={{
-        width: "65vw",
-        margin: "0 auto",
-        paddingTop: "23px",
-        minHeight: "calc(100vh - 200px)",
-      }}
-    >
+    <div className="community-blog-container">
       <div className="community-blog-page">
         <CommunityHeader />
-        <ShareBlock onAddPost={handleAddPost} />{" "}
+        <ShareBlock onAddPost={handleAddPost} />
         <DiscussionsAndGroups
           discussions={discussions}
           onLike={handleLike}

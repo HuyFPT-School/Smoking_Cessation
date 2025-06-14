@@ -15,9 +15,4 @@ public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {
     // Check if user has liked a post
     boolean existsByPostIdAndUserId(Integer postId, Integer userId);
 
-    // Count likes by post ID
-    int countByPostId(Integer postId);
-
-    // Delete like by post ID and user ID
-    void deleteByPostIdAndUserId(Integer postId, Integer userId);
 }
