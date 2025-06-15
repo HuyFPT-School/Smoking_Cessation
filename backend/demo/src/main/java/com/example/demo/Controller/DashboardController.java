@@ -149,7 +149,7 @@ public class DashboardController {
 
         // Create list of daily counts from quitDate to today
         List<Map<String, Object>> history = new ArrayList<>();
-        long daysBetween = ChronoUnit.DAYS.between(quitDate, today) + 1;
+        long daysBetween = ChronoUnit.DAYS.between(quitDate, today) ;
         for (long i = 0; i < daysBetween; i++) {
             LocalDate date = quitDate.plusDays(i);
             Map<String, Object> dailyEntry = new HashMap<>();
@@ -248,7 +248,7 @@ public class DashboardController {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
-        long totalDays = ChronoUnit.DAYS.between(quitDate, today) + 1;
+        long totalDays = ChronoUnit.DAYS.between(quitDate, today) ;
 
         Set<LocalDate> smokingDays = trackings.stream()
                 .filter(t -> "smoking".equalsIgnoreCase(t.getType()))

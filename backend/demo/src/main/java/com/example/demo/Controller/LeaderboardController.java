@@ -34,7 +34,9 @@ public class LeaderboardController {
     private TrackingRepo trackingRepo;
 
     @Autowired
-    private PostRepo postRepo;    @GetMapping
+    private PostRepo postRepo;
+
+    @GetMapping
     public ResponseEntity<Map<String, Object>> getLeaderboard(
             @RequestParam(defaultValue = "weekly") String timeRange,
             @RequestParam(required = false) Integer currentUserId) {
@@ -56,7 +58,8 @@ public class LeaderboardController {
 
             List<LeaderboardUserDTO> leaderboardUsers = new ArrayList<>();
 
-            for (User user : allUsers) {                try {
+            for (User user : allUsers) {
+                try {
                     LeaderboardUserDTO leaderboardUser = calculateUserStats(user, timeRange);
                     if (leaderboardUser != null) {
                         leaderboardUsers.add(leaderboardUser);
@@ -105,7 +108,12 @@ public class LeaderboardController {
             return ResponseEntity.status(500)
                 .body(Map.of("error", "Failed to fetch leaderboard: " + e.getMessage()));
         }
-    }    private LeaderboardUserDTO calculateUserStats(User user, String timeRange) {
+    }
+
+
+
+//    =====================================================HElP FUNCTIONS====================================================
+    private LeaderboardUserDTO calculateUserStats(User user, String timeRange) {
         try {
             LeaderboardUserDTO userStats = new LeaderboardUserDTO();
             userStats.setId(user.getId());
@@ -194,7 +202,12 @@ public class LeaderboardController {
             System.err.println("Error calculating user stats for user " + user.getId() + ": " + e.getMessage());
             return null;
         }
-    }    // Calculate current consecutive smoke-free days since last smoking incident
+    }
+
+
+
+
+    // Calculate current consecutive smoke-free days since last smoking incident
     private int calculateCurrentStreakDays(List<Tracking> trackingEntries, LocalDate startDate) {
         try {
             // Find the most recent smoking incident
@@ -230,7 +243,13 @@ public class LeaderboardController {
             System.err.println("Error calculating streak days: " + e.getMessage());
             return 0;
         }
-    }// Calculate total points using hybrid scoring system
+    }
+
+
+
+
+
+    // Calculate total points using hybrid scoring system
     private int calculateTotalPoints(List<Tracking> trackingEntries, int consecutiveSmokFreeDays, LocalDate startDate) {
         int points = 0;
         
