@@ -123,9 +123,13 @@ const SupportSection = () => (
   </div>
 );
 
+// Định nghĩa một functional component có tên là SuccessStories, nhận prop là onNavigate (callback điều hướng route)
 const SuccessStories = ({ onNavigate }) => (
+  // Container chính với nền trắng, padding trên 80px, trái/phải 24px, dưới 0
   <div style={{ background: "#fff", padding: "80px 24px 0" }}>
+    {/* Wrapper để giới hạn độ rộng tối đa là 960px và căn giữa */}
     <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+      {/* Tiêu đề chính "Success Stories", h2, căn giữa, đậm, font 45px, cách dưới 8px */}
       <Title
         level={2}
         style={{
@@ -137,6 +141,8 @@ const SuccessStories = ({ onNavigate }) => (
       >
         Success Stories
       </Title>
+
+      {/* Đoạn mô tả ngắn, căn giữa, màu xám, font 20px, cách dưới 48px */}
       <Paragraph
         style={{
           textAlign: "center",
@@ -147,6 +153,8 @@ const SuccessStories = ({ onNavigate }) => (
       >
         Hear from people who have successfully quit smoking with our platform.
       </Paragraph>
+
+      {/* Dãy chứa các card câu chuyện, canh giữa, khoảng cách 24px giữa các card, tự động xuống dòng khi hẹp */}
       <div
         style={{
           display: "flex",
@@ -155,13 +163,17 @@ const SuccessStories = ({ onNavigate }) => (
           flexWrap: "wrap",
         }}
       >
+        {/* Card 1: Câu chuyện của Michael */}
         <Card variant="borderless" style={storyCardStyle}>
+          {/* Tên người + tuổi, heading level 3, bỏ margin dưới */}
           <Title level={3} style={{ marginBottom: 0 }}>
             Michael, 42
           </Title>
+          {/* Thông tin thời gian bỏ thuốc, màu phụ (xám), xuống dòng, cách dưới 12px */}
           <Text type="secondary" style={{ display: "block", marginBottom: 12 }}>
             Smoke-free for 1 year and 3 months
           </Text>
+          {/* Nội dung chi tiết, chia sẻ cảm nghĩ và kết quả */}
           <Paragraph>
             "After 20 years of smoking, I never thought I could quit. The
             progress tracker and community support made all the difference. I've
@@ -169,6 +181,8 @@ const SuccessStories = ({ onNavigate }) => (
             sports."
           </Paragraph>
         </Card>
+
+        {/* Card 2: Câu chuyện của Sarah */}
         <Card variant="borderless" style={storyCardStyle}>
           <Title level={3} style={{ marginBottom: 0 }}>
             Sarah, 35
@@ -186,28 +200,33 @@ const SuccessStories = ({ onNavigate }) => (
       </div>
     </div>
 
+    {/* CTA Section (Call to Action) */}
     <div
       style={{
-        marginTop: "72px",
-        padding: "100px 24px",
-        background: "#16A34A",
-        textAlign: "center",
-        width: "100vw",
+        marginTop: "72px", // cách phần trên 72px
+        padding: "100px 24px", // padding đều, lớn hơn bình thường để nổi bật
+        background: "#16A34A", // nền xanh lá
+        textAlign: "center", // căn giữa mọi thứ bên trong
+        width: "100vw", // kéo rộng toàn bộ chiều ngang viewport
         position: "relative",
-        left: "50%",
-        transform: "translateX(-50%)",
+        left: "50%", // đẩy nửa viewport qua trái
+        transform: "translateX(-50%)", // kéo lại đúng nửa -> đảm bảo full chiều ngang dù trong wrapper hẹp
       }}
     >
       <div style={{ maxWidth: "720px", margin: "0 auto" }}>
+        {/* Heading CTA: nổi bật, trắng, to, đậm */}
         <Title
           level={2}
           style={{ color: "#fff", fontSize: "50px", fontWeight: 700 }}
         >
           Ready to Begin?
         </Title>
+        {/* Mô tả ngắn CTA */}
         <Paragraph style={{ color: "#fff", fontSize: "20px" }}>
           Join thousands who have successfully quit smoking with our support.
         </Paragraph>
+
+        {/* Button group */}
         <div
           style={{
             display: "flex",
@@ -216,6 +235,7 @@ const SuccessStories = ({ onNavigate }) => (
             flexWrap: "wrap",
           }}
         >
+          {/* Nút đăng ký - gọi hàm điều hướng khi click */}
           <Button
             type="primary"
             style={ctaButtonStyle}
@@ -223,6 +243,8 @@ const SuccessStories = ({ onNavigate }) => (
           >
             Create Free Account
           </Button>
+
+          {/* Nút phụ - không có hành động nhưng giữ style giống nhau */}
           <Button style={ctaButtonStyle}>Explore Resources</Button>
         </div>
       </div>
