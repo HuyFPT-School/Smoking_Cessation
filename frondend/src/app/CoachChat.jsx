@@ -54,7 +54,9 @@ const CoachChat = () => {
 
     setMessages([...messages, newMessage]);
     setInput('');
+    
 
+    // Giả lập coach trả lời 
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
@@ -167,7 +169,6 @@ const CoachChat = () => {
             </div>
 
             <div className="chat-input" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-
               <TextArea
                 ref={textAreaRef}
                 placeholder="Type your message..."

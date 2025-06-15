@@ -6,7 +6,9 @@ import com.example.demo.entity.Plan;
 import com.example.demo.entity.RewardItem;
 import com.example.demo.Repo.PlanRepo;
 // import com.example.demo.Repo.UserRepo; // Assuming UserRepo exists for validation if needed
+import com.example.demo.utils.DataUpdatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,8 @@ public class PlanController {
     // Optional: Autowire UserRepo if you need to validate userId against existing users
     // @Autowired
     // private UserRepo userRepo;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
 
@@ -87,6 +91,7 @@ public class PlanController {
 
         Plan plan = convertToEntity(planDTO, null);
         Plan savedPlan = planRepo.save(plan);
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(planDTO.getUserId())));
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(savedPlan));
     }
 
@@ -117,6 +122,7 @@ public class PlanController {
         Plan planToUpdate = convertToEntity(planDTO, existingPlanOpt.get());
         planToUpdate.setId(planId); // Ensure ID remains the same
         Plan updatedPlan = planRepo.save(planToUpdate);
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(planDTO.getUserId())));
         return ResponseEntity.ok(convertToDTO(updatedPlan));
     }
 
@@ -149,6 +155,7 @@ public class PlanController {
         }
 
         Plan savedPlan = planRepo.save(planToSave);
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(userId)));
         PlanDTO responseDTO = convertToDTO(savedPlan);
 
         if (isCreating) {
@@ -160,10 +167,12 @@ public class PlanController {
 
     @DeleteMapping("/{planId}")
     public ResponseEntity<Void> deletePlan(@PathVariable Long planId) {
+        Optional<Plan> existingPlanOpt = planRepo.findById(planId);
         if (!planRepo.existsById(planId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         planRepo.deleteById(planId);
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(existingPlanOpt.get().getUserId())));
         return ResponseEntity.noContent().build();
     }
 }

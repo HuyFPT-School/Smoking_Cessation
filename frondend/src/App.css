@@ -1,31 +1,31 @@
 /*================================================================ CSS FOR DASHBOARD======================================================= */
 /* Kiểu dáng cho container chính */
 .Dashboard-Backgroup {
-  max-width: 1400px; /* Độ rộng tối đa 1400px */
-  margin: 20px auto; /* Căn giữa với lề trên/dưới 20px */
-  padding: 32px; /* Đệm bên trong 32px */
-  margin-bottom: 0px; /* Loại bỏ lề dưới */
+  max-width: 1400px;
+  margin: 20px auto; 
+  padding: 32px; 
+  margin-bottom: 0px; 
   margin-top: 0px;
   padding-bottom: 32px;
-  box-sizing: border-box; /* Đảm bảo padding/margin không làm tràn nội dung */
+  box-sizing: border-box; 
 }
 
 /* Kiểu dáng cho hàng chứa các card */
 .dashboard-row-spacing {
-  margin-top: 8px; /* Lề trên 8px */
-  margin-bottom: 16px; /* Lề dưới 16px */
+  margin-top: 8px; 
+  margin-bottom: 16px; 
 }
 
 /* Kiểu dáng chung cho các card */
 .dashboard-card {
-  padding: 16px; /* Đệm bên trong 16px */
-  border-radius: 8px; /* Bo góc 8px */
-  height: 140px; /* Chiều cao cố định 140px */
-  position: relative; /* Định vị tương đối cho icon */
-  display: flex; /* Sử dụng flexbox để sắp xếp */
-  flex-direction: column; /* Xếp nội dung theo cột */
-  justify-content: space-between; /* Căn đều nội dung theo chiều dọc */
-  background-color: #fff; /* Màu nền trắng */
+  padding: 16px; 
+  border-radius: 8px; 
+  height: 140px; 
+  position: relative; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between;
+  background-color: #fff; 
   border: 1px solid #f0f0f0; /* Viền xám nhạt */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Chuyển đổi mượt mà */
@@ -248,9 +248,9 @@
   flex-direction: column; /* Xếp nội dung theo cột */
   justify-content: space-between; /* Căn đều nội dung */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
-  padding-bottom: 340px; /* Đệm dưới lớn */
+  padding-bottom: 380px; /* Đệm dưới lớn */
   background-color: #fff; /* Màu nền trắng */
-  margin: 20px 0px 100px 0px; /* Lề trên 20px */
+  margin: 20px 0px 60px 0px; /* Lề trên 20px */
 }
 /* Kiểu dáng cho đoạn văn trong container thống kê */
 .Last-item p {

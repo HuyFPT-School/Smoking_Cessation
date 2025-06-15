@@ -37,6 +37,7 @@ public class LeaderboardController {
     private TrackingRepo trackingRepo;
 
     @Autowired
+
     private PostRepo postRepo;   
     // === HÀM LẤY DỮ LIỆU BẢNG XẾP HẠNG ===
 
@@ -56,6 +57,7 @@ public class LeaderboardController {
     // 6. Trả về kết quả hoàn chỉnh
 
     //@RequestParam: Đánh dấu tham số được truyền qua URL query string
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> getLeaderboard(
             @RequestParam(defaultValue = "weekly") String timeRange,
@@ -81,6 +83,7 @@ public class LeaderboardController {
 
             // Danh sách để lưu thông tin người dùng trên bảng xếp hạng
             List<LeaderboardUserDTO> leaderboardUsers = new ArrayList<>();
+
 
              // Tính toán điểm số cho mỗi người dùng
             for (User user : allUsers) {
@@ -145,6 +148,7 @@ public class LeaderboardController {
         }
     }
 
+
     /**
      * === HÀM TÍNH ĐIỂM SỐ CHO MỖI NGƯỜI DÙNG ===
      *
@@ -166,6 +170,7 @@ public class LeaderboardController {
      * timeRange - Phạm vi thời gian đang xem (weekly, monthly, all)
      * LeaderboardUserDTO - Đối tượng chứa thông tin người dùng cho bảng xếp hạng
      */
+
 
     private LeaderboardUserDTO calculateUserStats(User user, String timeRange) {
         try {
@@ -266,6 +271,7 @@ public class LeaderboardController {
             System.err.println("Error calculating user stats for user " + user.getId() + ": " + e.getMessage());
             return null;
         }
+
     } 
     
     // === HÀM TÍNH SỐ NGÀY KHÔNG HÚT THUỐC LIÊN TIẾP === 
@@ -288,6 +294,7 @@ public class LeaderboardController {
     //   trackingEntries - Danh sách các bản ghi theo dõi của người dùng
     //   startDate - Ngày bắt đầu bỏ thuốc
     //   return Số ngày không hút thuốc liên tiếp tính đến hiện tại
+
 
     private int calculateCurrentStreakDays(List<Tracking> trackingEntries, LocalDate startDate) {
         try {
@@ -336,6 +343,7 @@ public class LeaderboardController {
         }
     }
 
+
     //   === HÀM TÍNH TỔNG ĐIỂM ===
     //   Hàm này tính tổng điểm của người dùng dựa trên toàn bộ tiến trình bỏ thuốc,
     //   kể từ ngày bắt đầu bỏ thuốc đến hiện tại.
@@ -356,6 +364,7 @@ public class LeaderboardController {
     //   4. Điểm phạt khi hút thuốc:
     //      - Mỗi lần ghi nhận hút thuốc: -15 điểm
     //  
+
 
     private int calculateTotalPoints(List<Tracking> trackingEntries, int consecutiveSmokFreeDays, LocalDate startDate) {
         int points = 0;
