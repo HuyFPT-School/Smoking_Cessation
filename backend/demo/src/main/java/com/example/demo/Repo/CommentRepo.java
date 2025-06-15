@@ -15,6 +15,4 @@ public interface CommentRepo extends JpaRepository<Comment, Integer> {
     // Find comments by user ID
     List<Comment> findByUserIdOrderByCreatedAtDesc(Integer userId);
 
-    // Count comments by post ID
-    int countByPostId(Integer postId);
 }
