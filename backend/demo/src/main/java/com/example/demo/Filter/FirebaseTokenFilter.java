@@ -1,4 +1,3 @@
-
 package com.example.demo.Filter;
 
 import com.example.demo.Repo.UserRepo;
@@ -44,37 +43,66 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 String name = decodedToken.getName();
                 String picture = decodedToken.getPicture();
 
-                // Tìm user, nếu chưa có thì tạo mới
+                // Tìm user trong database
                 User user = userRepo.findByEmail(email);                
+                
                 if (user == null) {
+                    // ✅ SỬA: Tạo user mới - loại bỏ text lạ
+                    user = new User();
+                    user.setEmail(email);
+                    
+                    // Xử lý tên an toàn
+                    String userName = (name != null && !name.trim().isEmpty()) ? name.trim() : "User";
+                    user.setName(userName);
+                    
+                    // Xử lý avatar
                     if (picture != null && !picture.isBlank()) {
-                        user = new User();
-                        user.setEmail(email);
-                        String userName = name != null ? name : "Google User";
-                        user.setName(userName);
                         user.setAvatarUrl(picture);
-                        user.setPassword(null);
-                        user.setRole(Role.USER);
-                        user.setCreateAt(LocalDateTime.now());
-                        user = userRepo.save(user);
-                        
-                        System.out.println("Auto-created Google user: " + email);
                     } else {
-                        System.out.println("Email login attempt without registration: " + email);
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, 
-                            "Account not found. Please register using the registration form first.");
+                        String diceBearAvatar = "https://api.dicebear.com/7.x/initials/svg?seed=" + userName;
+                        user.setAvatarUrl(diceBearAvatar);
+                    }
+                    
+                    user.setPassword(null);
+                    user.setRole(Role.USER);
+                    user.setCreateAt(LocalDateTime.now());
+                    
+                    // ✅ THÊM: Exception handling cho save operation
+                    try {
+                        user = userRepo.save(user);
+                    } catch (Exception saveException) {
+                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                            "Failed to create user account");
                         return;
                     }
+                    
                 } else {
-                    if (picture != null && !picture.equals(user.getAvatarUrl())) {
+                    // ✅ SỬA: Cập nhật user existing
+                    boolean needUpdate = false;
+                    
+                    // Cập nhật avatar từ Firebase nếu có
+                    if (picture != null && !picture.isBlank() && !picture.equals(user.getAvatarUrl())) {
                         user.setAvatarUrl(picture);
-                        userRepo.save(user);
-                    } else if(picture == null || picture.isBlank()) {
-                        user.setAvatarUrl("https://api.dicebear.com/7.x/initials/svg?seed=" + name); // Set a default avatar URL
-                        userRepo.save(user);
+                        needUpdate = true;
+                    } else if ((picture == null || picture.isBlank()) && 
+                              (user.getAvatarUrl() == null || user.getAvatarUrl().isBlank())) {
+                        // ✅ SỬA: Dùng user.getName() thay vì name từ token
+                        String diceBearAvatar = "https://api.dicebear.com/7.x/initials/svg?seed=" + user.getName();
+                        user.setAvatarUrl(diceBearAvatar);
+                        needUpdate = true;
+                    }
+                    
+                    if (needUpdate) {
+                        try {
+                            userRepo.save(user);
+                        } catch (Exception updateException) {
+                            // Log error nhưng không dừng flow
+                            // Tiếp tục với user cũ
+                        }
                     }
                 }
 
+                // Tạo authentication context
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
 
@@ -82,6 +110,10 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
             } catch (FirebaseAuthException e) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase ID Token");
+                return;
+            } catch (Exception e) {
+                // ✅ THÊM: Exception handling tổng quát
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Authentication error");
                 return;
             }
         }
