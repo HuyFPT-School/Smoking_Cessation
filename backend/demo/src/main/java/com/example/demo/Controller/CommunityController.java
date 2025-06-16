@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -440,4 +441,122 @@ public class CommunityController {
                 comment.getPost().getId()
         );
     }
+
+    //   API xóa bài đăng
+    //   
+    //   Chỉ cho phép tác giả bài đăng xóa bài đăng của chính họ.
+    //   Khi xóa bài đăng, tất cả bình luận và likes liên quan cũng sẽ bị xóa.
+    //   
+    //   @param postId - ID của bài đăng cần xóa
+    //   @param requestBody - Chứa userId của người thực hiện xóa
+    //   @return Thông báo thành công hoặc lỗi
+    //   
+    //   URL: DELETE /api/community/posts/123
+    //   Body: { "userId": 456 }
+    //   
+    //   Response: { "message": "Post deleted successfully" }
+    
+    @DeleteMapping("/posts/{postId}")
+    @Transactional // Đảm bảo xóa toàn bộ dữ liệu liên quan một cách an toàn
+    public ResponseEntity<?> deletePost(@PathVariable Integer postId, @RequestBody Map<String, Integer> requestBody) {
+        try {
+            Integer userId = requestBody.get("userId");
+            
+            // Validate dữ liệu đầu vào
+            if (userId == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "User ID is required"));
+            }
+            
+            // Kiểm tra bài đăng có tồn tại không
+            Optional<Post> postOpt = postRepo.findById(postId);
+            if (postOpt.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Post not found"));
+            }
+            
+            Post post = postOpt.get();
+            
+            // Kiểm tra quyền: chỉ tác giả mới được xóa bài đăng của mình
+            if (!Objects.equals(post.getUser().getId(), userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You can only delete your own posts"));
+            }
+            
+            // Xóa tất cả likes của bài đăng trước
+            postLikeRepo.deleteByPostId(postId);
+            
+            // Xóa tất cả comments của bài đăng trước
+            commentRepo.deleteByPostId(postId);
+            
+            // Cuối cùng xóa bài đăng
+            postRepo.delete(post);
+            
+            return ResponseEntity.ok(Map.of("message", "Post deleted successfully"));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error deleting post: " + e.getMessage()));
+        }
+    }
+
+    //   API xóa bình luận
+    //   
+    //   Chỉ cho phép tác giả bình luận xóa bình luận của chính họ.
+    //   Khi xóa bình luận, số lượng bình luận của bài đăng sẽ được cập nhật.
+    //   
+    //   @param commentId - ID của bình luận cần xóa
+    //   @param requestBody - Chứa userId của người thực hiện xóa
+    //   @return Thông báo thành công hoặc lỗi
+    //   
+    //   URL: DELETE /api/community/comments/789
+    //   Body: { "userId": 456 }
+    //   
+    //   Response: { "message": "Comment deleted successfully" }
+    
+    @DeleteMapping("/comments/{commentId}")
+    @Transactional // Đảm bảo cập nhật số lượng bình luận một cách an toàn
+    public ResponseEntity<?> deleteComment(@PathVariable Integer commentId, @RequestBody Map<String, Integer> requestBody) {
+        try {
+            Integer userId = requestBody.get("userId");
+            
+            // Validate dữ liệu đầu vào
+            if (userId == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "User ID is required"));
+            }
+            
+            // Kiểm tra bình luận có tồn tại không
+            Optional<Comment> commentOpt = commentRepo.findById(commentId);
+            if (commentOpt.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Comment not found"));
+            }
+            
+            Comment comment = commentOpt.get();
+            
+            // Kiểm tra quyền: chỉ tác giả mới được xóa bình luận của mình
+            if (!Objects.equals(comment.getUser().getId(), userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You can only delete your own comments"));
+            }
+            
+            // Lấy bài đăng để cập nhật số lượng bình luận
+            Post post = comment.getPost();
+            
+            // Xóa bình luận
+            commentRepo.delete(comment);
+            
+            // Cập nhật số lượng bình luận của bài đăng
+            post.setCommentsCount(Math.max(0, post.getCommentsCount() - 1)); // Đảm bảo không âm
+            postRepo.save(post);
+            
+            return ResponseEntity.ok(Map.of("message", "Comment deleted successfully"));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error deleting comment: " + e.getMessage()));
+        }
+    }
+    
 }

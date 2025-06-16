@@ -2,30 +2,30 @@
 /* Kiểu dáng cho container chính */
 .Dashboard-Backgroup {
   max-width: 1400px;
-  margin: 20px auto; 
-  padding: 32px; 
-  margin-bottom: 0px; 
+  margin: 20px auto;
+  padding: 32px;
+  margin-bottom: 0px;
   margin-top: 0px;
   padding-bottom: 32px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 /* Kiểu dáng cho hàng chứa các card */
 .dashboard-row-spacing {
-  margin-top: 8px; 
-  margin-bottom: 16px; 
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 /* Kiểu dáng chung cho các card */
 .dashboard-card {
-  padding: 16px; 
-  border-radius: 8px; 
-  height: 140px; 
-  position: relative; 
+  padding: 16px;
+  border-radius: 8px;
+  height: 140px;
+  position: relative;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   justify-content: space-between;
-  background-color: #fff; 
+  background-color: #fff;
   border: 1px solid #f0f0f0; /* Viền xám nhạt */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Chuyển đổi mượt mà */
@@ -2205,21 +2205,42 @@ button:hover,
 .discussion-item-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
 .discussion-item-author {
   display: flex;
   gap: 12px;
+  flex: 1;
 }
 
-.discussion-item-avatar {
-  background-color: #f0f0f0;
-  color: #555;
-  font-weight: 600;
+/* Avatar hình tròn với viền xám */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  border: 2px solid #d9d9d9;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.discussion-item-author-name {
-  font-weight: 600;
+/* Badge rank hiển thị số thứ hạng */
+.user-rank {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background-color: #52c41a;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
 }
 
 .discussion-item-status {
@@ -2872,4 +2893,44 @@ button:hover,
 
 .comment-button {
   cursor: pointer;
+}
+
+/* Style cho delete buttons */
+.comment-content-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.comment-main {
+  flex: 1;
+}
+
+.comment-delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.comment-item:hover .comment-delete-btn {
+  opacity: 1;
+}
+
+/* Style cho discussion item header với delete button */
+.discussion-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.discussion-item-author {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Post delete button styling */
+.ant-btn-text.ant-btn-dangerous:hover {
+  background-color: #fff1f0;
 }
