@@ -67,7 +67,7 @@ const Register = () => {
         }
       );
       // Lấy dữ liệu user từ response (có thể có format khác nhau)
-      const user = res.data.user || res.data; // đề phòng 2 format khác nhau
+      const user = res.data;
       // Lưu thông tin user vào localStorage để duy trì đăng nhập
       localStorage.setItem("user", JSON.stringify(user));
       // Cập nhật thông tin user trong context
@@ -79,7 +79,18 @@ const Register = () => {
     } catch (err) {
       // Xử lý lỗi khi gọi API
       console.error("Error fetching user:", err);
-      showSnackbar("Failed to load user info", "error");
+      if (err.response?.data?.message) {
+        showSnackbar(err.response.data.message, "error");
+      } else if (err.response?.status === 401) {
+        showSnackbar("Authentication failed. Please try again.", "error");
+      } else if (err.response?.status === 500) {
+        showSnackbar("Server error. Please try again later.", "error");
+      } else {
+        showSnackbar(
+          "Failed to complete registration. Please try again.",
+          "error"
+        );
+      }
     }
   };
   // Hàm xử lý khi người dùng submit form đăng ký

@@ -31,7 +31,6 @@ import axios from "axios";
 // Import context để quản lý trạng thái user đăng nhập
 import { AuthContext } from "../context/AuthContext";
 
-
 const Login = () => {
   // Khởi tạo các state (trạng thái) để lưu trữ dữ liệu tạm thời
   const [email, setEmail] = useState("");
@@ -88,7 +87,13 @@ const Login = () => {
     } catch (err) {
       // Nếu có lỗi khi gọi API, in lỗi ra console và hiển thị thông báo lỗi
       console.error("Error fetching user:", err);
-      showSnackbar("Failed to load user info", "error");
+      if (err.response?.status === 401) {
+        showSnackbar("Session expired. Please login again.", "error");
+      } else if (err.response?.status === 500) {
+        showSnackbar("Server error. Please try again later.", "error");
+      } else {
+        showSnackbar("Failed to load user info. Please try again.", "error");
+      }
     }
   };
   // Function xử lý đăng nhập bằng email và mật khẩu
@@ -180,48 +185,48 @@ const Login = () => {
         {/* Form đăng nhập - khi submit sẽ gọi handleEmailPasswordLogin */}
         <form onSubmit={handleEmailPasswordLogin}>
           <TextField
-            fullWidth 
-            label="Email" 
-            type="email" 
-            margin="normal" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
+            fullWidth
+            label="Email"
+            type="email"
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
-         
+
           <TextField
-            fullWidth 
-            label="Password" 
-            type="password" 
-            margin="normal" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
+            fullWidth
+            label="Password"
+            type="password"
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           <Button
-            onClick={handleForgotPassword} 
-            variant="text" 
+            onClick={handleForgotPassword}
+            variant="text"
             sx={{
-              mt: 1, 
-              display: "block", 
-              textAlign: "right", 
-              color: "#16A34A", 
-              fontWeight: "bold", 
+              mt: 1,
+              display: "block",
+              textAlign: "right",
+              color: "#16A34A",
+              fontWeight: "bold",
             }}
           >
             Forgot password?
           </Button>
 
           <Button
-            fullWidth 
-            type="submit" 
-            variant="contained" 
-            disabled={isLoading} 
+            fullWidth
+            type="submit"
+            variant="contained"
+            disabled={isLoading}
             sx={{
-              mt: 3, 
-              bgcolor: "#16A34A", 
-              "&:hover": { bgcolor: "#15803d" }, 
+              mt: 3,
+              bgcolor: "#16A34A",
+              "&:hover": { bgcolor: "#15803d" },
             }}
           >
             {isLoading ? "Logging in..." : "Login"}
@@ -247,9 +252,9 @@ const Login = () => {
 
         <Button
           variant="outlined" // Kiểu nút có viền
-          onClick={handleGoogleLogin} 
-          fullWidth 
-          sx={{ mt: 2, borderColor: "#16A34A", color: "#16A34A" }} 
+          onClick={handleGoogleLogin}
+          fullWidth
+          sx={{ mt: 2, borderColor: "#16A34A", color: "#16A34A" }}
         >
           Login with Google
         </Button>
@@ -258,7 +263,7 @@ const Login = () => {
       <Snackbar
         open={open} // Hiển thị khi open = true
         autoHideDuration={3000} // Tự động ẩn sau 3 giây (3000ms)
-        onClose={() => setOpen(false)} 
+        onClose={() => setOpen(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Vị trí hiển thị
       >
         <Alert
