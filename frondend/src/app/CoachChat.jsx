@@ -14,7 +14,14 @@ const CoachChat = () => {
   const textAreaRef = useRef(null);
 
   // Temporary user ID - in real app, get from authentication context
-  const userId = 1;
+  const userStr = localStorage.getItem("user");
+
+  // Parse chuỗi JSON thành object, nếu không có thì null
+  const userObj = userStr ? JSON.parse(userStr) : null;
+
+  // Lấy userId từ object user nếu tồn tại, nếu không thì null
+  const userId = userObj ? userObj.id : null;
+
   const scrollToBottom = (ref) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   };
