@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Typography, Button, Row, Col, Card } from "antd";
-import { RiseOutlined, TeamOutlined, BookOutlined } from "@ant-design/icons";
+import { RiseOutlined, TeamOutlined, BookOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
+import CoachChat from "./CoachChat";
 const { Title, Paragraph, Text } = Typography;
 
 const stats = [
@@ -352,12 +352,107 @@ const secondaryButtonStyle = {
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       <HeroSection />
       <StatsSection />
       <SupportSection />
       <SuccessStories onNavigate={navigate} />
+      {/* Floating Chat Button */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "30px",
+          right: "30px",
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          type="primary"
+          shape="circle"
+          size="large"
+          icon={<MessageOutlined />}
+          onClick={toggleChat}
+          style={{
+            width: "70px",
+            height: "70px",
+            fontSize: "24px",
+            background: "#1FB155",
+            border: "none",
+            boxShadow: "0 8px 25px rgba(102, 126, 234, 0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: isChatOpen ? "none" : "pulse 2s infinite",
+          }}
+        />
+      </div>
+
+      {/* Chat Modal/Sidebar */}
+      {isChatOpen && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            right: 0,
+            width: "500px",
+            height: "70vh",
+            zIndex: 1001,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* Close Button */}
+          <div
+            style={{
+              position: "absolute",
+              top: "30px",
+              right: "30px",
+              zIndex: 1002,
+            }}
+          >
+            <Button
+              type="text"
+              shape="circle"
+              icon={<CloseOutlined />}
+              onClick={toggleChat}
+              style={{
+                background: "rgba(255, 255, 255, 0.9)",
+                border: "1px solid #e8e8e8",
+                color: "#666",
+              }}
+            />
+          </div>
+
+          {/* Chat Component */}
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <CoachChat />
+          </div>
+        </div>
+      )}
+
+      {/* CSS for pulse animation */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+          }
+          100% {
+            transform: scale(1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+          }
+        }
+      `}</style>
     </div>
   );
 };

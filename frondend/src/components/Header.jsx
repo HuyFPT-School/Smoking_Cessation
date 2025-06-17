@@ -71,7 +71,6 @@ const Header = () => {
     { label: "Tracking", path: "/tracking" },
     { label: "Leaderboard", path: "/leaderboard" },
     { label: "Blog", path: "/blog" },
-    { label: "CoachChat", path: "/coachchat" },
   ];
 
   // Hook useEffect để xử lý sự kiện click ra ngoài menu profile
@@ -350,15 +349,15 @@ const Header = () => {
                   <ListItemText primary="Log In" />
                 </ListItem>
                 <ListItem
-                  button 
-                  component={RouterLink} 
-                  to="/register" 
+                  button
+                  component={RouterLink}
+                  to="/register"
                   sx={{
-                    py: 1.5, 
-                    bgcolor: "rgba(22, 163, 74, 0.1)", 
+                    py: 1.5,
+                    bgcolor: "rgba(22, 163, 74, 0.1)",
                     "& .MuiListItemText-primary": {
-                      color: "#16A34A", 
-                      fontWeight: "bold", 
+                      color: "#16A34A",
+                      fontWeight: "bold",
                     },
                   }}
                 >
