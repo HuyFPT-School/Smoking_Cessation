@@ -194,7 +194,21 @@ const UserProfile = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    form.resetFields();
+    if (userData) {
+      form.setFieldsValue({
+        name: userData.name,
+        phone: userData.phone,
+        birthdate: userData.birthdate
+          ? moment(userData.birthdate, "DD/MM/YYYY")
+          : null,
+        gender: userData.gender,
+        bio: userData.bio,
+        smokingAge: userData.smokingAge,
+        yearsSmoked: userData.yearsSmoked,
+        occupation: userData.occupation,
+        healthStatus: userData.healthStatus,
+      });
+    }
   };
   const handleFinish = async (values) => {
     if (!userId) {
@@ -313,6 +327,10 @@ const UserProfile = () => {
     } else {
       // Handle moment/dayjs object
       birthDate = birthdate.toDate ? birthdate.toDate() : new Date(birthdate);
+    }
+
+    if (isNaN(birthDate.getTime())) {
+      return "";
     }
 
     const today = new Date();
@@ -583,7 +601,6 @@ const UserProfile = () => {
               lineHeight: "1.5",
             }}
           >
-            {" "}
             {userData
               ? `${userData.birthdate ? `Born on ${userData.birthdate}` : ""} ${
                   userData.gender ? `• ${userData.gender}` : ""
@@ -616,7 +633,7 @@ const UserProfile = () => {
                   color: "#4caf50",
                   marginBottom: "8px",
                 }}
-              />{" "}
+              />
               <Title
                 level={4}
                 style={{
@@ -669,7 +686,7 @@ const UserProfile = () => {
                 }}
               >
                 {summaryStats.achievementPoints}
-              </Title>{" "}
+              </Title>
               <Text
                 style={{
                   color: "#1976d2",
@@ -850,7 +867,6 @@ const UserProfile = () => {
                 fontSize: "24px",
               }}
             >
-              {" "}
               <UserOutlined style={{ marginRight: "8px" }} />
               Personal Information
             </Title>
@@ -1076,7 +1092,7 @@ const UserProfile = () => {
             )}
           </div>
         )}
-      </Card>{" "}
+      </Card>
       <Modal
         title="Account Information"
         visible={isModalVisible}
@@ -1086,7 +1102,6 @@ const UserProfile = () => {
         okText="Update Information"
         cancelText="Cancel"
       >
-        {" "}
         <Form form={form} layout="vertical" onFinish={handleFinish}>
           <Form.Item
             label="Phone Number *"
@@ -1097,28 +1112,62 @@ const UserProfile = () => {
                 message: "Please enter your phone number!",
               },
               {
-                pattern: /^[0-9]+$/,
-                message: "Please enter numbers only!",
+                pattern: /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
+                message: "Please enter a valid Vietnamese phone number!",
               },
             ]}
           >
-            <Input type="number" placeholder="1234567890" />
-          </Form.Item>{" "}
-          <Form.Item label="Full Name *" name="name" initialValue="SSSSS">
-            <Input placeholder="Enter your full name" />
-          </Form.Item>{" "}
-          <Form.Item label="Date of Birth *" name="birthdate">
+            <Input
+              type="tel"
+              placeholder="0123456789 or +84123456789"
+              maxLength={15}
+            />
+          </Form.Item>
+          <Form.Item
+            label="Full Name *"
+            name="name"
+            rules={[
+              { required: true, message: "Please enter your full name!" },
+              { min: 2, message: "Name must be at least 2 characters!" },
+              { max: 50, message: "Name must not exceed 50 characters!" },
+              {
+                pattern: /^[a-zA-ZÀ-ỹ\s]+$/,
+                message: "Name can only contain letters and spaces!",
+              },
+            ]}
+          >
+            <Input placeholder="Enter your full name" maxLength={50} />
+          </Form.Item>
+          <Form.Item
+            label="Date of Birth *"
+            name="birthdate"
+            rules={[
+              { required: true, message: "Please select your date of birth!" },
+            ]}
+          >
             <DatePicker
               placeholder="Select date of birth"
               format="DD/MM/YYYY"
               style={{ width: "100%" }}
               disabledDate={(current) => {
-                // Disable future dates
-                return current && current > moment().endOf("day");
+                const today = moment().endOf("day");
+                const maxAge = moment().subtract(100, "years");
+                const minAge = moment().subtract(13, "years");
+
+                return (
+                  current &&
+                  (current > minAge || // Quá trẻ (dưới 13 tuổi)
+                    current < maxAge || // Quá già (trên 100 tuổi)
+                    current > today) // Tương lai
+                );
               }}
             />
           </Form.Item>
-          <Form.Item label="Gender *" name="gender">
+          <Form.Item
+            label="Gender *"
+            name="gender"
+            rules={[{ required: true, message: "Please select your gender!" }]}
+          >
             <Select placeholder="Select gender">
               <Option value="Male">Male</Option>
               <Option value="Female">Female</Option>
@@ -1128,18 +1177,147 @@ const UserProfile = () => {
           <Form.Item
             label="Bio"
             name="bio"
-            initialValue="On a journey to quit smoking. Every day is a new victory!"
+            rules={[
+              { max: 500, message: "Bio must not exceed 500 characters!" },
+            ]}
           >
-            <Input placeholder="On a journey to quit smoking. Every day is a new victory!" />
-          </Form.Item>{" "}
-          <Form.Item label="Age started smoking" name="smokingAge">
-            <Input type="number" placeholder="Enter age" />
+            <Input.TextArea
+              placeholder="Tell us about your journey to quit smoking..."
+              maxLength={500}
+              showCount
+              rows={4}
+            />
           </Form.Item>
-          <Form.Item label="Years of smoking" name="yearsSmoked">
-            <Input type="number" placeholder="Enter number of years" />
-          </Form.Item>{" "}
-          <Form.Item label="Occupation" name="occupation">
-            <Input placeholder="Enter occupation" />
+          {/* Smoking Age - Fixed với Dynamic Validation */}
+          <Form.Item
+            label="Age started smoking"
+            name="smokingAge"
+            dependencies={["birthdate"]} // ✅ Added dependency
+            rules={[
+              {
+                required: true,
+                message: "Please enter the age you started smoking!",
+              },
+              ({ getFieldValue }) => ({
+                // 🤔 TẠI SAO DÙNG PROMISE?
+                // Giống như bạn hỏi người bạn: "Tôi có thể bắt đầu hút thuốc ở tuổi 25 không?"
+                // Người bạn cần suy nghĩ, tính toán rồi mới trả lời "Có" hoặc "Không"
+                // Promise = "Lời hứa" sẽ trả lời sau khi kiểm tra xong
+                validator(_, value) {
+                  // 🚫 Nếu không nhập gì thì OK (không bắt buộc validation này)
+                  if (!value) return Promise.resolve(); // = "OK, không cần kiểm tra"
+
+                  const age = parseInt(value); // Chuyển text thành số
+                  const birthdate = getFieldValue("birthdate"); // Lấy ngày sinh từ field khác
+
+                  // KIỂM TRA CƠ BẢN: Tuổi phải >= 5
+                  if (age < 5) {
+                    // Promise.reject = "Xin lỗi, có lỗi!" (như người bạn nói "Không được!")
+                    return Promise.reject(new Error("Age must be at least 5!"));
+                  }
+
+                  // 🧠 KIỂM TRA THÔNG MINH: So sánh với tuổi thực
+                  // Giống như kiểm tra: "Bạn không thể bắt đầu hút ở tuổi 30 khi chỉ 25 tuổi"
+                  if (birthdate) {
+                    // Tính tuổi hiện tại từ ngày sinh
+                    const currentAge = moment().diff(birthdate, "years");
+                    if (age > currentAge) {
+                      // Promise.reject = "Không hợp lý!" với thông báo cụ thể
+                      return Promise.reject(
+                        new Error(
+                          `Cannot start smoking at age ${age} when you are ${currentAge} years old!`
+                        )
+                      );
+                    }
+                  } else if (age > 80) {
+                    // Nếu chưa có ngày sinh, dùng giới hạn cứng
+                    return Promise.reject(new Error("Age cannot exceed 80!"));
+                  }
+                  // ✅ Promise.resolve = "OK, hợp lệ!" (như người bạn nói "Được!")
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <Input type="number" placeholder="Enter age (e.g., 16)" min="5" />
+          </Form.Item>
+          {/* Years of Smoking - Fixed với Cross-Field Validation */}
+          <Form.Item
+            label="Years of smoking"
+            name="yearsSmoked"
+            dependencies={["smokingAge", "birthdate"]} // Phụ thuộc vào 2 fields khác
+            rules={[
+              {
+                required: true,
+                message: "Please enter the number of years you smoked!", // ✅ Fixed message
+              },
+              ({ getFieldValue }) => ({
+                // 🤔 TẠI SAO CẦN PROMISE CHO VALIDATION NÀY?
+                // Giống như câu hỏi phức tạp: "Tôi có thể hút thuốc 15 năm không?"
+                // Để trả lời, cần kiểm tra:
+                // 1. Bạn bắt đầu hút lúc mấy tuổi?
+                // 2. Bạn sinh năm nào?
+                // 3. Tính toán: Tuổi hiện tại - tuổi bắt đầu hút = tối đa có thể hút bao nhiêu năm?
+                // 4. So sánh với số năm bạn nhập
+                // Quá trình này cần thời gian → Dùng Promise!
+                validator(_, value) {
+                  if (!value) return Promise.resolve(); // Không nhập thì OK
+
+                  const yearsSmoked = parseInt(value);
+                  const smokingAge = getFieldValue("smokingAge"); // Lấy tuổi bắt đầu hút
+                  const birthdate = getFieldValue("birthdate"); // Lấy ngày sinh
+
+                  // KIỂM TRA CƠ BẢN: Không được âm
+                  if (yearsSmoked < 0) {
+                    return Promise.reject(
+                      new Error("Years cannot be negative!")
+                    );
+                  }
+
+                  // KIỂM TRA THÔNG MINH: Cross-field validation
+                  // Ví dụ: Nếu 25 tuổi, bắt đầu hút ở 18 tuổi
+                  // → Tối đa có thể hút: 25 - 18 = 7 năm
+                  // → Nếu nhập 10 năm thì sai!
+                  if (smokingAge && birthdate) {
+                    const currentAge = moment().diff(birthdate, "years");
+                    const maxPossibleYears = currentAge - smokingAge;
+
+                    if (
+                      maxPossibleYears >= 0 &&
+                      yearsSmoked > maxPossibleYears
+                    ) {
+                      // Promise.reject với thông báo chi tiết
+                      return Promise.reject(
+                        new Error(
+                          `Cannot exceed ${maxPossibleYears} years based on your current age ${currentAge} and when you started smoking ${smokingAge}!`
+                        )
+                      );
+                    }
+                  } else if (yearsSmoked > 70) {
+                    // Fallback: Nếu thiếu thông tin, dùng giới hạn chung
+                    return Promise.reject(
+                      new Error("Years of smoking cannot exceed 70!")
+                    );
+                  }
+                  // ✅ Tất cả đều OK!
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <Input type="number" placeholder="Enter number of years" min="0" />
+          </Form.Item>
+          <Form.Item
+            label="Occupation"
+            name="occupation"
+            rules={[
+              {
+                max: 100,
+                message: "Occupation must not exceed 100 characters!",
+              },
+            ]}
+          >
+            <Input placeholder="Enter occupation" maxLength={100} />
           </Form.Item>
           <Form.Item label="Health status" name="healthStatus">
             <Select placeholder="Select health status">
@@ -1148,7 +1326,7 @@ const UserProfile = () => {
               <Option value="fair">Fair</Option>
               <Option value="poor">Poor</Option>
             </Select>
-          </Form.Item>{" "}
+          </Form.Item>
         </Form>
       </Modal>
       {/* MUI Snackbar for notifications */}
