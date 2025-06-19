@@ -53,6 +53,29 @@ const UserProfile = () => {
     severity: "info", // 'success', 'error', 'warning', 'info'
   });
 
+  // ✅ HELPER FUNCTION - Tính tuổi chính xác từ DatePicker
+  const calculateCurrentAge = (birthdate) => {
+    if (!birthdate) return 0;
+
+    try {
+      // Handle moment object from DatePicker
+      if (moment.isMoment(birthdate)) {
+        const today = moment();
+        const age = today.diff(birthdate, "years");
+        console.log("Age calculation:", {
+          birthdate: birthdate.format("DD/MM/YYYY"),
+          today: today.format("DD/MM/YYYY"),
+          age: age,
+        });
+        return age;
+      }
+      return 0;
+    } catch (error) {
+      console.error("Error calculating age:", error);
+      return 0;
+    }
+  };
+
   // Helper function to show snackbar
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({
@@ -1215,20 +1238,19 @@ const UserProfile = () => {
                     // Promise.reject = "Xin lỗi, có lỗi!" (như người bạn nói "Không được!")
                     return Promise.reject(new Error("Age must be at least 5!"));
                   }
-
                   // 🧠 KIỂM TRA THÔNG MINH: So sánh với tuổi thực
                   // Giống như kiểm tra: "Bạn không thể bắt đầu hút ở tuổi 30 khi chỉ 25 tuổi"
-                  if (birthdate) {
-                    // Tính tuổi hiện tại từ ngày sinh
-                    const currentAge = moment().diff(birthdate, "years");
-                    if (age > currentAge) {
-                      // Promise.reject = "Không hợp lý!" với thông báo cụ thể
-                      return Promise.reject(
-                        new Error(
-                          `Cannot start smoking at age ${age} when you are ${currentAge} years old!`
-                        )
-                      );
-                    }
+
+                  // ✅ SỬA: Dùng helper function để tính tuổi chính xác
+                  const currentAge = calculateCurrentAge(birthdate);
+
+                  if (currentAge > 0 && age > currentAge) {
+                    // Promise.reject = "Không hợp lý!" với thông báo cụ thể
+                    return Promise.reject(
+                      new Error(
+                        `Cannot start smoking at age ${age} when you are ${currentAge} years old!`
+                      )
+                    );
                   } else if (age > 80) {
                     // Nếu chưa có ngày sinh, dùng giới hạn cứng
                     return Promise.reject(new Error("Age cannot exceed 80!"));
@@ -1273,14 +1295,16 @@ const UserProfile = () => {
                       new Error("Years cannot be negative!")
                     );
                   }
-
                   // KIỂM TRA THÔNG MINH: Cross-field validation
                   // Ví dụ: Nếu 25 tuổi, bắt đầu hút ở 18 tuổi
                   // → Tối đa có thể hút: 25 - 18 = 7 năm
                   // → Nếu nhập 10 năm thì sai!
-                  if (smokingAge && birthdate) {
-                    const currentAge = moment().diff(birthdate, "years");
-                    const maxPossibleYears = currentAge - smokingAge;
+
+                  // ✅ SỬA: Dùng helper function để tính tuổi chính xác
+                  const currentAge = calculateCurrentAge(birthdate);
+
+                  if (smokingAge && currentAge > 0) {
+                    const maxPossibleYears = currentAge - parseInt(smokingAge);
 
                     if (
                       maxPossibleYears >= 0 &&
