@@ -53,29 +53,6 @@ const UserProfile = () => {
     severity: "info", // 'success', 'error', 'warning', 'info'
   });
 
-  // ✅ HELPER FUNCTION - Tính tuổi chính xác từ DatePicker
-  const calculateCurrentAge = (birthdate) => {
-    if (!birthdate) return 0;
-
-    try {
-      // Handle moment object from DatePicker
-      if (moment.isMoment(birthdate)) {
-        const today = moment();
-        const age = today.diff(birthdate, "years");
-        console.log("Age calculation:", {
-          birthdate: birthdate.format("DD/MM/YYYY"),
-          today: today.format("DD/MM/YYYY"),
-          age: age,
-        });
-        return age;
-      }
-      return 0;
-    } catch (error) {
-      console.error("Error calculating age:", error);
-      return 0;
-    }
-  };
-
   // Helper function to show snackbar
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({
@@ -1211,125 +1188,68 @@ const UserProfile = () => {
               rows={4}
             />
           </Form.Item>
-          {/* Smoking Age - Fixed với Dynamic Validation */}
+          {/* Smoking Age - Simple version without Promise */}
           <Form.Item
             label="Age started smoking"
             name="smokingAge"
-            dependencies={["birthdate"]} // ✅ Added dependency
             rules={[
               {
                 required: true,
                 message: "Please enter the age you started smoking!",
               },
-              ({ getFieldValue }) => ({
-                // 🤔 TẠI SAO DÙNG PROMISE?
-                // Giống như bạn hỏi người bạn: "Tôi có thể bắt đầu hút thuốc ở tuổi 25 không?"
-                // Người bạn cần suy nghĩ, tính toán rồi mới trả lời "Có" hoặc "Không"
-                // Promise = "Lời hứa" sẽ trả lời sau khi kiểm tra xong
-                validator(_, value) {
-                  // 🚫 Nếu không nhập gì thì OK (không bắt buộc validation này)
-                  if (!value) return Promise.resolve(); // = "OK, không cần kiểm tra"
-
-                  const age = parseInt(value); // Chuyển text thành số
-                  const birthdate = getFieldValue("birthdate"); // Lấy ngày sinh từ field khác
-
-                  // KIỂM TRA CƠ BẢN: Tuổi phải >= 5
-                  if (age < 5) {
-                    // Promise.reject = "Xin lỗi, có lỗi!" (như người bạn nói "Không được!")
-                    return Promise.reject(new Error("Age must be at least 5!"));
-                  }
-                  // 🧠 KIỂM TRA THÔNG MINH: So sánh với tuổi thực
-                  // Giống như kiểm tra: "Bạn không thể bắt đầu hút ở tuổi 30 khi chỉ 25 tuổi"
-
-                  // ✅ SỬA: Dùng helper function để tính tuổi chính xác
-                  const currentAge = calculateCurrentAge(birthdate);
-
-                  if (currentAge > 0 && age > currentAge) {
-                    // Promise.reject = "Không hợp lý!" với thông báo cụ thể
-                    return Promise.reject(
-                      new Error(
-                        `Cannot start smoking at age ${age} when you are ${currentAge} years old!`
-                      )
-                    );
-                  } else if (age > 80) {
-                    // Nếu chưa có ngày sinh, dùng giới hạn cứng
-                    return Promise.reject(new Error("Age cannot exceed 80!"));
-                  }
-                  // ✅ Promise.resolve = "OK, hợp lệ!" (như người bạn nói "Được!")
-                  return Promise.resolve();
+              {
+                type: "number",
+                min: 5,
+                max: 80,
+                message: "Age must be between 5 and 80!",
+                transform: (value) => {
+                  return value ? Number(value) : value;
                 },
-              }),
+              },
+              {
+                pattern: /^[0-9]+$/,
+                message: "Please enter numbers only!",
+              },
             ]}
           >
-            <Input type="number" placeholder="Enter age (e.g., 16)" min="5" />
+            <Input
+              type="number"
+              placeholder="Enter age (e.g., 16)"
+              min="5"
+              max="80"
+            />
           </Form.Item>
-          {/* Years of Smoking - Fixed với Cross-Field Validation */}
+
+          {/* Years of Smoking - Simple version without Promise */}
           <Form.Item
             label="Years of smoking"
             name="yearsSmoked"
-            dependencies={["smokingAge", "birthdate"]} // Phụ thuộc vào 2 fields khác
             rules={[
               {
                 required: true,
-                message: "Please enter the number of years you smoked!", // ✅ Fixed message
+                message: "Please enter the number of years you smoked!",
               },
-              ({ getFieldValue }) => ({
-                // 🤔 TẠI SAO CẦN PROMISE CHO VALIDATION NÀY?
-                // Giống như câu hỏi phức tạp: "Tôi có thể hút thuốc 15 năm không?"
-                // Để trả lời, cần kiểm tra:
-                // 1. Bạn bắt đầu hút lúc mấy tuổi?
-                // 2. Bạn sinh năm nào?
-                // 3. Tính toán: Tuổi hiện tại - tuổi bắt đầu hút = tối đa có thể hút bao nhiêu năm?
-                // 4. So sánh với số năm bạn nhập
-                // Quá trình này cần thời gian → Dùng Promise!
-                validator(_, value) {
-                  if (!value) return Promise.resolve(); // Không nhập thì OK
-
-                  const yearsSmoked = parseInt(value);
-                  const smokingAge = getFieldValue("smokingAge"); // Lấy tuổi bắt đầu hút
-                  const birthdate = getFieldValue("birthdate"); // Lấy ngày sinh
-
-                  // KIỂM TRA CƠ BẢN: Không được âm
-                  if (yearsSmoked < 0) {
-                    return Promise.reject(
-                      new Error("Years cannot be negative!")
-                    );
-                  }
-                  // KIỂM TRA THÔNG MINH: Cross-field validation
-                  // Ví dụ: Nếu 25 tuổi, bắt đầu hút ở 18 tuổi
-                  // → Tối đa có thể hút: 25 - 18 = 7 năm
-                  // → Nếu nhập 10 năm thì sai!
-
-                  // ✅ SỬA: Dùng helper function để tính tuổi chính xác
-                  const currentAge = calculateCurrentAge(birthdate);
-
-                  if (smokingAge && currentAge > 0) {
-                    const maxPossibleYears = currentAge - parseInt(smokingAge);
-
-                    if (
-                      maxPossibleYears >= 0 &&
-                      yearsSmoked > maxPossibleYears
-                    ) {
-                      // Promise.reject với thông báo chi tiết
-                      return Promise.reject(
-                        new Error(
-                          `Cannot exceed ${maxPossibleYears} years based on your current age ${currentAge} and when you started smoking ${smokingAge}!`
-                        )
-                      );
-                    }
-                  } else if (yearsSmoked > 70) {
-                    // Fallback: Nếu thiếu thông tin, dùng giới hạn chung
-                    return Promise.reject(
-                      new Error("Years of smoking cannot exceed 70!")
-                    );
-                  }
-                  // ✅ Tất cả đều OK!
-                  return Promise.resolve();
+              {
+                type: "number",
+                min: 0,
+                max: 70,
+                message: "Years must be between 0 and 70!",
+                transform: (value) => {
+                  return value ? Number(value) : value;
                 },
-              }),
+              },
+              {
+                pattern: /^[0-9]+$/,
+                message: "Please enter numbers only!",
+              },
             ]}
           >
-            <Input type="number" placeholder="Enter number of years" min="0" />
+            <Input
+              type="number"
+              placeholder="Enter number of years"
+              min="0"
+              max="70"
+            />
           </Form.Item>
           <Form.Item
             label="Occupation"
