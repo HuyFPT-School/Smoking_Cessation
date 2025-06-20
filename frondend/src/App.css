@@ -2938,7 +2938,6 @@ button:hover,
 /*--------------------------css của adminpanel------------------------- */
 .admin-header {
   padding: 20px 24px 8px;
-  background: #fefefe;
   border-bottom: none;
 }
 .admin-header-top {
@@ -3002,7 +3001,6 @@ button:hover,
   align-items: center;
   margin: 20px auto 24px;
   background: #f9f9f9;
-  border: 1px solid #eee;
   border-radius: 10px;
   padding: 10px 16px;
   flex-wrap: wrap;
@@ -3028,7 +3026,7 @@ button:hover,
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
-.dashboard-card {
+.dashboard-card-admin {
   background: #fff;
   padding: 20px;
   border-radius: 10px;
@@ -3046,8 +3044,8 @@ button:hover,
   margin: 4px 0;
 }
 .card-label {
-  font-size: 13px;
-  color: #888;
+  font-size: 15px;
+  font-weight: bold;
 }
 .card-sub {
   font-size: 13px;
@@ -3215,7 +3213,6 @@ button:hover,
   font-size: 15px;
 }
 .user-info {
-  display: flex;
   flex-direction: column;
   font-size: 14px;
 }
@@ -3231,11 +3228,7 @@ button:hover,
   margin-top: 2px;
 }
 .user-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
   text-align: right;
-  justify-self: end;
   min-width: 220px;
 }
 .right-top {
@@ -3595,19 +3588,6 @@ input:checked + .slider:before {
   grid-column: 1 / -1;
   margin-top: 16px;
 }
-input[type="text"],
-select,
-textarea,
-input[type="date"],
-input[type="time"] {
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-}
 textarea {
   resize: vertical;
 }
@@ -3923,4 +3903,51 @@ textarea {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+/* User action dropdown styling */
+.user-action-wrapper {
+  position: relative;
+}
+
+.user-dropdown {
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 8px 0;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-item.delete-option {
+  color: #ff4d4f;
+}
+
+.dropdown-item.delete-option:hover {
+  background-color: #fff1f0;
+}
+
+.admin-action {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.admin-action:hover {
+  background-color: #f0f0f0;
 }

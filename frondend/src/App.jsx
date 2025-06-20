@@ -13,6 +13,7 @@ import CommunityBlogPage from "./app/CommunityBlogPage"; // Thêm import cho Com
 import LeaderboardPage from "./app/LeaderboardPage";
 import Profile from "./app/Profile";
 import CoachChat from "./app/CoachChat"; // 6/7/2025 thêm import cho CoachChat
+import AdminPanelPage from "./app/AdminPanelPage";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/coachchat" element={<CoachChat />} />
+          <Route path="/admin" element={<AdminPanelPage />} />
         </Routes>
         <Footer />
       </AuthProvider>
