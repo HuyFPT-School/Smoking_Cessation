@@ -2,7 +2,6 @@ package com.example.demo.Controller;
 
 import com.example.demo.DTO.LeaderboardUserDTO;
 import com.example.demo.entity.Plan;
-import com.example.demo.entity.Post;
 import com.example.demo.entity.Tracking;
 import com.example.demo.entity.User;
 import com.example.demo.Repo.PlanRepo;
@@ -12,6 +11,7 @@ import com.example.demo.Repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.entity.Role;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -81,12 +81,17 @@ public class LeaderboardController {
                 ));
             }
 
+            // Lọc người dùng có vai trò USER
+            List<User> userRoleOnly = allUsers.stream()
+                .filter(user -> user.getRole() == Role.USER)
+                .collect(Collectors.toList());
+
             // Danh sách để lưu thông tin người dùng trên bảng xếp hạng
             List<LeaderboardUserDTO> leaderboardUsers = new ArrayList<>();
 
 
              // Tính toán điểm số cho mỗi người dùng
-            for (User user : allUsers) {
+            for (User user : userRoleOnly) {
                 try {
                     // Gọi phương thức tính toán thống kê cho mỗi người dùng
                     LeaderboardUserDTO leaderboardUser = calculateUserStats(user, timeRange);
