@@ -5,7 +5,6 @@ import com.example.demo.entity.Plan;
 import com.example.demo.entity.Tracking;
 import com.example.demo.entity.User;
 import com.example.demo.Repo.PlanRepo;
-import com.example.demo.Repo.PostRepo;
 import com.example.demo.Repo.TrackingRepo;
 import com.example.demo.Repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,6 @@ public class LeaderboardController {
     @Autowired
     private TrackingRepo trackingRepo;
 
-    @Autowired
-
-    private PostRepo postRepo;   
     // === HÀM LẤY DỮ LIỆU BẢNG XẾP HẠNG ===
 
     // Đây là hàm chính để hiển thị bảng xếp hạng cho ứng dụng. 
@@ -72,19 +68,7 @@ public class LeaderboardController {
             }
 
             // Lấy tất cả người dùng từ cơ sở dữ liệu
-            List<User> allUsers = userRepo.findAll();
-            if (allUsers.isEmpty()) {
-                return ResponseEntity.ok(Map.of(
-                    "leaderboard", new ArrayList<>(),  // ArrayList<>(): Tạo danh sách rỗng
-                    "currentUser", null,               // Không có người dùng hiện tại
-                    "timeRange", timeRange             // Vẫn trả về phạm vi thời gian đã chọn
-                ));
-            }
-
-            // Lọc người dùng có vai trò USER
-            List<User> userRoleOnly = allUsers.stream()
-                .filter(user -> user.getRole() == Role.USER)
-                .collect(Collectors.toList());
+            List<User> userRoleOnly = userRepo.findByRole(Role.USER);
 
             // Danh sách để lưu thông tin người dùng trên bảng xếp hạng
             List<LeaderboardUserDTO> leaderboardUsers = new ArrayList<>();
