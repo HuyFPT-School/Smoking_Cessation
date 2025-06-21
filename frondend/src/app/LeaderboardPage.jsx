@@ -182,7 +182,7 @@ const LeaderboardPage = () => {
         >
           Badge {/* Tiêu đề cột Badge */}
         </Col>
-        {/* Cột Smoke-Free Days */}
+        {/* Cột Consecutive Streak */}
         <Col
           span={4}
           style={{
@@ -191,7 +191,7 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          Smoke-Free Days {/* Tiêu đề cột Smoke-Free Days */}
+          Consecutive Streak {/* Tiêu đề cột Consecutive Streak */}
         </Col>
         {/* Cột Points */}
         <Col
@@ -496,7 +496,7 @@ const LeaderboardPage = () => {
                   {user.tier} {/* Hiển thị tier */}
                 </div>
                 <Text style={{ color: "#666" }}>
-                  {user.days} smoke-free days {/* Hiển thị số ngày không hút thuốc */}
+                  {user.days} consecutive smoke-free days {/* Hiển thị số ngày không hút thuốc */}
                 </Text>
                 <Text strong style={{ fontSize: "1.125rem" }}>
                   {timeRange === "weekly"

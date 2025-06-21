@@ -35,7 +35,7 @@ public class Tracking {
     @Column(name = "notes", length = 500)
     private String notes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) // Chỉ tải User khi gọi getUser()
     @JoinColumn(name = "user_id") // Tên cột khóa ngoại
     private User user;
 }
