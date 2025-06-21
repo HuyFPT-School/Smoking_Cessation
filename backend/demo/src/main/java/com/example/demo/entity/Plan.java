@@ -28,13 +28,13 @@ public class Plan {
     private String quitMethod;
     private int cigarettesPerDay;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER) //  Load tất cả triggers cùng lúc với Plan
     @CollectionTable(name = "plan_triggers", joinColumns = @JoinColumn(name = "plan_id"))
     @Column(name = "trigger_item")
     private List<String> triggers;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "plan_coping_strategies", joinColumns = @JoinColumn(name = "plan_id"))
+    @CollectionTable(name = "plan_coping_strategies", joinColumns = @JoinColumn(name = "plan_id")) // Liên kết qua cột "plan_id"
     @Column(name = "coping_strategy_item")
     private List<String> copingStrategies;
 
@@ -43,7 +43,7 @@ public class Plan {
     @Column(name = "support_network_item")
     private List<String> supportNetwork;
 
-    @Lob
+    @Lob // Large Object - cho phép lưu văn bản rất dài
     @Column(columnDefinition = "TEXT")
     private String additionalNotes;
 

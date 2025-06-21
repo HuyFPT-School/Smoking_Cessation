@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity
-@Table(name = "user_profile")
+@Entity // Báo cho hệ thống biết class này đại diện cho một bảng trong database
+@Table(name = "user_profile") // Chỉ định tên bảng trong database là "user_profile"
 public class UserProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class UserProfile {
     @Column(name = "health_status", length = 50)
     private String healthStatus;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
+    @OneToOne // Mối quan hệ 1-1 (mỗi User có đúng 1 UserProfile)
+    @JoinColumn(name = "user_id", unique = true) // Kết nối thông qua cột "user_id" unique = true: Đảm bảo mỗi User chỉ có 1 Profile
     private User user;
 }

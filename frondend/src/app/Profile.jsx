@@ -226,7 +226,7 @@ const UserProfile = () => {
       // Add userId to the payload
       const profileData = {
         ...values,
-        userId: userId.toString(),
+        userId: userId,
       };
 
       const response = await axios.post(

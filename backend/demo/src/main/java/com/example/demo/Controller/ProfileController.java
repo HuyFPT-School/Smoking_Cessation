@@ -60,15 +60,14 @@ public class ProfileController {
     public ResponseEntity<?> createOrUpdateProfile(@RequestBody UserProfileDTO profileDTO) {
         try {
             // 1. KIỂM TRA NGƯỜI DÙNG CÓ TỒN TẠI KHÔNG
-            // Chuyển đổi userId từ String sang int
-            int userId = Integer.parseInt(profileDTO.getUserId());
+            Integer userId = profileDTO.getUserId();
             
             // Tìm người dùng trong database dựa trên userId
             Optional<User> userOptional = userRepo.findById(userId);
 
             // Nếu không tìm thấy người dùng, trả về lỗi 400 Bad Request
             if (userOptional.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
 
             User user = userOptional.get();
@@ -146,7 +145,7 @@ public class ProfileController {
         dto.setYearsSmoked(userProfile.getYearsSmoked());                 // Số năm đã hút thuốc
         dto.setOccupation(userProfile.getOccupation());                   // Nghề nghiệp
         dto.setHealthStatus(userProfile.getHealthStatus());               // Tình trạng sức khỏe
-        dto.setUserId(String.valueOf(userProfile.getUser().getId()));     // ID người dùng (chuyển từ int sang String)
+        dto.setUserId(userProfile.getUser().getId());                     // ID người dùng 
         
         // Trả về đối tượng DTO đã hoàn chỉnh
         return dto;

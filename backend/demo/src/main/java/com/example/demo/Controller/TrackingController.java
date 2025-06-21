@@ -26,7 +26,11 @@ public class TrackingController {
 
     @Autowired
     private UserRepo userRepo; // Assuming you have a UserRepo
-
+    
+    //  ApplicationEventPublisher - Để thông báo cập nhật dữ liệu
+    //  
+    //  Khi kế hoạch được tạo/cập nhật/xóa, sẽ gửi thông báo đến các component khác
+    //  để họ biết cần cập nhật lại dữ liệu (ví dụ: leaderboard cần tính lại điểm)
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
