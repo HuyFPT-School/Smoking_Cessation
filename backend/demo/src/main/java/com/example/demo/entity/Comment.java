@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comment {    @Id
+public class Comment {
+    @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private int id;
 

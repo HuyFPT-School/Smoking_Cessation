@@ -1,6 +1,7 @@
 package com.example.demo.Repo;
 
 import com.example.demo.entity.PostLike;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,8 @@ public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {    // F
     boolean existsByPostIdAndUserId(Integer postId, Integer userId);// Delete all likes for a specific post (used when deleting a post)
     @Modifying
     void deleteByPostId(Integer postId);
+
+    void deleteByUser(User user);
+
 
 }

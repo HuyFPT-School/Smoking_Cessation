@@ -1,6 +1,7 @@
 package com.example.demo.Repo;
 
 import com.example.demo.entity.Tracking;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface TrackingRepo extends JpaRepository<Tracking, Integer> {
+    void deleteByUser(User user);
 
     // Method hiện tại
     List<Tracking> findByUserId(Integer userId);

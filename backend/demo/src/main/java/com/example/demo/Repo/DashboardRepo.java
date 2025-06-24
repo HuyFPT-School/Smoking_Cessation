@@ -13,4 +13,6 @@ public interface DashboardRepo extends JpaRepository<Dashboard, Long> {
     Optional<Dashboard> findByUserIdAndRecordedDate(@Param("userId") Integer userId, @Param("recordedDate") LocalDate recordedDate);
 
     void deleteByUserIdAndRecordedDate(Integer userId, LocalDate recordedDate);
+    void deleteByUserId(Integer userId);
+
 }
