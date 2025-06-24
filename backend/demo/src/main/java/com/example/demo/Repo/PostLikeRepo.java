@@ -9,11 +9,24 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {    // Find like by post ID and user ID
+public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {
+    // Tìm bản ghi like cụ thể bằng post ID và user ID
+    // Mục đích: Kiểm tra xem user đã like post này chưa và lấy thông tin chi tiết
+    // Ví dụ: findByPostIdAndUserId(1, 123) → tìm like của user 123 cho post 1
+    // Trả về: Optional<PostLike> - có thể có hoặc không có (nếu chưa like)
     Optional<PostLike> findByPostIdAndUserId(Integer postId, Integer userId);
 
-    // Check if user has liked a post
-    boolean existsByPostIdAndUserId(Integer postId, Integer userId);// Delete all likes for a specific post (used when deleting a post)
+    // Kiểm tra xem user đã like post này chưa (chỉ trả về true/false)
+    // Mục đích: Hiển thị trạng thái nút like (đã like hay chưa)
+    // Ví dụ: existsByPostIdAndUserId(1, 123) → true nếu user 123 đã like post 1
+    // Hiệu quả hơn findByPostIdAndUserId khi chỉ cần biết có/không
+    boolean existsByPostIdAndUserId(Integer postId, Integer userId);
+
+    // Xóa tất cả likes của một post cụ thể
+    // @Modifying: Báo cho Spring biết đây là operation thay đổi dữ liệu (DELETE)
+    // Mục đích: Cleanup khi xóa bài viết - xóa tất cả likes liên quan
+    // Ví dụ: deleteByPostId(1) → xóa tất cả likes của post có ID = 1
+    // Quan trọng: Phải gọi trong @Transactional để đảm bảo consistency
     @Modifying
     void deleteByPostId(Integer postId);
 

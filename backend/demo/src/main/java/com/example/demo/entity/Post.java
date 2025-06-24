@@ -15,9 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Post {    @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private int id;
+public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @Column(nullable = false)
     private String title;
@@ -43,6 +44,11 @@ private int id;
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // @OneToMany: Một post có nhiều like
+    // mappedBy = "post": Liên kết qua thuộc tính post trong class PostLike
+    // cascade = CascadeType.ALL: Khi xóa post → tự động xóa tất cả like của post đó
+    // orphanRemoval = true: Xóa like nếu không còn thuộc về post nào
+    // @Builder.Default: Mặc định là list rỗng
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
@@ -63,6 +69,8 @@ private int id;
         this.comments = new ArrayList<>();
     }
 
+    // @PrePersist: Chạy tự động TRƯỚC KHI lưu lần đầu vào database
+    // Backup mechanism: Đảm bảo luôn có createdAt dù quên set
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Comment {
     @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
@@ -43,11 +43,17 @@ private int id;
         this.createdAt = LocalDateTime.now();
     }
 
+    // @PrePersist: Chạy tự động TRƯỚC KHI lưu lần đầu vào database
+    // Backup mechanism: Đảm bảo luôn có createdAt dù quên set trong constructor
+    // Safety net: Phòng trường hợp lỡ tay
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
+    // @PreUpdate: Chạy tự động TRƯỚC KHI cập nhật database
+    // Automatic timestamp: Tự động ghi nhận thời gian chỉnh sửa
+    // User experience: User biết comment đã được edit
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
