@@ -26,7 +26,7 @@ public class User {
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", length = 20)
+    @Column(name = "role")
     private Role role;
     @Column(name = "create_at")
     private LocalDateTime createAt;

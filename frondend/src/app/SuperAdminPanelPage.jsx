@@ -19,9 +19,14 @@ import {
   PhoneOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Spin, Alert, Button } from "antd";
+import { Descriptions, Avatar, Modal,Spin, Alert, Button } from "antd";
 
 const SuperAdminPanelPage = () => {
+
+    const [userProfile, setUserProfile] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loadingUserDetail, setLoadingUserDetail] = useState(false);
+
   const [dashboardStats, setDashboardStats] = useState(null);
   const [activeAdminTab, setActiveAdminTab] = useState("dashboard");
   const [isLoading, setIsLoading] = useState(false);
@@ -201,9 +206,20 @@ const promoteUserToAdmin = async (targetUserId) => {
     }
   };
 
-  const handleUserProfile = (user) => {
-    navigate(`/superadmin/user-profile/${user.id}`);
-    setOpenMenu(null);
+  const handleUserProfile = async (user) => {
+    setIsModalOpen(true);
+    setLoadingUserDetail(true);
+
+    try {
+      const response = await axios.get(`http://localhost:8080/api/admin/user/${user.id}`);
+      console.log("Fetched data:", response.data); // Xem có đúng dữ liệu không
+      setUserProfile(response.data); // CHỈ LẤY PHẦN PROFILE
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setUserProfile(null);
+    } finally {
+      setLoadingUserDetail(false);
+    }
   };
 
 
@@ -518,11 +534,6 @@ const promoteUserToAdmin = async (targetUserId) => {
                         </div>
                       </div>
                     </div>
-                    <div className="user-right">
-                      <div className="right-top">
-                        <div className="smoke-days">{user.days} days smoke-free</div>
-                      </div>
-                    </div>
                     <div className="user-action-wrapper">
                       <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
                       {openMenu === index && (
@@ -556,6 +567,42 @@ const promoteUserToAdmin = async (targetUserId) => {
           </div>
         )}
       </div>
+      <Modal
+              title="ADMIN Profile"
+              open={isModalOpen}
+              onCancel={() => setIsModalOpen(false)}
+              footer={null}
+            >
+              {loadingUserDetail ? (
+                <div style={{ textAlign: "center", padding: "20px 0" }}>
+                  <Spin tip="Loading..." />
+                </div>
+              ) : userProfile ? (
+                <div>
+                  <div style={{ textAlign: "center", marginBottom: 16 }}>
+                    <Avatar
+                      size={80}
+                      src={userProfile.avatarUrl}
+                      icon={!userProfile.avatarUrl && userProfile.name?.[0]}
+                      style={{ backgroundColor: "#87d068" }}
+                    />
+                    <div style={{ fontWeight: "bold", marginTop: 8 }}>{userProfile.name}</div>
+                  </div>
+                  <Descriptions bordered column={1} size="middle">
+                    <Descriptions.Item label="Phone">{userProfile.phone || "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Birthdate">{userProfile.birthdate || "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Gender">{userProfile.gender || "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Smoking Age">{userProfile.smokingAge ?? "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Years Smoked">{userProfile.yearsSmoked ?? "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Occupation">{userProfile.occupation || "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Health Status">{userProfile.healthStatus || "N/A"}</Descriptions.Item>
+                    <Descriptions.Item label="Bio">{userProfile.bio || "No bio provided."}</Descriptions.Item>
+                  </Descriptions>
+                </div>
+              ) : (
+                <p>Không có thông tin hồ sơ ADMIN.</p>
+              )}
+            </Modal>
     </div>
   ); // Added the missing closing parenthesis here
 };

@@ -1,11 +1,10 @@
 package com.example.demo.service.AdminServicePackage.user;
 
 
+
 import com.example.demo.Repo.*;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -106,15 +105,6 @@ public class AdminRemoteService {
         planRepo.deleteByUserId(String.valueOf(targetId));
         userProfileRepo.deleteByUser(target);
 
-        // ✅ Xóa tài khoản Firebase (nếu có uid)
-        try {
-            if (target.getUid() != null && !target.getUid().isBlank()) {
-                FirebaseAuth.getInstance().deleteUser(target.getUid());
-                System.out.println("✅ Firebase user deleted: " + target.getUid());
-            }
-        } catch (FirebaseAuthException e) {
-            System.err.println("❌ Failed to delete Firebase user: " + e.getMessage());
-        }
 
         userRepo.delete(target);
         return true;
@@ -129,8 +119,4 @@ public class AdminRemoteService {
         }
     }
 
-    private boolean delete(User user) {
-        userRepo.delete(user);
-        return true;
-    }
 }

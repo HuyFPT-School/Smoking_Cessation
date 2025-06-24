@@ -32,14 +32,13 @@ import { GoogleAuthProvider, linkWithPopup } from "firebase/auth";
 import axios from "axios";
 import moment from "moment";
 import "../App.css";
-import { useParams } from "react-router-dom";
+
 
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const UserProfile = () => {
-    const { userId: paramUserId } = useParams(); // lấy từ URL nếu có
   const { user, setUser } = useContext(AuthContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -92,11 +91,10 @@ const UserProfile = () => {
       }
     });
   }
-  const localUserId = userObj ? userObj.id : null;
-  // const userId = userObj ? userObj.id : null;
 
-  // Chọn userId cần fetch profile
-const userId = paramUserId || localUserId;
+  const userId = userObj ? userObj.id : null;
+
+
 
   // Fetch profile data on component mount
   useEffect(() => {

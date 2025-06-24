@@ -2,6 +2,7 @@ package com.example.demo.Controller;
 
 import com.example.demo.DTO.AdminDTO;
 import com.example.demo.DTO.AdminUserDTO;
+import com.example.demo.DTO.UserProfileDTO;
 import com.example.demo.service.AdminServicePackage.dashboard.AdminDashboardService;
 import com.example.demo.service.AdminServicePackage.user.AdminRemoteService;
 import com.example.demo.service.AdminServicePackage.user.AdminUserService;
@@ -23,6 +24,7 @@ public class AdminController {
 
     @Autowired
     private AdminRemoteService adminRemoteService;
+
 
     // ✅ Dùng chung cho ADMIN và SUPER_ADMIN
     @GetMapping("/dashboard")
@@ -78,6 +80,15 @@ public class AdminController {
         return success
                 ? ResponseEntity.ok("User deleted successfully")
                 : ResponseEntity.badRequest().body("Permission denied or invalid target");
+    }
+    // ✅ ADMIN xem user thường
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Integer id) {
+        UserProfileDTO dto = adminUserService.getUserProfileByUserId(id);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
     }
 
     // 🔜 Bạn có thể thêm API xóa post nếu muốn tại đây

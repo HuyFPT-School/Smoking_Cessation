@@ -1,10 +1,10 @@
 package com.example.demo.service.AdminServicePackage.user;
 
 import com.example.demo.DTO.AdminUserDTO;
+import com.example.demo.DTO.UserProfileDTO;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserProfile;
-import com.example.demo.entity.Plan;
 import com.example.demo.Repo.UserRepo;
 import com.example.demo.Repo.UserProfileRepo;
 import com.example.demo.Repo.PlanRepo;
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,5 +124,30 @@ public class AdminUserService {
                     user.getRole()
             );
         }).collect(Collectors.toList());
+    }
+
+    public UserProfileDTO getUserProfileByUserId(Integer userId) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isEmpty()) return null;
+
+        User user = userOpt.get();
+
+        Optional<UserProfile> profileOpt = userProfileRepo.findByUserId(userId);
+        if (profileOpt.isEmpty()) return null;
+
+        UserProfile profile = profileOpt.get();
+
+        return new UserProfileDTO(
+                user.getName(),
+                profile.getPhone(),
+                profile.getBirthdate(),
+                profile.getGender(),
+                profile.getBio(),
+                profile.getSmokingAge(),
+                profile.getYearsSmoked(),
+                profile.getOccupation(),
+                profile.getHealthStatus(),
+                String.valueOf(user.getId())
+        );
     }
 }
