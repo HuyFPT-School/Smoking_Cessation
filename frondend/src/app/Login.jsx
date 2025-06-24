@@ -82,8 +82,16 @@ const Login = () => {
 
       // Điều hướng user đến trang phù hợp:
       // - Nếu là ADMIN thì đến trang /admin
+      // - Nếu là SUPER_ADMIN thì đến trang /superadmin
       // - Nếu không phải admin thì đến trang /home
-      navigate(user.role === "ADMIN" ? "/admin" : "/home");
+    if (user.role === "SUPER_ADMIN") {
+        navigate("/superadmin");
+      } else if (user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
+
     } catch (err) {
       // Nếu có lỗi khi gọi API, in lỗi ra console và hiển thị thông báo lỗi
       console.error("Error fetching user:", err);

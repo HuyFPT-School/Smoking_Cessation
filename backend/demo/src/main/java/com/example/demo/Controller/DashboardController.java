@@ -342,7 +342,7 @@ public class DashboardController {
                     remainingDaysHolder[0] = obj.milestoneDays - daysSmokeFree;
                     return obj.milestone;
                 })
-                .orElse("All rewards achieved");
+                .orElse("Completed!");
 
         remainingDaysToMilestone = remainingDaysHolder[0];
         return new MilestoneResult(nextMilestone, remainingDaysToMilestone);

@@ -32,11 +32,14 @@ import { GoogleAuthProvider, linkWithPopup } from "firebase/auth";
 import axios from "axios";
 import moment from "moment";
 import "../App.css";
+import { useParams } from "react-router-dom";
+
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const UserProfile = () => {
+  const { userId: paramUserId } = useParams(); // lấy từ URL nếu có
   // Lấy thông tin người dùng và hàm cập nhật thông tin người dùng từ context AuthContext
   const { user, setUser } = useContext(AuthContext);
   // Khai báo trạng thái để điều khiển việc hiển thị modal (true = hiển thị, false = ẩn)
@@ -106,8 +109,13 @@ const UserProfile = () => {
       }
     });
   }
-  // lấy id của người dùng từ userObj (là object lấy từ localStorage)
-  const userId = userObj ? userObj.id : null;
+
+  const localUserId = userObj ? userObj.id : null;
+  // const userId = userObj ? userObj.id : null;
+
+  // Chọn userId cần fetch profile
+const userId = paramUserId || localUserId;
+
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -642,8 +650,8 @@ const UserProfile = () => {
         >
           <Avatar
             size={100}
-            src={user?.avatarUrl}
-            icon={!user?.avatarUrl && <CameraOutlined />}
+            src={userData?.avatarUrl}
+            icon={!userData?.avatarUrl && <CameraOutlined />}
             style={{
               border: "4px solid white",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
@@ -728,7 +736,7 @@ const UserProfile = () => {
                   fontWeight: "500",
                 }}
               >
-                Smoke-Free Days
+                Days on the streak
               </Text>
             </div>
           </Card>

@@ -266,7 +266,7 @@ const DashboardPage = () => {
               <FlagOutlined />
             </div>
             <div className="dashboard-card-title">Next Milestone</div>
-            <p className="dashboard-card-value">{dashboardData.nextMilestone || "N/A"}</p>
+            <p className="dashboard-card-value">{dashboardData.nextMilestone || "Completed"}</p>
             <p className="dashboard-card-subtext">{dashboardData.remainingDaysToMilestone || 0} days to go</p>
           </div>
         </Col>

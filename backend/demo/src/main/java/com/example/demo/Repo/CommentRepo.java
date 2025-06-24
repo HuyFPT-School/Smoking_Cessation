@@ -1,6 +1,7 @@
 package com.example.demo.Repo;
 
 import com.example.demo.entity.Comment;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
@@ -19,5 +20,8 @@ public interface CommentRepo extends JpaRepository<Comment, Integer> {
     // @Modifying: Báo cho Spring biết đây là operation thay đổi dữ liệu (DELETE)
     @Modifying
     void deleteByPostId(Integer postId);
+    void deleteByUser(User user);
+
+
 
 }

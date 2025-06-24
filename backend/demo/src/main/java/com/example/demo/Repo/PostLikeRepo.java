@@ -1,6 +1,7 @@
 package com.example.demo.Repo;
 
 import com.example.demo.entity.PostLike;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
@@ -28,5 +29,8 @@ public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {
     // Quan trọng: Phải gọi trong @Transactional để đảm bảo consistency
     @Modifying
     void deleteByPostId(Integer postId);
+
+    void deleteByUser(User user);
+
 
 }

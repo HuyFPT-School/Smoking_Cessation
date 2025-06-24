@@ -1,6 +1,7 @@
 package com.example.demo.Repo;
 
 import com.example.demo.entity.Tracking;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,7 @@ import java.util.List;
 // Interface này chứa các phương thức để truy vấn bảng "tracking"
 @Repository
 public interface TrackingRepo extends JpaRepository<Tracking, Integer> {
+    void deleteByUser(User user);
 
     // Tìm tất cả bản ghi tracking của một user cụ thể
     List<Tracking> findByUserId(Integer userId);

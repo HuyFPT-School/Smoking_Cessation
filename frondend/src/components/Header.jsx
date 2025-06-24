@@ -36,6 +36,9 @@ const Header = () => {
   // State để điều khiển trạng thái đóng/mở của menu di động
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
+
+
   // Handle opening the profile menu
   const handleMenuOpen = (event) => {
     // Ngăn sự kiện lan truyền (bubbling) lên các phần tử cha
@@ -147,7 +150,7 @@ const Header = () => {
             </MuiLink>
           </Typography>
         </Box>
-        {user?.role !== "ADMIN" && !isMobile && (
+        {!isAdminRole && !isMobile && (
           <Box
             sx={{
               display: "flex",
@@ -244,7 +247,6 @@ const Header = () => {
                 >
                   Profile
                 </MenuItem>
-                {/* Hiển thị tùy chọn Quản trị chỉ khi người dùng có vai trò ADMIN */}
                 {user.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => {
@@ -255,6 +257,19 @@ const Header = () => {
                     Quản trị
                   </MenuItem>
                 )}
+
+                {user.role === "SUPER_ADMIN" && (
+                  <MenuItem
+                    onClick={() => {
+                      navigate("/superadmin");
+                      handleMenuClose();
+                    }}
+                  >
+                    Quản trị (Super Admin)
+                  </MenuItem>
+                )}
+
+
                 <MenuItem onClick={handleLogout}>Log out</MenuItem>
               </Menu>
             </>
@@ -311,11 +326,14 @@ const Header = () => {
         >
           {/* Danh sách các liên kết điều hướng trên mobile */}
           <List sx={{ pt: 2 }}>
-            {user?.role !== "ADMIN" &&
+            {/* 👉 Chỉ hiển thị navLinks nếu KHÔNG phải ADMIN hoặc SUPER_ADMIN */}
+            {user &&
+              user.role !== "ADMIN" &&
+              user.role !== "SUPER_ADMIN" &&
               navLinks.map((item) => (
                 <ListItem
-                  button // Thuộc tính để hiển thị như nút có thể click
-                  key={item.label} // Key là bắt buộc khi render danh sách trong React
+                  button
+                  key={item.label}
                   component={RouterLink}
                   to={item.path}
                   sx={{
@@ -328,7 +346,6 @@ const Header = () => {
                     },
                   }}
                 >
-                  {/* Text hiển thị tên của liên kết */}
                   <ListItemText
                     primary={item.label}
                     sx={{
@@ -337,15 +354,11 @@ const Header = () => {
                   />
                 </ListItem>
               ))}
-            {/* Các nút Đăng nhập/Đăng ký trên mobile - Hiển thị khi chưa đăng nhập */}
+
+            {/* 👉 Nếu chưa đăng nhập (user = null), hiện nút login/register */}
             {!user && (
               <>
-                <ListItem
-                  button
-                  component={RouterLink}
-                  to="/login"
-                  sx={{ py: 1.5 }}
-                >
+                <ListItem button component={RouterLink} to="/login" sx={{ py: 1.5 }}>
                   <ListItemText primary="Log In" />
                 </ListItem>
                 <ListItem
@@ -366,6 +379,7 @@ const Header = () => {
               </>
             )}
           </List>
+
         </Box>
       </Drawer>
     </AppBar>

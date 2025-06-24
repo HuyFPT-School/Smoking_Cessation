@@ -21,7 +21,7 @@ import {
 } from "@ant-design/icons";
 import { Spin, Alert, Button } from "antd";
 
-const AdminPanelPage = () => {
+const SuperAdminPanelPage = () => {
   const [dashboardStats, setDashboardStats] = useState(null);
   const [activeAdminTab, setActiveAdminTab] = useState("dashboard");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +33,7 @@ const AdminPanelPage = () => {
   const tabs = [
     { label: "Dashboard", path: "dashboard", icon: <DashboardOutlined /> },
     { label: "Users", path: "users", icon: <TeamOutlined /> },
+    { label: "Admins", path: "admins", icon: <TeamOutlined /> },
     { label: "Content", path: "content", icon: <FileTextOutlined /> },
   ];
 
@@ -51,10 +52,10 @@ const AdminPanelPage = () => {
     }
   };
 
-  // Gọi API lấy danh sách user (tùy theo quyền của người gọi)
+  // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
+       const res = await axios.get(`http://localhost:8080/api/admin/regular-users?currentAdminId=${userId}`);
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -67,24 +68,63 @@ const AdminPanelPage = () => {
     }
   };
 
-  const deleteUserById = async (targetUserId) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`);
-      alert("✅ User deleted successfully");
-      fetchUsers().then(setUsers); // load lại danh sách
-    } catch (err) {
-      console.error("❌ Delete failed", err);
-      const message =
-        typeof err.response?.data === "object"
-          ? JSON.stringify(err.response.data)
-          : err.response?.data || "Failed to delete user";
-      alert(`❌ ${message}`);
-    }
-  };
+ const demoteAdminById = async (targetAdminId) => {
+  try {
+    await axios.put(
+      `http://localhost:8080/api/admin/demote/${targetAdminId}?currentAdminId=${userId}`
+    );
+    alert("✅ Admin demoted to USER successfully");
+    fetchUsers().then(setUsers); // load lại danh sách người dùng
+  } catch (err) {
+    console.error("❌ Demotion failed", err);
+    const message =
+      typeof err.response?.data === "object"
+        ? JSON.stringify(err.response.data)
+        : err.response?.data || "Failed to demote admin";
+    alert(`❌ ${message}`);
+  }
+};
+ 
+
+const fetchAdmins = async () => {
+  try {
+    const res = await axios.get(
+      `http://localhost:8080/api/admin/admins?currentAdminId=${userId}`
+    );
+    return res.data.map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      phone: u.phone || "N/A",
+      days: u.daysSmokeFree,
+      role: u.role,
+    }));
+  } catch (err) {
+    console.error("❌ Failed to fetch admin list", err);
+    throw new Error(err.response?.data?.message || "Failed to load admin list");
+  }
+};
+
+const promoteUserToAdmin = async (targetUserId) => {
+  try {
+    await axios.put(
+      `http://localhost:8080/api/admin/promote/${targetUserId}?currentAdminId=${userId}`
+    );
+    alert("✅ User promoted to ADMIN successfully");
+    fetchUsers().then(setUsers); // load lại danh sách
+  } catch (err) {
+    console.error("❌ Promote failed", err);
+    const message =
+      typeof err.response?.data === "object"
+        ? JSON.stringify(err.response.data)
+        : err.response?.data || "Failed to promote user";
+    alert(`❌ ${message}`);
+  }
+};
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user && (activeAdminTab === "dashboard" || activeAdminTab === "users")) {
+      if (!user && (activeAdminTab === "dashboard" || activeAdminTab === "users" || activeAdminTab === "admin")) {
         setError("Please log in to access this page");
         navigate("/login");
       }
@@ -122,6 +162,22 @@ const AdminPanelPage = () => {
             navigate("/login");
           }
         });
+    }else if (activeAdminTab === "admins") {
+      setIsLoading(true);
+      setError(null);
+      fetchAdmins()
+        .then((data) => {
+          setUsers(data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to load admin list", err);
+          setError(err.message);
+          setIsLoading(false);
+          if (err.message.includes("log in")) {
+            navigate("/login");
+          }
+        });
     }
 
     return () => unsubscribe();
@@ -131,15 +187,22 @@ const AdminPanelPage = () => {
     setOpenMenu(openMenu === index ? null : index);
   };
 
-  const handleDeleteUser = (user) => {
+  const handleDemoteAdmin = (user) => {
     setOpenMenu(null);
-    if (window.confirm(`Are you sure you want to delete user ${user.name}?`)) {
-      deleteUserById(user.id);
+    if (window.confirm(`Are you sure you want to demote admin ${user.name}?`)) {
+      demoteAdminById(user.id);
+    }
+  };
+
+    const handlePromoteAdmin = (user) => {
+    setOpenMenu(null);
+    if (window.confirm(`Are you sure you want to promote user ${user.name}?`)) {
+      promoteUserToAdmin(user.id);
     }
   };
 
   const handleUserProfile = (user) => {
-    navigate(`/admin/user-profile/${user.id}`);
+    navigate(`/superadmin/user-profile/${user.id}`);
     setOpenMenu(null);
   };
 
@@ -240,7 +303,7 @@ const AdminPanelPage = () => {
                   <div className="section-title">Platform Analytics</div>
                   <div className="dashboard-grid analytics-section">
                     <div className="analytics-card">
-            
+                   
                       <div className="analytics-title">
                         <UserOutlined /> New Users
                       </div>
@@ -248,7 +311,7 @@ const AdminPanelPage = () => {
                       <div className="analytics-sub">This month</div>
                     </div>
                     <div className="analytics-card">
-                    
+                   
                       <div className="analytics-title">
                         <CheckCircleOutlined style={{ color: "#52c41a" }} /> Smoke-Free Rate
                       </div>
@@ -256,7 +319,7 @@ const AdminPanelPage = () => {
                       <div className="analytics-sub">+{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from last month</div>
                     </div>
                     <div className="analytics-card">
-                 
+                     
                       <div className="analytics-title">
                         <AreaChartOutlined style={{ color: "#9254de" }} /> Avg. Days Quit
                       </div>
@@ -378,8 +441,8 @@ const AdminPanelPage = () => {
                       <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
                       {openMenu === index && (
                         <div className="user-dropdown">
-                          <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
-                            <DeleteOutlined /> Delete User
+                           <div className="dropdown-item" onClick={() => handlePromoteAdmin(user)}>
+                            <UserOutlined /> Promote to Admin
                           </div>
                           <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
                             <UserOutlined /> User Profile
@@ -393,6 +456,94 @@ const AdminPanelPage = () => {
             )}
           </div>
         )}
+
+        {activeAdminTab === "admins" && (
+          <div>
+            {isLoading ? (
+              <Spin tip="Loading admin list...">
+                <div style={{ minHeight: 200 }} />
+              </Spin>
+            ) : error ? (
+              <Alert
+                message={error}
+                type="error"
+                showIcon
+                action={
+                  error.includes("log in") ? (
+                    <Button type="primary" onClick={() => navigate("/login")}>
+                      Log In
+                    </Button>
+                  ) : null
+                }
+              />
+            ) : (
+              <div className="users-wrapper">
+                <div className="user-header">
+                  <div>
+                    <div className="user-title">Admin Management</div>
+                    <div className="user-sub">Manage all admins and their progress</div>
+                  </div>
+                </div>
+                {users.map((user, index) => (
+                  <div className="user-row" key={index}>
+                    <div className="user-left">
+                      <div className="avatar">
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            style={{
+                              width: "40px",
+                              height: "40px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                        )}
+                      </div>
+                      <div className="user-info">
+                        <span className="user-name">{user.name}</span>
+                        <div className="user-contact">
+                          <span>
+                            <MailOutlined /> {user.email}
+                          </span>
+                          <span>
+                            <PhoneOutlined /> {user.phone}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="user-right">
+                      <div className="right-top">
+                        <div className="smoke-days">{user.days} days smoke-free</div>
+                      </div>
+                    </div>
+                    <div className="user-action-wrapper">
+                      <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
+                      {openMenu === index && (
+                        <div className="user-dropdown">
+                          <div className="dropdown-item delete-option" onClick={() => handleDemoteAdmin(user)}>
+                            <DeleteOutlined /> Demote Admin
+                          </div>
+                               <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
+                            <UserOutlined /> Admin Profile
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+
         {activeAdminTab === "content" && (
           <div>
             <div className="section-box">
@@ -409,4 +560,4 @@ const AdminPanelPage = () => {
   ); // Added the missing closing parenthesis here
 };
 
-export default AdminPanelPage;
+export default SuperAdminPanelPage;

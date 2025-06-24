@@ -1,0 +1,56 @@
+package com.example.demo.service.AdminServicePackage.dashboard;
+
+import com.example.demo.Repo.PlanRepo;
+import com.example.demo.entity.Plan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class UserProgressDistributionService {
+
+    @Autowired
+    private PlanRepo planRepo;
+
+    public Map<String, Double> calculateProgressDistribution() {
+        List<Plan> plans = planRepo.findAll();
+        int totalUsers = plans.size();
+
+        int firstWeek = 0;
+        int firstMonth = 0;
+        int threeMonthsPlus = 0;
+
+        LocalDate today = LocalDate.now();
+
+        for (Plan plan : plans) {
+            if (plan.getCreateAt() == null) continue;
+            long daysSincePlanCreated = ChronoUnit.DAYS.between(plan.getCreateAt().toLocalDate(), today);
+
+            if (daysSincePlanCreated >= 1 && daysSincePlanCreated <= 7) {
+                firstWeek++;
+            } else if (daysSincePlanCreated >= 8 && daysSincePlanCreated <= 30) {
+                firstMonth++;
+            } else if (daysSincePlanCreated >= 90) {
+                threeMonthsPlus++;
+            }
+        }
+
+        Map<String, Double> result = new HashMap<>();
+        if (totalUsers == 0) {
+            result.put("firstWeek", 0.0);
+            result.put("firstMonth", 0.0);
+            result.put("threeMonthsPlus", 0.0);
+        } else {
+            result.put("firstWeek", Math.round((firstWeek * 1000.0 / totalUsers)) / 10.0);
+            result.put("firstMonth", Math.round((firstMonth * 1000.0 / totalUsers)) / 10.0);
+            result.put("threeMonthsPlus", Math.round((threeMonthsPlus * 1000.0 / totalUsers)) / 10.0);
+        }
+
+        return result;
+    }
+}

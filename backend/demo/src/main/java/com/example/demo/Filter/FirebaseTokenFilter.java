@@ -66,6 +66,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                     }
                     
                     user.setPassword(null);
+                    user.setUid(decodedToken.getUid()); // Lưu UID
                     user.setRole(Role.USER);
                     user.setCreateAt(LocalDateTime.now());
                     

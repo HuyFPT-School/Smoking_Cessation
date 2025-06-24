@@ -11,7 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    
+    void deleteByUserId(Long userId); // nếu userId kiểu Long trong ChatMessage
+
     // Lấy lịch sử chat theo user ID
     List<ChatMessage> findByUserIdOrderByCreatedAtAsc(Long userId);
       // Lấy 5 tin nhắn gần nhất để tạo context (sử dụng Spring Data naming convention)
