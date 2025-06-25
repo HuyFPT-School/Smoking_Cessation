@@ -36,8 +36,7 @@ const Header = () => {
   // State để điều khiển trạng thái đóng/mở của menu di động
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
-
+  const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
 
   // Handle opening the profile menu
   const handleMenuOpen = (event) => {
@@ -247,6 +246,7 @@ const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
                 >
                   Profile
                 </MenuItem>
+                {/* Hiển thị tùy chọn Quản trị chỉ khi người dùng có vai trò ADMIN */}
                 {user.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => {
@@ -268,7 +268,6 @@ const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
                     Quản trị (Super Admin)
                   </MenuItem>
                 )}
-
 
                 <MenuItem onClick={handleLogout}>Log out</MenuItem>
               </Menu>
@@ -346,6 +345,7 @@ const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
                     },
                   }}
                 >
+                  {/* Text hiển thị tên của liên kết */}
                   <ListItemText
                     primary={item.label}
                     sx={{
@@ -358,7 +358,12 @@ const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
             {/* 👉 Nếu chưa đăng nhập (user = null), hiện nút login/register */}
             {!user && (
               <>
-                <ListItem button component={RouterLink} to="/login" sx={{ py: 1.5 }}>
+                <ListItem
+                  button
+                  component={RouterLink}
+                  to="/login"
+                  sx={{ py: 1.5 }}
+                >
                   <ListItemText primary="Log In" />
                 </ListItem>
                 <ListItem
@@ -379,7 +384,6 @@ const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
               </>
             )}
           </List>
-
         </Box>
       </Drawer>
     </AppBar>

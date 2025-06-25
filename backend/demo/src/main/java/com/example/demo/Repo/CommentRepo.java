@@ -9,11 +9,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommentRepo extends JpaRepository<Comment, Integer> {    // Find comments by post ID ordered by creation date
+public interface CommentRepo extends JpaRepository<Comment, Integer> {
+    // Tìm tất cả comments của một post cụ thể, sắp xếp theo thời gian tạo (cũ nhất trước)
     List<Comment> findByPostIdOrderByCreatedAtAsc(Integer postId);
 
-    // Find comments by user ID
-    List<Comment> findByUserIdOrderByCreatedAtDesc(Integer userId);// Delete all comments for a specific post (used when deleting a post)
+    // Tìm tất cả comments của một user cụ thể, sắp xếp theo thời gian tạo (mới nhất trước)
+    List<Comment> findByUserIdOrderByCreatedAtDesc(Integer userId);
+
+    // Xóa tất cả comments của một post cụ thể
+    // @Modifying: Báo cho Spring biết đây là operation thay đổi dữ liệu (DELETE)
     @Modifying
     void deleteByPostId(Integer postId);
     void deleteByUser(User user);

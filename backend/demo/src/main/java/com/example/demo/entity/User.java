@@ -30,4 +30,7 @@ public class User {
     private Role role;
     @Column(name = "create_at")
     private LocalDateTime createAt;
+    @Column(unique = true)
+    private String uid; // lưu UID từ Firebase
+
 }

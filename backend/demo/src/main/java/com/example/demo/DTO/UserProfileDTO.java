@@ -18,5 +18,5 @@ public class UserProfileDTO {
     private Integer yearsSmoked;
     private String occupation;
     private String healthStatus;
-    private String userId; // To link with the User
+    private Integer userId; // To link with the User
 }

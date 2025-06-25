@@ -1,6 +1,8 @@
 package com.example.demo.service.AdminServicePackage.user;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 
 import com.example.demo.Repo.*;
 import com.example.demo.entity.Role;
@@ -37,6 +39,9 @@ public class AdminRemoteService {
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    private PostRepo postRepo;
 
     // SUPER_ADMIN promote USER → ADMIN
     public boolean promoteToAdmin(String userIdStr, String currentAdminIdStr) {
@@ -92,32 +97,68 @@ public class AdminRemoteService {
         Role currentRole = current.getRole();
         Role targetRole = target.getRole();
 
-        // ❌ Không ai được xóa SUPER_ADMIN (trừ khi bạn muốn cho phép)
+        // ❌ Không cho xóa SUPER_ADMIN
         if (targetRole == Role.SUPER_ADMIN) return false;
 
-        // ✅ SUPER_ADMIN được xóa bất kỳ ai (trừ SUPER_ADMIN khác)
+        // ✅ SUPER_ADMIN được xóa ADMIN và USER
         if (currentRole == Role.SUPER_ADMIN) {
-            return performUserDeletion(target, targetId);
+            return deleteUserAndFirebase(target, targetId);
         }
 
         // ✅ ADMIN chỉ được xóa USER
         if (currentRole == Role.ADMIN && targetRole == Role.USER) {
-            return performUserDeletion(target, targetId);
+            return deleteUserAndFirebase(target, targetId);
         }
 
-        return false; // Các trường hợp còn lại đều bị từ chối
+        return false;
     }
 
-    private boolean performUserDeletion(User target, int targetId) {
-        commentRepo.deleteByUser(target);
-        postLikeRepo.deleteByUser(target);
-        trackingRepo.deleteByUser(target);
-        dashboardRepo.deleteByUserId(targetId);
-        chatMessageRepository.deleteByUserId((long) targetId);
-        planRepo.deleteByUserId(String.valueOf(targetId));
-        userProfileRepo.deleteByUser(target);
-        userRepo.delete(target);
-        return true;
+    private boolean deleteUserAndFirebase(User target, int targetId) {
+        System.out.println("🔍 Attempting to delete user:");
+        System.out.println("  - Database ID: " + target.getId());
+        System.out.println("  - Email: " + target.getEmail());
+        System.out.println("  - UID: " + target.getUid());
+
+        // ✅ XÓA FIREBASE TRƯỚC
+        boolean firebaseDeleted = false;
+        if (target.getUid() != null && !target.getUid().isBlank()) {
+            try {
+                FirebaseAuth.getInstance().deleteUser(target.getUid());
+                System.out.println("✅ Firebase user deleted successfully: " + target.getUid());
+                firebaseDeleted = true;
+            } catch (FirebaseAuthException e) {
+                System.err.println("❌ Firebase deletion failed: " + e.getMessage());
+                System.err.println("Error code: " + e.getErrorCode());
+                // KHÔNG return false, vẫn tiếp tục xóa database
+            }
+        }
+
+        // ✅ XÓA DATABASE
+        try {
+            commentRepo.deleteByUser(target);
+            postLikeRepo.deleteByUser(target);
+            trackingRepo.deleteByUser(target);
+            dashboardRepo.deleteByUserId(targetId);
+            chatMessageRepository.deleteByUserId((long) targetId);
+            planRepo.deleteByUserId(String.valueOf(targetId));
+            userProfileRepo.deleteByUser(target);
+            postRepo.deleteByUser(target); // bổ sung
+
+            userRepo.delete(target);
+
+            System.out.println("✅ Database records deleted successfully");
+
+            if (firebaseDeleted) {
+                System.out.println("🎉 User completely removed from both Database and Firebase!");
+            } else {
+                System.out.println("⚠️ User removed from Database, but Firebase deletion failed. Manual cleanup needed.");
+            }
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("❌ Database deletion failed: " + e.getMessage());
+            return false;
+        }
     }
 
 

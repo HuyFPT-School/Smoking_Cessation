@@ -226,7 +226,7 @@ const DashboardPage = () => {
         Welcome back, {dashboardData.userName || "User"}
       </h2>
       <p style={{ color: "#595959", marginBottom: "24px" }}>
-        You’ve been smoke-free for {dashboardData.daysSmokeFree || 0} days. Keep going!
+        You've accumulated {dashboardData.daysSmokeFree || 0} smoke-free days. Keep going!
       </p>
 
       <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 24]} className="dashboard-row-spacing">
@@ -235,9 +235,9 @@ const DashboardPage = () => {
             <div className="dashboard-card-icon">
               <FireOutlined />
             </div>
-            <div className="dashboard-card-title">Days Smoke-Free</div>
+            <div className="dashboard-card-title">Total Smoke-Free Days</div>
             <p className="dashboard-card-value">{dashboardData.daysSmokeFree || 0}</p>
-            <p className="dashboard-card-subtext">You're on a streak!</p>
+            <p className="dashboard-card-subtext">Total smoke-free days accumulated!</p>
           </div>
         </Col>
         <Col xs={24} sm={12} md={6}>
