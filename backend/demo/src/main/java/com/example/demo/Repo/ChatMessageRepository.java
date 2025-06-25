@@ -15,10 +15,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // Lấy lịch sử chat theo user ID
     List<ChatMessage> findByUserIdOrderByCreatedAtAsc(Long userId);
-      // Lấy 5 tin nhắn gần nhất để tạo context (sử dụng Spring Data naming convention)
+    // Lấy 5 tin nhắn gần nhất để tạo context (sử dụng Spring Data naming convention)
     List<ChatMessage> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
 
-      // Đếm số tin nhắn của user trong ngày (sử dụng date range thay vì DATE() function)
+    // Đếm số tin nhắn của user trong ngày (sử dụng date range thay vì DATE() function)
     @Query("SELECT COUNT(c) FROM ChatMessage c WHERE c.userId = :userId AND c.createdAt >= :startOfDay AND c.createdAt < :endOfDay")
     long countTodayMessagesByUserId(@Param("userId") Long userId, 
                                    @Param("startOfDay") Date startOfDay, 

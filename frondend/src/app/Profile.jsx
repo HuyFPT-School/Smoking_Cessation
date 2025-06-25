@@ -114,7 +114,7 @@ const UserProfile = () => {
   // const userId = userObj ? userObj.id : null;
 
   // Chọn userId cần fetch profile
-const userId = paramUserId || localUserId;
+  const userId = paramUserId || localUserId;
 
 
   // Fetch profile data on component mount
@@ -650,8 +650,8 @@ const userId = paramUserId || localUserId;
         >
           <Avatar
             size={100}
-            src={userData?.avatarUrl}
-            icon={!userData?.avatarUrl && <CameraOutlined />}
+            src={user?.avatarUrl}
+            icon={!user?.avatarUrl && <CameraOutlined />}
             style={{
               border: "4px solid white",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
