@@ -19,13 +19,13 @@ import {
   PhoneOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Descriptions, Avatar, Modal,Spin, Alert, Button } from "antd";
+import { Descriptions, Avatar, Modal, Spin, Alert, Button } from "antd";
 
 const SuperAdminPanelPage = () => {
 
-    const [userProfile, setUserProfile] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loadingUserDetail, setLoadingUserDetail] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingUserDetail, setLoadingUserDetail] = useState(false);
 
   const [dashboardStats, setDashboardStats] = useState(null);
   const [activeAdminTab, setActiveAdminTab] = useState("dashboard");
@@ -60,7 +60,7 @@ const SuperAdminPanelPage = () => {
   // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
   const fetchUsers = async () => {
     try {
-       const res = await axios.get(`http://localhost:8080/api/admin/regular-users?currentAdminId=${userId}`);
+      const res = await axios.get(`http://localhost:8080/api/admin/regular-users?currentAdminId=${userId}`);
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -73,59 +73,73 @@ const SuperAdminPanelPage = () => {
     }
   };
 
- const demoteAdminById = async (targetAdminId) => {
-  try {
-    await axios.put(
-      `http://localhost:8080/api/admin/demote/${targetAdminId}?currentAdminId=${userId}`
-    );
-    alert("✅ Admin demoted to USER successfully");
-    fetchUsers().then(setUsers); // load lại danh sách người dùng
-  } catch (err) {
-    console.error("❌ Demotion failed", err);
-    const message =
-      typeof err.response?.data === "object"
-        ? JSON.stringify(err.response.data)
-        : err.response?.data || "Failed to demote admin";
-    alert(`❌ ${message}`);
-  }
-};
- 
+  const demoteAdminById = async (targetAdminId) => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/admin/demote/${targetAdminId}?currentAdminId=${userId}`
+      );
+      alert("✅ Admin demoted to USER successfully");
+      fetchUsers().then(setUsers); // load lại danh sách người dùng
+    } catch (err) {
+      console.error("❌ Demotion failed", err);
+      const message =
+        typeof err.response?.data === "object"
+          ? JSON.stringify(err.response.data)
+          : err.response?.data || "Failed to demote admin";
+      alert(`❌ ${message}`);
+    }
+  };
 
-const fetchAdmins = async () => {
-  try {
-    const res = await axios.get(
-      `http://localhost:8080/api/admin/admins?currentAdminId=${userId}`
-    );
-    return res.data.map((u) => ({
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      phone: u.phone || "N/A",
-      days: u.daysSmokeFree,
-      role: u.role,
-    }));
-  } catch (err) {
-    console.error("❌ Failed to fetch admin list", err);
-    throw new Error(err.response?.data?.message || "Failed to load admin list");
-  }
-};
+  const deleteUserById = async (targetUserId) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`);
+      alert("✅ User deleted successfully");
+      fetchUsers().then(setUsers); // load lại danh sách
+    } catch (err) {
+      console.error("❌ Delete failed", err);
+      const message =
+        typeof err.response?.data === "object"
+          ? JSON.stringify(err.response.data)
+          : err.response?.data || "Failed to delete user";
+      alert(`❌ ${message}`);
+    }
+  };
 
-const promoteUserToAdmin = async (targetUserId) => {
-  try {
-    await axios.put(
-      `http://localhost:8080/api/admin/promote/${targetUserId}?currentAdminId=${userId}`
-    );
-    alert("✅ User promoted to ADMIN successfully");
-    fetchUsers().then(setUsers); // load lại danh sách
-  } catch (err) {
-    console.error("❌ Promote failed", err);
-    const message =
-      typeof err.response?.data === "object"
-        ? JSON.stringify(err.response.data)
-        : err.response?.data || "Failed to promote user";
-    alert(`❌ ${message}`);
-  }
-};
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/admin/admins?currentAdminId=${userId}`
+      );
+      return res.data.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        phone: u.phone || "N/A",
+        days: u.daysSmokeFree,
+        role: u.role,
+      }));
+    } catch (err) {
+      console.error("❌ Failed to fetch admin list", err);
+      throw new Error(err.response?.data?.message || "Failed to load admin list");
+    }
+  };
+
+  const promoteUserToAdmin = async (targetUserId) => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/admin/promote/${targetUserId}?currentAdminId=${userId}`
+      );
+      alert("✅ User promoted to ADMIN successfully");
+      fetchUsers().then(setUsers); // load lại danh sách
+    } catch (err) {
+      console.error("❌ Promote failed", err);
+      const message =
+        typeof err.response?.data === "object"
+          ? JSON.stringify(err.response.data)
+          : err.response?.data || "Failed to promote user";
+      alert(`❌ ${message}`);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -167,7 +181,7 @@ const promoteUserToAdmin = async (targetUserId) => {
             navigate("/login");
           }
         });
-    }else if (activeAdminTab === "admins") {
+    } else if (activeAdminTab === "admins") {
       setIsLoading(true);
       setError(null);
       fetchAdmins()
@@ -198,8 +212,13 @@ const promoteUserToAdmin = async (targetUserId) => {
       demoteAdminById(user.id);
     }
   };
-
-    const handlePromoteAdmin = (user) => {
+  const handleDeleteUser = (user) => {
+    setOpenMenu(null);
+    if (window.confirm(`Are you sure you want to delete user ${user.name}?`)) {
+      deleteUserById(user.id);
+    }
+  };
+  const handlePromoteAdmin = (user) => {
     setOpenMenu(null);
     if (window.confirm(`Are you sure you want to promote user ${user.name}?`)) {
       promoteUserToAdmin(user.id);
@@ -319,7 +338,7 @@ const promoteUserToAdmin = async (targetUserId) => {
                   <div className="section-title">Platform Analytics</div>
                   <div className="dashboard-grid analytics-section">
                     <div className="analytics-card">
-                   
+
                       <div className="analytics-title">
                         <UserOutlined /> New Users
                       </div>
@@ -327,7 +346,7 @@ const promoteUserToAdmin = async (targetUserId) => {
                       <div className="analytics-sub">This month</div>
                     </div>
                     <div className="analytics-card">
-                   
+
                       <div className="analytics-title">
                         <CheckCircleOutlined style={{ color: "#52c41a" }} /> Smoke-Free Rate
                       </div>
@@ -335,7 +354,7 @@ const promoteUserToAdmin = async (targetUserId) => {
                       <div className="analytics-sub">+{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from last month</div>
                     </div>
                     <div className="analytics-card">
-                     
+
                       <div className="analytics-title">
                         <AreaChartOutlined style={{ color: "#9254de" }} /> Avg. Days Quit
                       </div>
@@ -457,11 +476,14 @@ const promoteUserToAdmin = async (targetUserId) => {
                       <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
                       {openMenu === index && (
                         <div className="user-dropdown">
-                           <div className="dropdown-item" onClick={() => handlePromoteAdmin(user)}>
+                          <div className="dropdown-item" onClick={() => handlePromoteAdmin(user)}>
                             <UserOutlined /> Promote to Admin
                           </div>
                           <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
                             <UserOutlined /> User Profile
+                          </div>
+                           <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
+                            <DeleteOutlined /> Delete User
                           </div>
                         </div>
                       )}
@@ -541,7 +563,7 @@ const promoteUserToAdmin = async (targetUserId) => {
                           <div className="dropdown-item delete-option" onClick={() => handleDemoteAdmin(user)}>
                             <DeleteOutlined /> Demote Admin
                           </div>
-                               <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
+                          <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
                             <UserOutlined /> Admin Profile
                           </div>
                         </div>
@@ -568,41 +590,41 @@ const promoteUserToAdmin = async (targetUserId) => {
         )}
       </div>
       <Modal
-              title="ADMIN Profile"
-              open={isModalOpen}
-              onCancel={() => setIsModalOpen(false)}
-              footer={null}
-            >
-              {loadingUserDetail ? (
-                <div style={{ textAlign: "center", padding: "20px 0" }}>
-                  <Spin tip="Loading..." />
-                </div>
-              ) : userProfile ? (
-                <div>
-                  <div style={{ textAlign: "center", marginBottom: 16 }}>
-                    <Avatar
-                      size={80}
-                      src={userProfile.avatarUrl}
-                      icon={!userProfile.avatarUrl && userProfile.name?.[0]}
-                      style={{ backgroundColor: "#87d068" }}
-                    />
-                    <div style={{ fontWeight: "bold", marginTop: 8 }}>{userProfile.name}</div>
-                  </div>
-                  <Descriptions bordered column={1} size="middle">
-                    <Descriptions.Item label="Phone">{userProfile.phone || "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Birthdate">{userProfile.birthdate || "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Gender">{userProfile.gender || "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Smoking Age">{userProfile.smokingAge ?? "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Years Smoked">{userProfile.yearsSmoked ?? "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Occupation">{userProfile.occupation || "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Health Status">{userProfile.healthStatus || "N/A"}</Descriptions.Item>
-                    <Descriptions.Item label="Bio">{userProfile.bio || "No bio provided."}</Descriptions.Item>
-                  </Descriptions>
-                </div>
-              ) : (
-                <p>Không có thông tin hồ sơ ADMIN.</p>
-              )}
-            </Modal>
+        title="ADMIN Profile"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+      >
+        {loadingUserDetail ? (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <Spin tip="Loading..." />
+          </div>
+        ) : userProfile ? (
+          <div>
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <Avatar
+                size={80}
+                src={userProfile.avatarUrl}
+                icon={!userProfile.avatarUrl && userProfile.name?.[0]}
+                style={{ backgroundColor: "#87d068" }}
+              />
+              <div style={{ fontWeight: "bold", marginTop: 8 }}>{userProfile.name}</div>
+            </div>
+            <Descriptions bordered column={1} size="middle">
+              <Descriptions.Item label="Phone">{userProfile.phone || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Birthdate">{userProfile.birthdate || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Gender">{userProfile.gender || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Smoking Age">{userProfile.smokingAge ?? "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Years Smoked">{userProfile.yearsSmoked ?? "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Occupation">{userProfile.occupation || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Health Status">{userProfile.healthStatus || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Bio">{userProfile.bio || "No bio provided."}</Descriptions.Item>
+            </Descriptions>
+          </div>
+        ) : (
+          <p>Không có thông tin hồ sơ ADMIN.</p>
+        )}
+      </Modal>
     </div>
   ); // Added the missing closing parenthesis here
 };

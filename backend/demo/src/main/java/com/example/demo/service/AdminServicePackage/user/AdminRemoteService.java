@@ -79,7 +79,7 @@ public class AdminRemoteService {
         int targetId = Integer.parseInt(targetUserId);
         int adminId = Integer.parseInt(currentAdminId);
 
-        if (targetId == adminId) return false;
+        if (targetId == adminId) return false; // Không cho tự xóa chính mình
 
         Optional<User> currentOpt = userRepo.findById(adminId);
         Optional<User> targetOpt = userRepo.findById(targetId);
@@ -92,11 +92,23 @@ public class AdminRemoteService {
         Role currentRole = current.getRole();
         Role targetRole = target.getRole();
 
+        // ❌ Không ai được xóa SUPER_ADMIN (trừ khi bạn muốn cho phép)
         if (targetRole == Role.SUPER_ADMIN) return false;
-        if (currentRole == Role.ADMIN && targetRole != Role.USER) return false;
-        if (currentRole == Role.SUPER_ADMIN && targetRole != Role.ADMIN) return false;
 
-        // ✅ Xóa dữ liệu liên quan
+        // ✅ SUPER_ADMIN được xóa bất kỳ ai (trừ SUPER_ADMIN khác)
+        if (currentRole == Role.SUPER_ADMIN) {
+            return performUserDeletion(target, targetId);
+        }
+
+        // ✅ ADMIN chỉ được xóa USER
+        if (currentRole == Role.ADMIN && targetRole == Role.USER) {
+            return performUserDeletion(target, targetId);
+        }
+
+        return false; // Các trường hợp còn lại đều bị từ chối
+    }
+
+    private boolean performUserDeletion(User target, int targetId) {
         commentRepo.deleteByUser(target);
         postLikeRepo.deleteByUser(target);
         trackingRepo.deleteByUser(target);
@@ -104,11 +116,10 @@ public class AdminRemoteService {
         chatMessageRepository.deleteByUserId((long) targetId);
         planRepo.deleteByUserId(String.valueOf(targetId));
         userProfileRepo.deleteByUser(target);
-
-
         userRepo.delete(target);
         return true;
     }
+
 
 
     private Integer parse(String str) {

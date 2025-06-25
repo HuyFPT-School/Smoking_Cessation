@@ -1,0 +1,85 @@
+package com.example.demo.service.AdminServicePackage.content;
+
+import com.example.demo.Repo.*;
+import com.example.demo.entity.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class AdminCommunityService {
+
+    private final PostRepo postRepo;
+    private final CommentRepo commentRepo;
+    private final PostLikeRepo postLikeRepo;
+    private final UserRepo userRepo;
+
+    // Kiểm tra user có phải là ADMIN hoặc SUPER_ADMIN không
+    private boolean isAdminOrSuperAdmin(User user) {
+        return user.getRole() == Role.ADMIN || user.getRole() == Role.SUPER_ADMIN;
+    }
+
+    /**
+     * Admin xóa bài viết bất kỳ
+     */
+    @Transactional
+    public ResponseEntity<?> deletePostByAdmin(Integer postId, Integer adminId) {
+        Optional<User> adminOpt = userRepo.findById(adminId);
+        if (adminOpt.isEmpty() || !isAdminOrSuperAdmin(adminOpt.get())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Access denied: You are not an admin"));
+        }
+
+        Optional<Post> postOpt = postRepo.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Post not found"));
+        }
+
+        Post post = postOpt.get();
+
+        // Xóa like và comment trước
+        postLikeRepo.deleteByPostId(postId);
+        commentRepo.deleteByPostId(postId);
+
+        postRepo.delete(post);
+
+        return ResponseEntity.ok(Map.of("message", "Post deleted by admin successfully"));
+    }
+
+    /**
+     * Admin xóa bình luận bất kỳ
+     */
+    @Transactional
+    public ResponseEntity<?> deleteCommentByAdmin(Integer commentId, Integer adminId) {
+        Optional<User> adminOpt = userRepo.findById(adminId);
+        if (adminOpt.isEmpty() || !isAdminOrSuperAdmin(adminOpt.get())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Access denied: You are not an admin"));
+        }
+
+        Optional<Comment> commentOpt = commentRepo.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Comment not found"));
+        }
+
+        Comment comment = commentOpt.get();
+        Post post = comment.getPost();
+
+        commentRepo.delete(comment);
+
+        // Cập nhật số lượng bình luận
+        post.setCommentsCount(Math.max(0, post.getCommentsCount() - 1));
+        postRepo.save(post);
+
+        return ResponseEntity.ok(Map.of("message", "Comment deleted by admin successfully"));
+    }
+}

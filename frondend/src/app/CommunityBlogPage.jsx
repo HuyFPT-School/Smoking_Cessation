@@ -10,6 +10,12 @@ import "../App.css";
 
 const { TextArea } = Input;
 
+// --- THÊM HÀM KIỂM TRA ADMIN --- //
+const isAdminOrSuperAdmin = () => {
+  const user = getCurrentUser();
+  return user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+};
+
 // Helper function to format time ago
 const formatTimeAgo = (date) => {
   const now = new Date();
@@ -144,8 +150,8 @@ const DiscussionItem = ({
             <div className="discussion-item-time">{time}</div>
           </div>
         </div>
-        {/* Delete button with confirmation for post author */}
-        {isPostAuthor && (
+        {/* Delete button with confirmation for post author or admin or superadmin*/}
+        {(isPostAuthor || isAdminOrSuperAdmin()) && (
           <Popconfirm
             title="Delete this post?"
             description="Are you sure you want to delete this post? This action cannot be undone."
@@ -205,7 +211,7 @@ const DiscussionItem = ({
                     <div className="comment-time">{comment.time}</div>
                   </div>
                   {/* Delete button for comment author */}
-                  {isCommentAuthor && (
+                  {(isCommentAuthor || isAdminOrSuperAdmin()) && (
                     <Popconfirm
                       title="Delete this comment?"
                       description="Are you sure you want to delete this comment?"
@@ -596,72 +602,85 @@ const CommunityBlogPage = () => {
     }
   };
   // Handle deleting a post
-  const handleDeletePost = async (postId) => {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      message.error("Please log in to delete posts");
-      return;
-    }
+const handleDeletePost = async (postId) => {
+  const userId = getCurrentUserId();
+  if (!userId) {
+    message.error("Please log in to delete posts");
+    return;
+  }
 
-    try {
-      const response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
-        data: { userId: userId }, // Send userId in request body
-        headers: {
-          "Content-Type": "application/json",
-        },
+  try {
+    let response;
+
+    if (isAdminOrSuperAdmin()) {
+      // Gọi API admin
+      response = await axios.delete(
+        `http://localhost:8080/api/admin/posts/delete/${postId}?adminId=${userId}`
+      );
+    } else {
+      // Gọi API user thường
+      response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
+        data: { userId: userId },
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (response.status === 200) {
-        // Remove the post from local state
-        setDiscussions((prev) => prev.filter((post) => post.id !== postId));
-        message.success("Post deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      message.error(error.response?.data?.message || "Failed to delete post");
-      throw error;
     }
-  };
-  // Handle deleting a comment
+
+    if (response.status === 200) {
+      setDiscussions((prev) => prev.filter((post) => post.id !== postId));
+      message.success("Post deleted successfully");
+    }
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    message.error(error.response?.data?.message || "Failed to delete post");
+    throw error;
+  }
+};
+
   const handleDeleteComment = async (commentId) => {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      message.error("Please log in to delete comments");
-      return;
+  const userId = getCurrentUserId();
+  if (!userId) {
+    message.error("Please log in to delete comments");
+    return;
+  }
+
+  try {
+    let response;
+
+    if (isAdminOrSuperAdmin()) {
+      // Gọi API dành cho admin
+      response = await axios.delete(
+        `http://localhost:8080/api/admin/comments/delete/${commentId}?adminId=${userId}`
+      );
+    } else {
+      // Gọi API dành cho user thường
+      response = await axios.delete(`${API_BASE_URL}/comments/${commentId}`, {
+        data: { userId: userId },
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    try {
-      const response = await axios.delete(
-        `${API_BASE_URL}/comments/${commentId}`,
-        {
-          data: { userId: userId }, // Send userId in request body
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+    if (response.status === 200) {
+      // Cập nhật lại local state
+      setDiscussions((prev) =>
+        prev.map((post) => ({
+          ...post,
+          commentsList: post.commentsList.filter(
+            (comment) => comment.id !== commentId
+          ),
+          comments: Math.max(0, post.comments - 1),
+        }))
       );
-
-      if (response.status === 200) {
-        // Remove the comment from local state and update comment count
-        setDiscussions((prev) =>
-          prev.map((post) => ({
-            ...post,
-            commentsList: post.commentsList.filter(
-              (comment) => comment.id !== commentId
-            ),
-            comments: Math.max(0, post.comments - 1), // Ensure comment count doesn't go negative
-          }))
-        );
-        message.success("Comment deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      message.error(
-        error.response?.data?.message || "Failed to delete comment"
-      );
-      throw error;
+      message.success("Comment deleted successfully");
     }
-  };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    message.error(
+      error.response?.data?.message || "Failed to delete comment"
+    );
+    throw error;
+  }
+};
+
 
   return (
     <div className="community-blog-container">
