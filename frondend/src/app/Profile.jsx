@@ -39,43 +39,56 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const UserProfile = () => {
-    const { userId: paramUserId } = useParams(); // lấy từ URL nếu có
+  const { userId: paramUserId } = useParams(); // lấy từ URL nếu có
+  // Lấy thông tin người dùng và hàm cập nhật thông tin người dùng từ context AuthContext
   const { user, setUser } = useContext(AuthContext);
+  // Khai báo trạng thái để điều khiển việc hiển thị modal (true = hiển thị, false = ẩn)
   const [isModalVisible, setIsModalVisible] = useState(false);
+  // Trạng thái lưu thông tin chi tiết của người dùng (profile), ban đầu là null
   const [userData, setUserData] = useState(null);
+  // Trạng thái cho biết có đang trong quá trình tải dữ liệu hay không, dùng để hiện loading spinner
   const [loading, setLoading] = useState(false);
+  // Tạo một đối tượng form của Ant Design để thao tác với các trường dữ liệu trong form (như set value, validate, reset)
   const [form] = Form.useForm();
-  // Add state for leaderboard data
-  const [leaderboardData, setLeaderboardData] = useState(null); // Google account linking state
+  // Trạng thái lưu dữ liệu bảng xếp hạng (leaderboard), ví dụ như top người dùng có điểm cao nhất
+  const [leaderboardData, setLeaderboardData] = useState(null);
+  // Trạng thái cờ cho biết người dùng có đang thực hiện liên kết tài khoản Google hay không
+  // Dùng để disable nút hoặc hiện loading khi đang liên kết
   const [linkingGoogle, setLinkingGoogle] = useState(false);
 
-  // Snackbar state for notifications
+  // Trạng thái quản lý hiển thị snackbar(thông báo)
   const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info", // 'success', 'error', 'warning', 'info'
+    open: false, // ban đầu không hiển thị
+    message: "", // nội dung rỗng
+    severity: "info", // mặc định là thông báo thông tin (có thể đổi thành success, error...)
   });
 
-  // Helper function to show snackbar
+  // Hàm tiện ích (helper function) để hiển thị snackbar
   const showSnackbar = (message, severity = "info") => {
+    // Cập nhật trạng thái snackbar để hiển thị thông báo với nội dung và mức độ nhất định
     setSnackbar({
-      open: true,
-      message,
-      severity,
+      open: true, // mở snackbar (hiển thị)
+      message, // nội dung thông báo, được truyền vào khi gọi hàm
+      severity, // mức độ cảnh báo ('info' mặc định, hoặc 'success', 'error', 'warning')
     });
   };
 
-  // Helper function to close snackbar
+  // Hàm tiện ích (helper function) để đóng snackbar (ẩn thông báo)
   const handleCloseSnackbar = (event, reason) => {
+    // Nếu lý do đóng là do người dùng click ra ngoài (clickaway), thì không làm gì cả
     if (reason === "clickaway") {
-      return;
+      return; // Giữ nguyên snackbar, không đóng
     }
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    // Cập nhật trạng thái snackbar: chỉ thay đổi `open` thành `false` để ẩn thông báo
+    setSnackbar((prev) => ({ ...prev, open: false })); // giữ nguyên các giá trị cũ (message, severity),  open : false :đóng snackbar
   };
-  // Get user ID from localStorage
+  // Lấy chuỗi JSON người dùng từ localStorage
   const userStr = localStorage.getItem("user");
-  const userObj = userStr ? JSON.parse(userStr) : null; // Log user object to check structure and all date-related fields
+  // Nếu userStr tồn tại thì parse (chuyển từ JSON thành object), nếu không thì trả về null
+  const userObj = userStr ? JSON.parse(userStr) : null;
+  // In ra console để kiểm tra cấu trúc đối tượng người dùng
   console.log("User object from localStorage:", userObj);
+  // Tạo một danh sách các tên trường có thể chứa ngày tháng
   if (userObj) {
     const possibleDateFields = [
       "createAt",
@@ -85,34 +98,45 @@ const UserProfile = () => {
       "joinDate",
       "dateCreated",
     ];
+    // In ra console để biết mình đang kiểm tra trường nào
     console.log("Checking date fields in user object:");
+    // Lặp qua từng tên trường có thể là ngày tháng
     possibleDateFields.forEach((field) => {
+      // Nếu object user có trường đó
       if (userObj[field]) {
+        // In ra giá trị ngày tháng để xem dữ liệu
         console.log(`Found date field ${field}:`, userObj[field]);
       }
     });
   }
+
   const localUserId = userObj ? userObj.id : null;
   // const userId = userObj ? userObj.id : null;
 
   // Chọn userId cần fetch profile
-const userId = paramUserId || localUserId;
+  const userId = paramUserId || localUserId;
+
 
   // Fetch profile data on component mount
   useEffect(() => {
+    // hàm bất đồng bộ gọi API lấy dữ liệu hồ sơ.
     const fetchProfileData = async () => {
+      //Nếu không có userId, thì dừng hàm lại, không gọi API nữa.
       if (!userId) return;
 
-      setLoading(true);
+      setLoading(true); // Bật trạng thái đang tải (loading): khi gọi 1 api mất 1 khoảng time -> hiển thị 1 vòng xoay
       try {
+        //gọi endpoint lấy thông tin hồ sơ của người dùng dựa vào userId
         const response = await axios.get(
           `http://localhost:8080/api/profile/user/${userId}`
         );
         if (response.status === 200) {
+          //Lấy dữ liệu JSON từ phản hồi API và gán vào biến profileData.
           const profileData = response.data;
+          //In dữ liệu hồ sơ người dùng ra console để có thể kiểm tra khi debug.
           console.log("Profile data from API:", profileData);
 
-          // Check for date fields in the profile data
+          //Kiểm tra các trường ngày trong dữ liệu hồ sơ
           const possibleDateFields = [
             "createAt",
             "createdAt",
@@ -121,305 +145,340 @@ const userId = paramUserId || localUserId;
             "joinDate",
             "dateCreated",
           ];
+          //Duyệt qua từng tên trường trong danh sách để kiểm tra xem profileData có chứa trường đó không.
           possibleDateFields.forEach((field) => {
+            //Nếu hồ sơ có tồn tại trường đó không rỗng/null), thì xử lý tiếp
             if (profileData[field]) {
+              // In ra console tên trường ngày và giá trị ngày được tìm thấy
               console.log(
                 `Found date field ${field} in profile data:`,
                 profileData[field]
               );
             }
           });
-
+          // update data hồ sơ người dùng (profileData) vào state userData
           setUserData(profileData);
 
-          // Set form fields with existing data
+          //  gán giá trị mặc định cho form
           form.setFieldsValue({
-            name: profileData.name,
-            phone: profileData.phone,
-            birthdate: profileData.birthdate
+            name: profileData.name, // Gán tên người dùng vào ô "Họ tên".
+            phone: profileData.phone, // gán sdt
+            birthdate: profileData.birthdate //Dùng thư viện moment() để chuyển chuỗi ngày sang định dạng chuẩn mà DatePicker hiểu.
               ? moment(profileData.birthdate, "DD/MM/YYYY")
-              : null,
-            gender: profileData.gender,
-            bio: profileData.bio,
-            smokingAge: profileData.smokingAge,
-            yearsSmoked: profileData.yearsSmoked,
-            occupation: profileData.occupation,
-            healthStatus: profileData.healthStatus,
+              : null, // ko có ngày gán null
+            gender: profileData.gender, // giới tính
+            bio: profileData.bio, // mô tả , giới thiệu bản thân
+            smokingAge: profileData.smokingAge, // tuổi bắt đầu hút thuốc
+            yearsSmoked: profileData.yearsSmoked, //năm đã hút thuốc
+            occupation: profileData.occupation, // nghề nghiệp
+            healthStatus: profileData.healthStatus, // tình trạng sức khỏe
           });
         }
       } catch (error) {
         if (error.response?.status === 404) {
-          // Profile doesn't exist yet, that's okay
-          console.log("No profile found, user can create one");
+          //Kiểm tra xem lỗi có phải là “Không tìm thấy” (Not Found) hay không.
+
+          console.log("No profile found, user can create one"); // ko tìm thấy , tạo mới
         } else {
-          console.error("Error fetching profile data:", error);
-          showSnackbar("Failed to load profile data", "error");
+          console.error("Error fetching profile data:", error); // nếu ko p 404, in ra lỗi
+          showSnackbar("Failed to load profile data", "error"); // hiển thị thanh thông báo
         }
       } finally {
-        setLoading(false);
+        setLoading(false); // dù có lỗi hay ko thì cx dừng quá trình load
       }
     };
 
     fetchProfileData();
   }, [userId, form]);
 
-  // Add new effect to fetch leaderboard data
   useEffect(() => {
+    // khai báo 1 hàm bất đồng bộ để gọi api leaderboard
     const fetchLeaderboardData = async () => {
+      //Nếu userId chưa có (chưa đăng nhập), thì không làm gì cả
       if (!userId) return;
 
       try {
+        // params là nơi bạn truyền các tham số (query string) để đính kèm vào URL.
         const params = {
-          currentUserId: userId,
-          timeRange: "all", // Get all-time stats
+          currentUserId: userId, //gửi ID người dùng hiện tại để backend biết bạn là ai.
+          timeRange: "all", //gửi yêu cầu muốn lấy thống kê theo toàn thời gian.
         };
-
+        // gọi api leaderboard kèm theo params
         const response = await axios.get(
           "http://localhost:8080/api/leaderboard",
           { params }
         );
 
         if (response.status === 200) {
+          //lấy thông tin người dùng hiện tại trong bảng xếp hạng (currentUser) và lưu vào leaderboardData.
           setLeaderboardData(response.data.currentUser);
         }
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
-        // Don't show error message to avoid UI clutter
+        //Nếu có lỗi (API hỏng, mất mạng...), in lỗi ra console
       }
     };
 
-    fetchLeaderboardData();
+    fetchLeaderboardData(); // gọi hàm
   }, [userId]);
 
   const showModal = () => {
+    // mở một hộp thoại (Modal)
     setIsModalVisible(true);
   };
 
   const handleOk = () => {
-    form.submit();
+    // hàm submit khi ng dùng nhập thông tin và nhấn lưu
+    form.submit(); //Gửi toàn bộ dữ liệu form để xử lý (như lưu vào DB hoặc gọi API).
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
+    // hàm khi ng dùng nhấn cancel ở form nhập
+    setIsModalVisible(false); // đóng modal
     if (userData) {
+      //nếu ng dùng có thông tin
       form.setFieldsValue({
-        name: userData.name,
-        phone: userData.phone,
-        birthdate: userData.birthdate
+        // gán giá trị cho các trường trong form
+        name: userData.name, // tên
+        phone: userData.phone, // số điện thoại
+        birthdate: userData.birthdate //Dùng thư viện moment() để chuyển chuỗi ngày sang định dạng chuẩn mà DatePicker hiểu.
           ? moment(userData.birthdate, "DD/MM/YYYY")
           : null,
-        gender: userData.gender,
-        bio: userData.bio,
-        smokingAge: userData.smokingAge,
-        yearsSmoked: userData.yearsSmoked,
-        occupation: userData.occupation,
-        healthStatus: userData.healthStatus,
+        gender: userData.gender, // giới tính
+        bio: userData.bio, // tiểu sử bản thân
+        smokingAge: userData.smokingAge, //tuổi bắt đầu hút thuốc
+        yearsSmoked: userData.yearsSmoked, // số năm hút thuốc
+        occupation: userData.occupation, //nghề nghiệp
+        healthStatus: userData.healthStatus, // tình trạng sức khỏe
       });
     }
   };
   const handleFinish = async (values) => {
+    // hàm bất đồng bộ nhận vào 1 value: là những j nhập vào form
     if (!userId) {
-      showSnackbar("User ID not found", "error");
-      return;
+      // check userid có tồn tại ko
+      showSnackbar("User ID not found", "error"); // hiện thông báo lỗi
+      return; // end tại đây
     }
 
-    setLoading(true);
+    setLoading(true); // chặn người dùng gửi data khi đang load data
     try {
-      // Convert DatePicker value to string format DD/MM/YYYY
+      //Chuyển đổi giá trị DatePicker sang định dạng chuỗi DD/MM/YYYY
       if (values.birthdate) {
         values.birthdate = values.birthdate.format("DD/MM/YYYY");
       }
 
-      // Add userId to the payload
       const profileData = {
-        ...values,
-        userId: userId.toString(),
+        ...values, // giữ lại những trường cũ mà ng dùng đã nhập trong form
+        userId: userId.toString(), // thêm userid và chuyển sang chuỗi
       };
-
+      //Gửi một POST request đến server để cập nhật hoặc lưu hồ sơ người dùng với dữ liệu từ profileData
       const response = await axios.post(
         "http://localhost:8080/api/profile",
         profileData
       );
 
       if (response.status === 200) {
-        setUserData(response.data);
+        setUserData(response.data); //Cập nhật dữ liệu hồ sơ mới vào state
 
-        // Update user state in AuthContext if name was updated
+        //Nếu người dùng đã thay đổi tên (name)
         if (values.name && values.name !== user?.name) {
           const updatedUser = {
-            ...user,
-            name: values.name,
+            ...user, //sao chép toàn bộ thuộc tính từ object user vào object mới
+            name: values.name, // Ghi đè trường name nếu có tên mới (values.name)
           };
-          setUser(updatedUser);
-          // Also update localStorage
+          setUser(updatedUser); // Cập nhật lại state user với dữ liệu mới (updatedUser)
+          //lưu thông tin người dùng (đã cập nhật) vào trình duyệt của bạn (localStorage).
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
-        setIsModalVisible(false);
-        showSnackbar("Profile updated successfully!", "success");
+        setIsModalVisible(false); // hàm đóng modal chỉnh sửa hồ sơ
+        showSnackbar("Profile updated successfully!", "success"); // thông báo update thành công
       }
     } catch (error) {
-      console.error("Error saving profile:", error);
-      showSnackbar("Failed to save profile. Please try again.", "error");
+      console.error("Error saving profile:", error); // ghi lỗi chi tiết trong console
+      showSnackbar("Failed to save profile. Please try again.", "error"); //snackbar báo lỗi cho ng dùng
     } finally {
-      setLoading(false);
+      setLoading(false); // tắt loading
     }
   };
 
-  // Google account linking function
+  //hàm bất đồng bộ liên kết với google
   const handleLinkGoogleAccount = async () => {
+    //auth.currentUser là thông tin người dùng hiện tại đã đăng nhập
+    //Kiểm tra xem đã có ai đăng nhập chưa.
     if (!auth.currentUser) {
-      showSnackbar("Please log in first", "error");
+      showSnackbar("Please log in first", "error"); // nếu chưa thì show thông báo
       return;
     }
 
-    setLinkingGoogle(true);
+    setLinkingGoogle(true); //Hiển thị trạng thái linking.
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await linkWithPopup(auth.currentUser, provider);
+      const provider = new GoogleAuthProvider(); //Mở popup để người dùng đăng nhập Google.
+      const result = await linkWithPopup(auth.currentUser, provider); //Liên kết tài khoản Google với tài khoản hiện tại.
 
-      // Get updated token with Google info
+      //Lấy token mới có chứa thông tin Google.
       const idToken = await result.user.getIdToken(true);
 
-      // Update backend with new Google info
+      //Gửi token về server để cập nhật dữ liệu backend.
       const response = await axios.post(
         "http://localhost:8080/api/user/me",
         {},
         {
           headers: {
-            Authorization: `Bearer ${idToken}`,
+            Authorization: `Bearer ${idToken}`, //// gửi kèm ID Token trong header
           },
         }
       );
 
       if (response.status === 200) {
+        //lấy dữ liệu người dùng được cập nhật từ phản hồi (response) của API
         const updatedUser = response.data.user || response.data;
-        setUser(updatedUser);
+        setUser(updatedUser); //Cập nhật user mới vào state hiện tại
+        // Ghi thông tin user vào localStorage của trình duyệt dưới dạng chuỗi JSON
+        //Để ghi nhớ thông tin user giữa các lần tải lại trang.
         localStorage.setItem("user", JSON.stringify(updatedUser));
         showSnackbar(
+          // hiển thị thông báo thành công
           "🎉 Google account linked successfully! You can now login with Google or Email/Password.",
           "success"
         );
       }
     } catch (error) {
-      console.error("Error linking Google account:", error);
+      console.error("Error linking Google account:", error); // in ra log lỗi
       if (error.code === "auth/popup-closed-by-user") {
-        showSnackbar("Google linking cancelled.", "info");
+        //Người dùng tự tay đóng cửa sổ popup (bấm dấu x) trước khi hoàn tất thao tác
+        showSnackbar("Google linking cancelled.", "info"); // hiện thông báo người dùng đã hủy thao tác
       } else if (error.code === "auth/credential-already-in-use") {
+        //Tài khoản Google đang định liên kết đã được người khác dùng trước đó
+        //Thông báo lỗi bằng snackbar để người dùng hiểu và chọn tài khoản Google khác
         showSnackbar(
           "This Google account is already linked to another user.",
           "error"
         );
       } else if (error.code === "auth/provider-already-linked") {
+        //Kiểm tra xem có đúng là lỗi do provider đã liên kết trước không
+        //Tài khoản Google này đã được liên kết với tài khoản của bạn rồi.
         showSnackbar(
           "Google account is already linked to your account.",
           "info"
         );
       } else {
+        // thông báo thất bại
         showSnackbar(
           "Failed to link Google account. Please try again.",
           "error"
         );
       }
     } finally {
-      setLinkingGoogle(false);
+      setLinkingGoogle(false); //hoàn tất hoặc hủy quá trình liên kết.
     }
   };
   const calculateAge = (birthdate) => {
+    //Nếu birthdate là null, undefined, hoặc rỗng thì không xử lý nữa, trả về chuỗi rỗng ""
     if (!birthdate) return "";
 
-    let birthDate;
+    let birthDate; //biến kiểu Date dùng để tính tuổi sau này.
     if (typeof birthdate === "string") {
-      const [day, month, year] = birthdate.split("/");
-      birthDate = new Date(year, month - 1, day);
+      //Kiểm tra xem birthdate có phải kiểu chuỗi hay không (ví dụ "01/05/1990")
+      const [day, month, year] = birthdate.split("/"); // Dùng .split("/") để tách chuỗi theo dấu /,
+      birthDate = new Date(year, month - 1, day); // Tạo một đối tượng Date từ các phần đã tách.
     } else {
-      // Handle moment/dayjs object
+      //Dòng này giúp chuyển birthdate về kiểu Date, ưu tiên dùng .toDate() nếu là đối tượng moment/dayjs, ngược lại dùng new Date(birthdate).
       birthDate = birthdate.toDate ? birthdate.toDate() : new Date(birthdate);
     }
 
     if (isNaN(birthDate.getTime())) {
+      // nếu ngày sinh ko hợp lệ vd tháng 13, ngày 32, ko tính tuổi , trả về chuỗi rỗng
       return "";
     }
 
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const today = new Date(); // lấy ngày hôm nay
+    let age = today.getFullYear() - birthDate.getFullYear(); //Trừ năm hiện tại với năm sinh
+    const monthDiff = today.getMonth() - birthDate.getMonth(); //So sánh tháng hiện tại với tháng sinh.
+    //monthDiff < 0 → chưa đến tháng sinh → chưa đến sinh nhật,  monthDiff === 0 → kiểm tra tiếp ngày.
     if (
-      monthDiff < 0 ||
+      monthDiff < 0 || // chưa đến tháng sinh && ngày sinh thì trừ đi 1 tuổi
       (monthDiff === 0 && today.getDate() < birthDate.getDate())
     ) {
       age--;
     }
-    return age > 0 ? `${age} years old` : "";
-  }; // Use leaderboard data or fallback to defaults  // Function to format the member since date properly
+    return age > 0 ? `${age} years old` : ""; //Nếu tuổi > 0 thì trả về chuỗi, ko thì return rỗng
+  };
   const formatMemberSinceDate = (dateValue) => {
-    // If no date provided, return default
+    // định dạng ngày ng dùng tham gia
+    //Nếu không có ngày → trả mặc định
     if (!dateValue) return "15/04/2023";
 
-    // Log the date value for debugging
+    //In giá trị ngày để debug
     console.log("Formatting date value:", dateValue);
 
     try {
-      // Handle ISO string format (common from Java backend)
+      //Kiểm tra nếu dateValue là chuỗi (string)
       if (typeof dateValue === "string") {
-        // Try specific formats first - Java LocalDateTime often comes as "[2023,6,15,10,30]"
+        // Kiểm tra xem chuỗi có phải chuỗi mảng kiểu "[2023,6,15]" không
         if (dateValue.startsWith("[") && dateValue.endsWith("]")) {
           try {
-            // Parse JSON array string
+            //Dùng JSON.parse để chuyển chuỗi "[2023,6,15]" thành mảng [2023, 6, 15]
             const dateArray = JSON.parse(dateValue);
             if (Array.isArray(dateArray) && dateArray.length >= 3) {
+              //Kiểm tra xem có đúng là mảng không, và có ít nhất 3 phần tử:ngày tháng năm
               const year = dateArray[0];
-              const month = dateArray[1]; // Java's LocalDateTime months are 1-based
+              const month = dateArray[1]; //Gán lần lượt giá trị năm, tháng, ngày từ mảng.
               const day = dateArray[2];
-              return moment([year, month - 1, day]).format("DD/MM/YYYY");
+              return moment([year, month - 1, day]).format("DD/MM/YYYY"); // Dùng moment.js để tạo đối tượng ngày, rồi format theo kiểu dd/mm/yyyy
             }
           } catch (e) {
-            console.error("Failed to parse date array string:", e);
+            console.error("Failed to parse date array string:", e); // log ra lỗi to debug
           }
         }
 
-        // Try common Java date formats
+        //Chuyển đổi giá trị DatePicker sang định dạng chuỗi DD/MM/YYYY
         const formats = [
-          "YYYY-MM-DDTHH:mm:ss", // ISO
-          "YYYY-MM-DD HH:mm:ss", // Standard SQL
-          "YYYY-MM-DD", // Simple date
-          "DD/MM/YYYY", // European format
-          "MM/DD/YYYY", // US format
+          "YYYY-MM-DDTHH:mm:ss", // ISO 8601, chuẩn Java hay dùng (ví dụ: "2023-06-15T14:30:00")
+          "YYYY-MM-DD HH:mm:ss", // Dạng chuẩn SQL (ví dụ: "2023-06-15 14:30:00")
+          "YYYY-MM-DD", // Chỉ ngày, không giờ (ví dụ: "2023-06-15")
+          "DD/MM/YYYY", // Định dạng ngày phổ biến ở VN/EU
+          "MM/DD/YYYY", // Định dạng Mỹ (tháng/ngày/năm)
         ];
 
         for (const format of formats) {
-          const parsed = moment(dateValue, format, true);
+          //Duyệt qua từng định dạng ngày trong mảng `formats`
+          const parsed = moment(dateValue, format, true); //parse dateValue thành ngày hợp lệ với moment.js.
           if (parsed.isValid()) {
+            //Nếu thành công, trả về ngày đã định dạng chuẩn kiểu DD/MM/YYYY.
             return parsed.format("DD/MM/YYYY");
           }
         }
 
-        // If none of the specific formats work, let moment try to guess
-        const memberDate = moment(dateValue);
+        // Chuyển dateValue (ngày đầu vào) thành chuỗi định dạng "DD/MM/YYYY" nếu hợp lệ.
+        const memberDate = moment(dateValue); //Dùng moment() để chuyển dateValue thành đối tượng moment.
         if (memberDate.isValid()) {
-          return memberDate.format("DD/MM/YYYY");
+          // check memberDate có hợp lệ hay ko
+          return memberDate.format("DD/MM/YYYY"); // định dạng lại ngày theo kiểu dd/mm/yyyy
         }
       }
 
-      // Handle array format [year, month, day, ...] that sometimes comes from Java LocalDateTime
+      // Nếu dateValue là mảng như [2023, 4, 15], thì chuyển nó thành ngày "15/04/2023" bằng moment.
+      //Kiểm tra xem dateValue có phải là mảng ít nhất 3 phần tử không (tức [year, month, day]).
       if (Array.isArray(dateValue) && dateValue.length >= 3) {
         const year = dateValue[0];
-        const month = dateValue[1]; // Java months are 1-based
+        const month = dateValue[1]; //Lấy từng phần tử ra từ mảng:
         const day = dateValue[2];
-        return moment([year, month - 1, day]).format("DD/MM/YYYY");
+        return moment([year, month - 1, day]).format("DD/MM/YYYY"); // trả về theo định dạng
       }
 
-      console.error("Invalid date format for createAt:", dateValue);
-      return "15/04/2023"; // Fallback to default date
+      console.error("Invalid date format for createAt:", dateValue); // log ra lỗi để debug
+      return "15/04/2023"; // nếu ko đc định dạng , thì trả về ngày mặc định
     } catch (error) {
-      console.error("Error formatting date:", error);
-      return "15/04/2023"; // Fallback to default date on any error
+      console.error("Error formatting date:", error); // log ra lỗi
+      return "15/04/2023"; // nếu ko đc định dạng , thì trả về ngày mặc định
     }
   };
-  // Determine the member since date from various possible sources
+  // ngày bắt đầu trở thành thành viên
   const getMemberSinceDate = () => {
-    console.log("Finding member since date");
+    console.log("Finding member since date"); // log ra ngày thành viên đã bắt đầu
 
-    // Possible date fields to check in both user object and profile data
+    // mảng chứa các tên trường ngày
     const dateFields = [
       "createAt",
       "createdAt",
@@ -430,56 +489,72 @@ const userId = paramUserId || localUserId;
       "created",
     ];
 
-    // First try from user object in localStorage
+    //lấy ngày tạo tài khoản từ userObj (được lưu trong localStorage).
     if (userObj) {
+      // check userObj  có tồn tại hay ko
       for (const field of dateFields) {
+        // lặp qua các trường có trong mảng trường
         if (userObj[field]) {
-          console.log(`Using date from userObj.${field}`);
-          return formatMemberSinceDate(userObj[field]);
+          // kiểm tra trường đang xét có tồn tại trong object hay ko
+          console.log(`Using date from userObj.${field}`); // In ra console thông tin về trường nào đã được dùng để lấy ngày.
+          return formatMemberSinceDate(userObj[field]); // Gọi hàm formatMemberSinceDate(...) để định dạng ngày theo ý muốn
         }
       }
     }
 
-    // Then try from profile data if available
+    // tìm ngày thành viên từ userData nếu không tìm được từ userObj
     if (userData) {
+      // check userData có tồn tại ko
       for (const field of dateFields) {
+        // duyệt qua các trường ngày
         if (userData[field]) {
-          console.log(`Using date from userData.${field}`);
+          //Nếu userData có một trong các trường đang duyệt->sử dụng
+          console.log(`Using date from userData.${field}`); //In ra console để biết đang sử dụng trường nào từ userData
+          //Gọi hàm formatMemberSinceDate(...) để định dạng ngày (ví dụ chuyển từ "2023-04-15T10:00:00Z" thành "15/04/2023").
           return formatMemberSinceDate(userData[field]);
         }
       }
 
-      // If userData has a user property, check that too
+      //kiểm tra và lấy ngày tạo tài khoản
       if (userData.user) {
+        // Kiểm tra xem trong userData có thuộc tính user không.
         for (const field of dateFields) {
+          // duyệt qua các trường
           if (userData.user[field]) {
-            console.log(`Using date from userData.user.${field}`);
+            // Kiểm tra xem trong userData.user có tồn tại trường đang duyệt không
+            console.log(`Using date from userData.user.${field}`); // In ra thông tin log để lập trình viên biết đang lấy ngày từ đâu
+            //Nếu tìm thấy ngày → gọi hàm formatMemberSinceDate() để định dạng lại ngày (ví dụ từ dạng ISO → thành "15/04/2023").
             return formatMemberSinceDate(userData.user[field]);
           }
         }
       }
     }
 
-    // If we have leaderboard data with creation date
+    //Nếu chúng ta có dữ liệu bảng xếp hạng với ngày tạo
+    //Kiểm tra xem đối tượng leaderboardData có tồn tại và có chứa trường creationDate hoặc createDate không
     if (leaderboardData?.creationDate || leaderboardData?.createDate) {
+      // Nếu cả hai trường cùng tồn tại, thì lấy creationDate trước
       const date = leaderboardData.creationDate || leaderboardData.createDate;
+      // In ra console để thông báo rằng ngày đã được lấy từ dữ liệu leaderboard
       console.log("Using date from leaderboard data");
+      //Gọi hàm định dạng ngày formatMemberSinceDate(...), chuyển ngày thành dạng dễ đọc (ví dụ: 15/04/2023).
       return formatMemberSinceDate(date);
     }
 
-    console.log("No date found, using default date");
-    // Fallback to default date
-    return "15/04/2023";
-  };
+    console.log("No date found, using default date"); // ko tìm thấy ngày hợp lệ trong bất kì nguồn nào
 
+    return "15/04/2023"; // trả về ngày mặc định
+  };
+  //tổng hợp các thống kê chính (summary) của người dùng trong ứng dụng theo dõi việc bỏ thuốc
   const summaryStats = {
-    smokeFreeDays: leaderboardData?.consecutiveSmokFreeDays || 0,
-    achievementPoints: leaderboardData?.totalPoints || 0,
-    memberSince: getMemberSinceDate(),
-    rank: leaderboardData?.rank || "-",
+    smokeFreeDays: leaderboardData?.consecutiveSmokFreeDays || 0, //Lấy số ngày liên tiếp không hút thuốc từ leaderboardData, nếu undefined mặc định là 0
+    achievementPoints: leaderboardData?.totalPoints || 0, //Lấy tổng số điểm thành tựu từ leaderboardData.totalPoints, nếu ko có mặc định là 0
+    memberSince: getMemberSinceDate(), //Gọi hàm getMemberSinceDate() mà bạn đã viết ở trên để lấy ngày người dùng trở thành thành viên
+    rank: leaderboardData?.rank || "-", //Lấy xếp hạng hiện tại của người dùng trong bảng xếp hạng., nếu undefined thì ko có thông tin
   };
 
   if (loading && !userData) {
+    // nếu loading đang là true và userdata vẫn chưa có-> trả về giao diện loading
     return (
       <div
         style={{
@@ -575,8 +650,8 @@ const userId = paramUserId || localUserId;
         >
           <Avatar
             size={100}
-            src={userData?.avatarUrl}
-            icon={!userData?.avatarUrl && <CameraOutlined />}
+            src={user?.avatarUrl}
+            icon={!user?.avatarUrl && <CameraOutlined />}
             style={{
               border: "4px solid white",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
@@ -599,6 +674,7 @@ const userId = paramUserId || localUserId;
             }}
           >
             {userData?.name || "User Name"}
+            {/*nếu có data hiển thị tên, chưa có mặc định là user name*/}
           </Title>
           <Text
             className="user-description"
@@ -608,14 +684,14 @@ const userId = paramUserId || localUserId;
               lineHeight: "1.5",
             }}
           >
-            {userData
+            {userData // hiển thị Ngày sinh (nếu có), Giới tính (nếu có), Tuổi (tính từ ngày sinh, nếu có), nhăn cách bằng .
               ? `${userData.birthdate ? `Born on ${userData.birthdate}` : ""} ${
                   userData.gender ? `• ${userData.gender}` : ""
                 } ${
                   calculateAge(userData.birthdate)
                     ? `• ${calculateAge(userData.birthdate)}`
                     : ""
-                }`
+                }` // nếu chưa có hiện thị mặc định
               : "On a journey to quit smoking. Every day is a new victory!"}
           </Text>
         </div>
@@ -650,6 +726,7 @@ const userId = paramUserId || localUserId;
                   fontWeight: "bold",
                 }}
               >
+                {/*số ngày liên tiếp ko hút thuốc*/}
                 {summaryStats.smokeFreeDays}
               </Title>
               <Text
@@ -693,6 +770,7 @@ const userId = paramUserId || localUserId;
                 }}
               >
                 {summaryStats.achievementPoints}
+                {/*tổng số điểm thành tựu*/}
               </Title>
               <Text
                 style={{
@@ -735,6 +813,7 @@ const userId = paramUserId || localUserId;
                 }}
               >
                 {summaryStats.memberSince}
+                {/*ngày người dùng trỏ thành thành viên*/}
               </Title>
               <Text
                 style={{
@@ -777,6 +856,7 @@ const userId = paramUserId || localUserId;
                 }}
               >
                 #{summaryStats.rank}
+                {/*rank của thành viên*/}
               </Title>
               <Text
                 style={{
@@ -927,6 +1007,7 @@ const userId = paramUserId || localUserId;
                     </span>
                     <span style={{ color: "#212529", fontWeight: "600" }}>
                       {userData.name || "Not updated"}
+                      {/* hiển thị tên , nêú ko có hiện not update*/}
                     </span>
                   </div>
                   <div

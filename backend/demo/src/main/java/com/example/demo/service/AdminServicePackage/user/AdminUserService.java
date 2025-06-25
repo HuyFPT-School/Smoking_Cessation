@@ -111,9 +111,11 @@ public class AdminUserService {
             String phone = userProfileRepo.findByUserId(user.getId())
                     .map(UserProfile::getPhone).orElse("");
 
-            long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
+            long daysSmokeFree = planRepo.findByUserId(user.getUid())
                     .map(calculatorUtils::calculateDaysSmokeFree)
                     .orElse(0L);
+
+
 
             return new AdminUserDTO(
                     user.getId(),
@@ -147,7 +149,7 @@ public class AdminUserService {
                 profile.getYearsSmoked(),
                 profile.getOccupation(),
                 profile.getHealthStatus(),
-                String.valueOf(user.getId())
+                user.getId()
         );
     }
 }
