@@ -100,28 +100,54 @@ public class AdminRemoteService {
         if (currentRole == Role.ADMIN && targetRole != Role.USER) return false;
         if (currentRole == Role.SUPER_ADMIN && targetRole != Role.ADMIN) return false;
 
-        // ✅ Xóa dữ liệu liên quan
-        commentRepo.deleteByUser(target);
-        postLikeRepo.deleteByUser(target);
-        postRepo.deleteByUser(target);
-        trackingRepo.deleteByUser(target);
-        dashboardRepo.deleteByUserId(targetId);
-        chatMessageRepository.deleteByUserId((long) targetId);
-        planRepo.deleteByUserId(String.valueOf(targetId));
-        userProfileRepo.deleteByUser(target);
+        // Debug info
+        System.out.println("🔍 Attempting to delete user:");
+        System.out.println("  - Database ID: " + target.getId());
+        System.out.println("  - Email: " + target.getEmail());
+        System.out.println("  - UID: " + target.getUid());
 
-        // ✅ Xóa tài khoản Firebase (nếu có uid)
-        try {
-            if (target.getUid() != null && !target.getUid().isBlank()) {
+        // ✅ XÓA FIREBASE TRƯỚC (quan trọng!)
+        boolean firebaseDeleted = false;
+        if (target.getUid() != null && !target.getUid().isBlank()) {
+            try {
                 FirebaseAuth.getInstance().deleteUser(target.getUid());
-                System.out.println("✅ Firebase user deleted: " + target.getUid());
+                System.out.println("✅ Firebase user deleted successfully: " + target.getUid());
+                firebaseDeleted = true;
+            } catch (FirebaseAuthException e) {
+                System.err.println("❌ Firebase deletion failed: " + e.getMessage());
+                System.err.println("Error code: " + e.getErrorCode());
+                // KHÔNG return false ở đây, vẫn tiếp tục xóa database
             }
-        } catch (FirebaseAuthException e) {
-            System.err.println("❌ Failed to delete Firebase user: " + e.getMessage());
         }
 
-        userRepo.delete(target);
-        return true;
+        // ✅ Xóa dữ liệu liên quan trong database
+        try {
+            commentRepo.deleteByUser(target);
+            postLikeRepo.deleteByUser(target);
+            postRepo.deleteByUser(target);
+            trackingRepo.deleteByUser(target);
+            dashboardRepo.deleteByUserId(targetId);
+            chatMessageRepository.deleteByUserId((long) targetId);
+            planRepo.deleteByUserId(String.valueOf(targetId));
+            userProfileRepo.deleteByUser(target);
+            
+            // Xóa user chính
+            userRepo.delete(target);
+            
+            System.out.println("✅ Database records deleted successfully");
+            
+            if (firebaseDeleted) {
+                System.out.println("🎉 User completely removed from both Database and Firebase!");
+            } else {
+                System.out.println("⚠️ User removed from Database, but Firebase deletion failed. Manual cleanup needed.");
+            }
+            
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Database deletion failed: " + e.getMessage());
+            return false;
+        }
     }
 
 
