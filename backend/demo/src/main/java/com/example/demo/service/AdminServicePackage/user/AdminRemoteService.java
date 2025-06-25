@@ -16,6 +16,9 @@ import java.util.Optional;
 public class AdminRemoteService {
 
     @Autowired
+    private PostRepo postRepo;
+
+    @Autowired
     private UserRepo userRepo;
 
     @Autowired
@@ -100,6 +103,7 @@ public class AdminRemoteService {
         // ✅ Xóa dữ liệu liên quan
         commentRepo.deleteByUser(target);
         postLikeRepo.deleteByUser(target);
+        postRepo.deleteByUser(target);
         trackingRepo.deleteByUser(target);
         dashboardRepo.deleteByUserId(targetId);
         chatMessageRepository.deleteByUserId((long) targetId);
