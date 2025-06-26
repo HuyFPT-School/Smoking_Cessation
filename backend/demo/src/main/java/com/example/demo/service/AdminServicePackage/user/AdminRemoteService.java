@@ -1,11 +1,12 @@
 package com.example.demo.service.AdminServicePackage.user;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+
 import com.example.demo.Repo.*;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,6 @@ import java.util.Optional;
 
 @Service
 public class AdminRemoteService {
-
-    @Autowired
-    private PostRepo postRepo;
 
     @Autowired
     private UserRepo userRepo;
@@ -41,6 +39,9 @@ public class AdminRemoteService {
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    private PostRepo postRepo;
 
     // SUPER_ADMIN promote USER → ADMIN
     public boolean promoteToAdmin(String userIdStr, String currentAdminIdStr) {
@@ -83,7 +84,7 @@ public class AdminRemoteService {
         int targetId = Integer.parseInt(targetUserId);
         int adminId = Integer.parseInt(currentAdminId);
 
-        if (targetId == adminId) return false;
+        if (targetId == adminId) return false; // Không cho tự xóa chính mình
 
         Optional<User> currentOpt = userRepo.findById(adminId);
         Optional<User> targetOpt = userRepo.findById(targetId);
@@ -96,17 +97,29 @@ public class AdminRemoteService {
         Role currentRole = current.getRole();
         Role targetRole = target.getRole();
 
+        // ❌ Không cho xóa SUPER_ADMIN
         if (targetRole == Role.SUPER_ADMIN) return false;
-        if (currentRole == Role.ADMIN && targetRole != Role.USER) return false;
-        if (currentRole == Role.SUPER_ADMIN && targetRole != Role.ADMIN) return false;
 
-        // Debug info
+        // ✅ SUPER_ADMIN được xóa ADMIN và USER
+        if (currentRole == Role.SUPER_ADMIN) {
+            return deleteUserAndFirebase(target, targetId);
+        }
+
+        // ✅ ADMIN chỉ được xóa USER
+        if (currentRole == Role.ADMIN && targetRole == Role.USER) {
+            return deleteUserAndFirebase(target, targetId);
+        }
+
+        return false;
+    }
+
+    private boolean deleteUserAndFirebase(User target, int targetId) {
         System.out.println("🔍 Attempting to delete user:");
         System.out.println("  - Database ID: " + target.getId());
         System.out.println("  - Email: " + target.getEmail());
         System.out.println("  - UID: " + target.getUid());
 
-        // ✅ XÓA FIREBASE TRƯỚC (quan trọng!)
+        // ✅ XÓA FIREBASE TRƯỚC
         boolean firebaseDeleted = false;
         if (target.getUid() != null && !target.getUid().isBlank()) {
             try {
@@ -116,39 +129,38 @@ public class AdminRemoteService {
             } catch (FirebaseAuthException e) {
                 System.err.println("❌ Firebase deletion failed: " + e.getMessage());
                 System.err.println("Error code: " + e.getErrorCode());
-                // KHÔNG return false ở đây, vẫn tiếp tục xóa database
+                // KHÔNG return false, vẫn tiếp tục xóa database
             }
         }
 
-        // ✅ Xóa dữ liệu liên quan trong database
+        // ✅ XÓA DATABASE
         try {
             commentRepo.deleteByUser(target);
             postLikeRepo.deleteByUser(target);
-            postRepo.deleteByUser(target);
             trackingRepo.deleteByUser(target);
             dashboardRepo.deleteByUserId(targetId);
             chatMessageRepository.deleteByUserId((long) targetId);
             planRepo.deleteByUserId(String.valueOf(targetId));
             userProfileRepo.deleteByUser(target);
-            
-            // Xóa user chính
+            postRepo.deleteByUser(target); // bổ sung
+
             userRepo.delete(target);
-            
+
             System.out.println("✅ Database records deleted successfully");
-            
+
             if (firebaseDeleted) {
                 System.out.println("🎉 User completely removed from both Database and Firebase!");
             } else {
                 System.out.println("⚠️ User removed from Database, but Firebase deletion failed. Manual cleanup needed.");
             }
-            
+
             return true;
-            
         } catch (Exception e) {
             System.err.println("❌ Database deletion failed: " + e.getMessage());
             return false;
         }
     }
+
 
 
     private Integer parse(String str) {
@@ -159,8 +171,4 @@ public class AdminRemoteService {
         }
     }
 
-    private boolean delete(User user) {
-        userRepo.delete(user);
-        return true;
-    }
 }

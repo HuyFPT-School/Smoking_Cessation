@@ -2,9 +2,12 @@ package com.example.demo.Controller;
 
 import com.example.demo.DTO.AdminDTO;
 import com.example.demo.DTO.AdminUserDTO;
+import com.example.demo.DTO.UserProfileDTO;
 import com.example.demo.service.AdminServicePackage.dashboard.AdminDashboardService;
 import com.example.demo.service.AdminServicePackage.user.AdminRemoteService;
 import com.example.demo.service.AdminServicePackage.user.AdminUserService;
+import com.example.demo.service.AdminServicePackage.content.AdminCommunityService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +16,11 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminController {
+
+    @Autowired
+    private  AdminCommunityService adminCommunityService;
 
     @Autowired
     private AdminDashboardService dashboardService;
@@ -23,6 +30,7 @@ public class AdminController {
 
     @Autowired
     private AdminRemoteService adminRemoteService;
+
 
     // ✅ Dùng chung cho ADMIN và SUPER_ADMIN
     @GetMapping("/dashboard")
@@ -79,6 +87,35 @@ public class AdminController {
                 ? ResponseEntity.ok("User deleted successfully")
                 : ResponseEntity.badRequest().body("Permission denied or invalid target");
     }
+    // ✅ ADMIN xem user thường
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Integer id) {
+        UserProfileDTO dto = adminUserService.getUserProfileByUserId(id);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
+    }
 
-    // 🔜 Bạn có thể thêm API xóa post nếu muốn tại đây
+    /**
+     * Xóa bài viết bất kỳ (chỉ cho ADMIN hoặc SUPER_ADMIN)
+     * <p>
+     * URL: DELETE /api/admin/posts/delete/{postId}?adminId=2
+     */
+    @DeleteMapping("/posts/delete/{postId}")
+    public ResponseEntity<?> deletePostByAdmin(@PathVariable Integer postId,
+                                               @RequestParam Integer adminId) {
+        return adminCommunityService.deletePostByAdmin(postId, adminId);
+    }
+
+    /**
+     * Xóa bình luận bất kỳ (chỉ cho ADMIN hoặc SUPER_ADMIN)
+     * <p>
+     * URL: DELETE /api/admin/comments/delete/{commentId}?adminId=2
+     */
+    @DeleteMapping("/comments/delete/{commentId}")
+    public ResponseEntity<?> deleteCommentByAdmin(@PathVariable Integer commentId,
+                                                  @RequestParam Integer adminId) {
+        return adminCommunityService.deleteCommentByAdmin(commentId, adminId);
+    }
 }

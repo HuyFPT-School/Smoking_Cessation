@@ -10,6 +10,14 @@ import "../App.css";
 
 const { TextArea } = Input;
 
+
+// --- THÊM HÀM KIỂM TRA ADMIN --- //
+const isAdminOrSuperAdmin = () => {
+  const user = getCurrentUser();
+  return user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+};
+
+
 /**
  * Hàm tính toán thời gian "bao lâu trước" (như Facebook hiển thị "2 hours ago")
  * date - Ngày cần tính toán
@@ -122,6 +130,9 @@ const DiscussionItem = ({
     currentUserId &&
     author &&
     (author.id === currentUserId || author.username === currentUserId);
+
+    
+
   /**
    * Hàm xử lý khi user click nút like
    * Gọi function onLike được truyền từ component cha
@@ -202,7 +213,8 @@ const DiscussionItem = ({
           </div>
         </div>
         {/* Nút xóa bài đăng - chỉ hiển thị cho tác giả */}
-        {isPostAuthor && (
+       {(isPostAuthor || isAdminOrSuperAdmin()) && (
+
           <Popconfirm
             title="Delete this post?" // Tiêu đề popup xác nhận
             description="Are you sure you want to delete this post? This action cannot be undone."
@@ -272,7 +284,8 @@ const DiscussionItem = ({
                     <div className="comment-time">{comment.time}</div>
                   </div>
                   {/* Nút xóa comment - chỉ hiển thị cho tác giả comment */}
-                  {isCommentAuthor && (
+                  {(isCommentAuthor || isAdminOrSuperAdmin()) && (
+
                     <Popconfirm
                       title="Delete this comment?"
                       description="Are you sure you want to delete this comment?"
@@ -742,71 +755,94 @@ const CommunityBlogPage = () => {
    * postId - ID của bài đăng cần xóa
    */
   const handleDeletePost = async (postId) => {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      message.error("Please log in to delete posts");
-      return;
-    }
+  const userId = getCurrentUserId();
+  if (!userId) {
+    message.error("Please log in to delete posts");
+    return;
+  }
 
-    try {
-      // Gọi API xóa bài đăng
-      const response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
+  try {
+    let response;
+
+    if (isAdminOrSuperAdmin()) {
+      // Gọi API admin
+      response = await axios.delete(
+        `http://localhost:8080/api/admin/posts/delete/${postId}?adminId=${userId}`
+      );
+    } else {
+      // Gọi API user thường
+      response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
         data: { userId: userId },
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (response.status === 200) {
-        // Xóa bài đăng khỏi state local
-        setDiscussions((prev) => prev.filter((post) => post.id !== postId));
-        message.success("Post deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      message.error(error.response?.data?.message || "Failed to delete post");
-      throw error;
     }
-  };
+
+    if (response.status === 200) {
+      setDiscussions((prev) => prev.filter((post) => post.id !== postId));
+      message.success("Post deleted successfully");
+    }
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    message.error(error.response?.data?.message || "Failed to delete post");
+    throw error;
+  }
+};
+
   /**
    * Hàm xử lý xóa comment
    * Chỉ tác giả comment mới có thể xóa comment của mình
    * commentId - ID của comment cần xóa
    */
   const handleDeleteComment = async (commentId) => {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      message.error("Please log in to delete comments");
-      return;
+  const userId = getCurrentUserId();
+  if (!userId) {
+    message.error("Please log in to delete comments");
+    return;
+  }
+
+  try {
+    let response;
+
+    if (isAdminOrSuperAdmin()) {
+      // Gọi API dành cho admin
+      response = await axios.delete(
+        `http://localhost:8080/api/admin/comments/delete/${commentId}?adminId=${userId}`
+      );
+    } else {
+      // Gọi API dành cho user thường
+      response = await axios.delete(`${API_BASE_URL}/comments/${commentId}`, {
+        data: { userId: userId },
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    try {
-      // Gọi API xóa comment
-      const response = await axios.delete(
-        `${API_BASE_URL}/comments/${commentId}`,
-        {
-          data: { userId: userId }, // Send userId in request body
-        }
+    if (response.status === 200) {
+      // Cập nhật lại local state
+      setDiscussions((prev) =>
+        prev.map((post) => ({
+          ...post,
+          commentsList: post.commentsList.filter(
+            (comment) => comment.id !== commentId
+          ),
+          comments: Math.max(0, post.comments - 1),
+        }))
       );
-
-      if (response.status === 200) {
-        // Xóa comment khỏi state local và giảm số lượng comment
-        setDiscussions((prev) =>
-          prev.map((post) => ({
-            ...post,
-            commentsList: post.commentsList.filter(
-              (comment) => comment.id !== commentId
-            ),
-            comments: Math.max(0, post.comments - 1), // Giảm số lượng comment
-          }))
-        );
-        message.success("Comment deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      message.error(
-        error.response?.data?.message || "Failed to delete comment"
-      );
-      throw error;
+      message.success("Comment deleted successfully");
     }
-  };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    message.error(
+      error.response?.data?.message || "Failed to delete comment"
+    );
+    throw error;
+  }
+
+
+};
+
+console.log("👤 User:", getCurrentUser());
+console.log("🛡️ Role check:", isAdminOrSuperAdmin());
+
   // JSX return - Cấu trúc UI của trang cộng đồng
   return (
     <div className="community-blog-container">

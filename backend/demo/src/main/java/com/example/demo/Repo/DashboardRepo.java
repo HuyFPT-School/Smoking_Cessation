@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface DashboardRepo extends JpaRepository<Dashboard, Long> {
@@ -14,5 +15,7 @@ public interface DashboardRepo extends JpaRepository<Dashboard, Long> {
 
     void deleteByUserIdAndRecordedDate(Integer userId, LocalDate recordedDate);
     void deleteByUserId(Integer userId);
+
+
 
 }
