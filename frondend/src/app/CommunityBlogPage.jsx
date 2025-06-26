@@ -773,7 +773,6 @@ const CommunityBlogPage = () => {
       // Gọi API user thường
       response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
         data: { userId: userId },
-        headers: { "Content-Type": "application/json" },
       });
     }
 
@@ -812,7 +811,6 @@ const CommunityBlogPage = () => {
       // Gọi API dành cho user thường
       response = await axios.delete(`${API_BASE_URL}/comments/${commentId}`, {
         data: { userId: userId },
-        headers: { "Content-Type": "application/json" },
       });
     }
 
