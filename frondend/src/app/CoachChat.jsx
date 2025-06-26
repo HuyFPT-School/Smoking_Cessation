@@ -54,7 +54,7 @@ const CoachChat = () => {
         setMessages([
           {
             from: "coach",
-            text: "Xin chào! Tôi là Sarah Chen - chuyên gia cai thuốc lá với 15 năm kinh nghiệm lâm sàng. Tôi đã giúp hơn 5,000 người cai thuốc thành công! 🌟 Hôm nay tôi có thể hỗ trợ gì cho bạn trong hành trình cai thuốc? 💪😊",
+            text: "Hello! I'm Sarah Chen - a smoking cessation specialist with 15 years of clinical experience. I've helped over 5,000 people quit smoking successfully! 🌟 How can I support you today in your quit smoking journey? 💪😊",
             time: new Date().toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -68,7 +68,7 @@ const CoachChat = () => {
       setMessages([
         {
           from: "coach",
-          text: "Xin chào! Tôi là Sarah Chen - chuyên gia cai thuốc lá với 15 năm kinh nghiệm lâm sàng. Tôi đã giúp hơn 5,000 người cai thuốc thành công! 🌟 Hôm nay tôi có thể hỗ trợ gì cho bạn trong hành trình cai thuốc? 💪😊",
+          text: "Hello! I'm Sarah Chen - a smoking cessation specialist with 15 years of clinical experience. I've helped over 5,000 people quit smoking successfully! 🌟 How can I support you today in your quit smoking journey? 💪😊",
           time: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -153,24 +153,24 @@ const CoachChat = () => {
 
       // ✅ CẢI THIỆN: Axios error handling tốt hơn
       let fallbackMessage =
-        "Xin lỗi, tôi gặp sự cố kỹ thuật. Nhưng tôi tin bạn có thể vượt qua khó khăn này! 💪";
+        "Sorry, I'm experiencing technical difficulties. But I believe you can overcome this challenge! 💪";
 
       if (error.code === "ECONNABORTED") {
-        fallbackMessage = "Request timeout. Vui lòng thử lại sau! ⏰";
+        fallbackMessage = "Request timeout. Please try again later! ⏰";
       } else if (error.response?.status === 500) {
         fallbackMessage =
-          "Server đang gặp sự cố. Tôi sẽ quay lại hỗ trợ bạn sau! ⏰";
+          "The server is experiencing issues. I will get back to assist you later! ⏰";
       } else if (
         error.response?.status >= 400 &&
         error.response?.status < 500
       ) {
-        fallbackMessage = "Có lỗi xảy ra. Hãy thử hỏi theo cách khác nhé! 🤔";
+        fallbackMessage = "An error occurred. Please try asking in a different way! 🤔";
       } else if (!error.response) {
         fallbackMessage =
-          "Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng! 🔄";
+          "Unable to connect to the server. Please check your network connection! 🔄";
       } else if (error.message.includes("Empty response")) {
         fallbackMessage =
-          "Tôi đang suy nghĩ... Hãy thử hỏi theo cách khác nhé! 🤔";
+          "I'm thinking... Please try asking in a different way! 🤔";
       }
 
       // Fallback response
@@ -251,7 +251,7 @@ const CoachChat = () => {
               AI Coach Sarah
             </h1>
             <p style={{ margin: 0, opacity: 0.9, fontSize: "14px" }}>
-              Chuyên gia cai thuốc lá • Online • Luôn sẵn sàng hỗ trợ
+              Smoking Cessation Specialist • Online • Always ready to help
             </p>
           </div>
         </div>{" "}
@@ -279,7 +279,7 @@ const CoachChat = () => {
             >
               <Spin size="large" />
               <span style={{ color: "#666", fontSize: "16px" }}>
-                Đang tải lịch sử chat...
+                Loading chat history...
               </span>
             </div>
           ) : (
@@ -417,7 +417,7 @@ const CoachChat = () => {
                   >
                     <Spin size="small" />
                     <span style={{ color: "#666", fontSize: "14px" }}>
-                      Sarah đang soạn tin nhắn...
+                      Sarah is typing...
                     </span>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ const CoachChat = () => {
                 boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
               }}
             >
-              Gửi
+              Send
             </Button>
           </div>
 
@@ -501,7 +501,7 @@ const CoachChat = () => {
             }}
           >
             <button
-              onClick={() => setInput("Tôi muốn bắt đầu cai thuốc lá")}
+              onClick={() => setInput("I want to start quitting smoking")}
               style={{
                 background: "rgba(102, 126, 234, 0.1)",
                 border: "1px solid rgba(102, 126, 234, 0.3)",
@@ -513,11 +513,11 @@ const CoachChat = () => {
                 transition: "all 0.3s ease",
               }}
             >
-              🚭 Bắt đầu cai thuốc
+              🚭 Start quitting
             </button>
             <button
               onClick={() =>
-                setInput("Tôi đang gặp khó khăn trong việc cai thuốc")
+                setInput("I'm having trouble quitting smoking")
               }
               style={{
                 background: "rgba(102, 126, 234, 0.1)",
@@ -530,10 +530,10 @@ const CoachChat = () => {
                 transition: "all 0.3s ease",
               }}
             >
-              💪 Cần động viên
+              💪 Need encouragement
             </button>
             <button
-              onClick={() => setInput("Cho tôi lời khuyên về sức khỏe")}
+              onClick={() => setInput("Give me health advice")}
               style={{
                 background: "rgba(102, 126, 234, 0.1)",
                 border: "1px solid rgba(102, 126, 234, 0.3)",
@@ -545,7 +545,7 @@ const CoachChat = () => {
                 transition: "all 0.3s ease",
               }}
             >
-              🏥 Lời khuyên sức khỏe
+              🏥 Give me health advice
             </button>
           </div>
         </div>
