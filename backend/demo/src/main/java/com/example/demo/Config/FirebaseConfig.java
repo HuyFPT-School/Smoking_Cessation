@@ -20,23 +20,29 @@ public class FirebaseConfig {
             if (FirebaseApp.getApps().isEmpty()) {
                 System.out.println("🔄 Initializing Firebase Admin SDK...");
                 
-                InputStream serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+                // Đọc file và tạo fresh InputStream mỗi lần
+                ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+                if (!resource.exists()) {
+                    throw new IOException("serviceAccountKey.json not found in classpath");
+                }
+                
+                // Đọc toàn bộ file vào memory trước
+                byte[] keyBytes = resource.getInputStream().readAllBytes();
+                System.out.println("📁 Service account key file size: " + keyBytes.length + " bytes");
+                
+                // Tạo fresh InputStream từ bytes
+                InputStream serviceAccount = new java.io.ByteArrayInputStream(keyBytes);
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .setProjectId("my-project-caaa7") // Thêm project ID rõ ràng
+                        .setProjectId("my-project-caaa7")
                         .build();
 
                 FirebaseApp.initializeApp(options);
                 System.out.println("✅ Firebase Admin SDK initialized successfully");
                 
-                // Test connection
-                try {
-                    com.google.firebase.auth.FirebaseAuth.getInstance().listUsers(null);
-                    System.out.println("✅ Firebase connection test passed");
-                } catch (Exception e) {
-                    System.err.println("❌ Firebase connection test failed: " + e.getMessage());
-                }
+                // Test connection với retry mechanism
+                testFirebaseConnection();
                 
             } else {
                 System.out.println("✅ Firebase Admin SDK already initialized");
@@ -50,5 +56,38 @@ public class FirebaseConfig {
             e.printStackTrace();
         }
     }
-
+    
+    private void testFirebaseConnection() {
+        int maxRetries = 3;
+        int retryCount = 0;
+        
+        while (retryCount < maxRetries) {
+            try {
+                System.out.println("🔍 Testing Firebase connection (attempt " + (retryCount + 1) + ")...");
+                
+                // Thêm delay để đảm bảo token được tạo đúng
+                if (retryCount > 0) {
+                    Thread.sleep(2000 * retryCount); // 2s, 4s, 6s
+                }
+                
+                com.google.firebase.auth.FirebaseAuth.getInstance().listUsers(null, 1);
+                System.out.println("✅ Firebase connection test passed");
+                return;
+                
+            } catch (Exception e) {
+                retryCount++;
+                System.err.println("❌ Firebase connection test failed (attempt " + retryCount + "): " + e.getMessage());
+                
+                if (retryCount >= maxRetries) {
+                    System.err.println("💡 All retry attempts failed. Possible solutions:");
+                    System.err.println("   1. Sync system time: Run 'w32tm /resync' as Administrator");
+                    System.err.println("   2. Download fresh service account key from Firebase Console");
+                    System.err.println("   3. Check internet connection");
+                    System.err.println("   4. Restart application after time sync");
+                } else {
+                    System.out.println("🔄 Retrying in " + (2 * retryCount) + " seconds...");
+                }
+            }
+        }
+    }
 }
