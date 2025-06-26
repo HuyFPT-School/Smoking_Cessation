@@ -407,7 +407,7 @@ const UserProfile = () => {
   const formatMemberSinceDate = (dateValue) => {
     // định dạng ngày ng dùng tham gia
     //Nếu không có ngày → trả mặc định
-    if (!dateValue) return "15/04/2023";
+    if (!dateValue) return "N/A";
 
     //In giá trị ngày để debug
     console.log("Formatting date value:", dateValue);
@@ -468,10 +468,10 @@ const UserProfile = () => {
       }
 
       console.error("Invalid date format for createAt:", dateValue); // log ra lỗi để debug
-      return "15/04/2023"; // nếu ko đc định dạng , thì trả về ngày mặc định
+      return "N/A"; // nếu ko đc định dạng , thì trả về ngày mặc định
     } catch (error) {
       console.error("Error formatting date:", error); // log ra lỗi
-      return "15/04/2023"; // nếu ko đc định dạng , thì trả về ngày mặc định
+      return "N/A"; // nếu ko đc định dạng , thì trả về ngày mặc định
     }
   };
   // ngày bắt đầu trở thành thành viên
@@ -543,7 +543,7 @@ const UserProfile = () => {
 
     console.log("No date found, using default date"); // ko tìm thấy ngày hợp lệ trong bất kì nguồn nào
 
-    return "15/04/2023"; // trả về ngày mặc định
+    return "N/A"; // trả về ngày mặc định
   };
   //tổng hợp các thống kê chính (summary) của người dùng trong ứng dụng theo dõi việc bỏ thuốc
   const summaryStats = {
