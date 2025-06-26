@@ -55,7 +55,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                     // Xử lý tên an toàn
                     String userName = (name != null && !name.trim().isEmpty()) ? name.trim() : "User";
                     user.setName(userName);
-                    
+
                     // Xử lý avatar
                     // Nếu có ảnh từ Firebase, dùng nó, nếu không thì tạo avatar mặc định
                     if (picture != null && !picture.isBlank()) {
@@ -68,7 +68,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                     user.setPassword(null);
                     user.setRole(Role.USER);
                     user.setCreateAt(LocalDateTime.now());
-                    
+                    user.setUid(decodedToken.getUid());
                     // Nếu có lỗi khi lưu, trả về lỗi 500
                     try {
                         user = userRepo.save(user);
