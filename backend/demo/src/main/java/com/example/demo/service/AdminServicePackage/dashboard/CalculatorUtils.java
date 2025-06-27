@@ -25,7 +25,7 @@ public class CalculatorUtils {
         Integer userId = tryParseUserId(plan.getUserId());
         if (userId == null) return 0;
 
-        long totalDays = ChronoUnit.DAYS.between(quitDate, today);
+        long totalDays = ChronoUnit.DAYS.between(quitDate, today)+1;
         if (totalDays <= 0) return 0;
 
         List<Tracking> trackings = trackingRepo.findByUserId(userId);

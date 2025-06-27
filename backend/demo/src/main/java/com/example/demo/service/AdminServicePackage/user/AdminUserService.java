@@ -52,8 +52,9 @@ public class AdminUserService {
         }
 
         return users.stream().map(user -> {
-            String phone = userProfileRepo.findByUserId(user.getId())
-                    .map(UserProfile::getPhone).orElse("");
+            Optional<UserProfile> profileOpt = userProfileRepo.findByUserId(user.getId());
+
+            String phone = profileOpt.map(UserProfile::getPhone).orElse("");
 
             long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
                     .map(calculatorUtils::calculateDaysSmokeFree)
@@ -65,9 +66,12 @@ public class AdminUserService {
                     user.getEmail(),
                     phone,
                     daysSmokeFree,
-                    user.getRole()
+                    user.getRole(),
+                    user.getAvatarUrl()
             );
         }).collect(Collectors.toList());
+
+
     }
 
 
@@ -88,7 +92,8 @@ public class AdminUserService {
                     user.getEmail(),
                     phone,
                     daysSmokeFree,
-                    user.getRole()
+                    user.getRole(),
+                    user.getAvatarUrl()
             );
         }).collect(Collectors.toList());
     }
@@ -123,7 +128,8 @@ public class AdminUserService {
                     user.getEmail(),
                     phone,
                     daysSmokeFree,
-                    user.getRole()
+                    user.getRole(),
+                    user.getAvatarUrl()
             );
         }).collect(Collectors.toList());
     }
@@ -140,6 +146,7 @@ public class AdminUserService {
         UserProfile profile = profileOpt.get();
 
         return new UserProfileDTO(
+                user.getAvatarUrl(),
                 user.getName(),
                 profile.getPhone(),
                 profile.getBirthdate(),
