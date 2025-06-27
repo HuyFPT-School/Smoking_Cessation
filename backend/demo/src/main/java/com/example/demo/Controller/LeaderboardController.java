@@ -253,7 +253,11 @@ public class LeaderboardController {
             userStats.setStartDate(startDateString);    // Ngày bắt đầu bỏ thuốc
             userStats.setTotalDaysSinceQuit(totalDaysSinceQuit);   // Tổng số ngày từ khi bắt đầu
             userStats.setConsecutiveSmokFreeDays(consecutiveSmokFreeDays);   // Số ngày chuỗi hiện tại
-            userStats.setTier(calculateTier(totalPoints));   // Xác định hạng dựa trên tổng điểm
+            switch (timeRange) {
+                case "weekly" -> userStats.setTier(calculateTier(weeklyPoints)); //  xác định tier dựa trên điểm tuần
+                case "monthly" -> userStats.setTier(calculateTier(monthlyPoints)); // xác định tier dựa trên điểm tháng
+                default -> userStats.setTier(calculateTier(totalPoints)); // xác định tier dựa trên tổng điểm
+            } 
 
             return userStats;  // Trả về đối tượng chứa thông tin điểm và hạng của người dùng
         } catch (Exception e) {
