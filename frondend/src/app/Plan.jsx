@@ -522,9 +522,7 @@ const Plan = () => {
       style={{ backgroundColor: "#F9FAFB" }}
     >
       {/* Tiêu đề và phụ đề của kế hoạch */}
-      <Text strong className="plan-plan-title">
-        Create a Quit Plan
-      </Text>
+      <Text className="plan-plan-title">Create a Quit Plan</Text>
       <Text className="plan-plan-subtitle">
         Create a personalized quit plan to increase your chances of success
       </Text>

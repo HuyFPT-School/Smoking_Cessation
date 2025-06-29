@@ -328,14 +328,14 @@ const LeaderboardPage = () => {
           <h2
             style={{
               color: "#262626",
-              marginBottom: "5px",
-              fontWeight: "700",
-              fontSize: "30px",
+              marginBottom: "10px",
+              fontWeight: "bold",
+              fontSize: "24px",
             }}
           >
             Leaderboard {/* Tiêu đề trang */}
           </h2>
-          <p style={{ color: "#595959", margin: 0 }}>
+          <p style={{ color: "#595959", margin: 0, fontSize: "14px" }}>
             Track your progress and others' in the smoking cessation journey {/* Mô tả trang */}
           </p>
         </div>
