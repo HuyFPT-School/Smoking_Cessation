@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserProfileDTO {
-    private String avatarUrl;
     private String name; // From User entity
     private String phone;
     private String birthdate; // DD/MM/YYYY format

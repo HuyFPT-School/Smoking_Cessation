@@ -61,7 +61,7 @@ const SuperAdminPanelPage = () => {
   // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/regular-users?currentAdminId=${userId}`);
+      const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,

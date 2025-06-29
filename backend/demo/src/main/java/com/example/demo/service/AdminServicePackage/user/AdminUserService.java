@@ -32,71 +32,28 @@ public class AdminUserService {
     private CalculatorUtils calculatorUtils;
 
 
-    public List<AdminUserDTO> getAllUsersForAdmin(int currentAdminId) {
-        User current = userRepo.findById(currentAdminId)
-                .orElseThrow(() -> new RuntimeException("Current admin not found"));
+public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
+    User current = userRepo.findById(currentAdminId)
+            .orElseThrow(() -> new RuntimeException("Current admin not found"));
 
-        Role role = current.getRole();
-        if (role == null) {
-            throw new RuntimeException("User has no role assigned");
-        }
-
-        List<User> users;
-
-        if (role == Role.SUPER_ADMIN) {
-            users = userRepo.findByRole(Role.ADMIN);
-        } else if (role == Role.ADMIN) {
-            users = userRepo.findByRole(Role.USER);
-        } else {
-            throw new RuntimeException("Access denied: unsupported role");
-        }
-
-        return users.stream().map(user -> {
-            Optional<UserProfile> profileOpt = userProfileRepo.findByUserId(user.getId());
-
-            String phone = profileOpt.map(UserProfile::getPhone).orElse("");
-
-            long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
-                    .map(calculatorUtils::calculateDaysSmokeFree)
-                    .orElse(0L);
-
-            return new AdminUserDTO(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    phone,
-                    daysSmokeFree,
-                    user.getRole(),
-                    user.getAvatarUrl()
-            );
-        }).collect(Collectors.toList());
-
-
+    Role role = current.getRole();
+    if (role == null) {
+        throw new RuntimeException("User has no role assigned");
     }
 
-
-    public List<AdminUserDTO> getAllRegularUsers() {
-        List<User> users = userRepo.findByRole(Role.USER);
-
-        return users.stream().map(user -> {
-            String phone = userProfileRepo.findByUserId(user.getId())
-                    .map(UserProfile::getPhone).orElse("");
-
-            long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
-                    .map(calculatorUtils::calculateDaysSmokeFree)
-                    .orElse(0L);
-
-            return new AdminUserDTO(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    phone,
-                    daysSmokeFree,
-                    user.getRole(),
-                    user.getAvatarUrl()
-            );
-        }).collect(Collectors.toList());
+    if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
+        throw new RuntimeException("Access denied: unsupported role");
     }
+
+    // Cả ADMIN và SUPER_ADMIN đều được xem danh sách USER
+    List<User> users = userRepo.findByRole(Role.USER);
+
+    return users.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+}
+
+
 
     /**
      * SUPER_ADMIN xem danh sách các ADMIN (không bao gồm SUPER_ADMIN)
@@ -109,30 +66,13 @@ public class AdminUserService {
             throw new RuntimeException("Permission denied");
         }
 
-        // Chỉ lấy những người có role là ADMIN (không bao gồm SUPER_ADMIN)
         List<User> adminUsers = userRepo.findByRole(Role.ADMIN);
 
-        return adminUsers.stream().map(user -> {
-            String phone = userProfileRepo.findByUserId(user.getId())
-                    .map(UserProfile::getPhone).orElse("");
-
-            long daysSmokeFree = planRepo.findByUserId(user.getUid())
-                    .map(calculatorUtils::calculateDaysSmokeFree)
-                    .orElse(0L);
-
-
-
-            return new AdminUserDTO(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    phone,
-                    daysSmokeFree,
-                    user.getRole(),
-                    user.getAvatarUrl()
-            );
-        }).collect(Collectors.toList());
+        return adminUsers.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
+
 
     public UserProfileDTO getUserProfileByUserId(Integer userId) {
         Optional<User> userOpt = userRepo.findById(userId);
@@ -146,7 +86,6 @@ public class AdminUserService {
         UserProfile profile = profileOpt.get();
 
         return new UserProfileDTO(
-                user.getAvatarUrl(),
                 user.getName(),
                 profile.getPhone(),
                 profile.getBirthdate(),
@@ -157,6 +96,26 @@ public class AdminUserService {
                 profile.getOccupation(),
                 profile.getHealthStatus(),
                 user.getId()
+        );
+    }
+
+    private AdminUserDTO convertToDTO(User user) {
+        String phone = userProfileRepo.findByUserId(user.getId())
+                .map(UserProfile::getPhone)
+                .orElse("");
+
+        long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
+                .map(calculatorUtils::calculateDaysSmokeFree)
+                .orElse(0L);
+
+        return new AdminUserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                phone,
+                daysSmokeFree,
+                user.getRole(),
+                user.getAvatarUrl()
         );
     }
 }
