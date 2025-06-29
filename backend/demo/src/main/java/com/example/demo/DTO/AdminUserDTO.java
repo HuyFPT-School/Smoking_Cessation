@@ -14,6 +14,8 @@ public class AdminUserDTO {
     private String phone;
     private long daysSmokeFree;
     private Role role;
+    private String avatarUrl;
+
 
     public AdminUserDTO(User user) {
         this.id = user.getId();
@@ -22,6 +24,8 @@ public class AdminUserDTO {
         this.role = user.getRole();
         this.phone = ""; // Gán sau nếu cần
         this.daysSmokeFree = 0L; // Gán sau nếu cần
+        this.avatarUrl = user.getAvatarUrl();
+
     }
 
 }

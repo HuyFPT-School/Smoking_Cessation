@@ -41,20 +41,15 @@ public class AdminController {
     // ✅ Cho cả ADMIN và SUPER_ADMIN xem danh sách user thường
     @GetMapping("/users")
     public List<AdminUserDTO> getUsersForAdmin(@RequestParam int currentAdminId) {
-        return adminUserService.getAllUsersForAdmin(currentAdminId);
+        return adminUserService.getAllUsersVisibleToAdmin(currentAdminId);
     }
 
-    // ✅ Lấy danh sách user có role ADMIN
+    // ✅ Lấy Danh sách Admin cho super admin
     @GetMapping("/admins")
     public List<AdminUserDTO> getAllAdmins(@RequestParam int currentAdminId) {
         return adminUserService.getAllAdmins(currentAdminId);
     }
-    // SUPER_ADMIN lấy danh sách USER thường
-    @GetMapping("/regular-users")
-    public List<AdminUserDTO> getRegularUsers(@RequestParam int currentAdminId) {
-        // Nếu muốn kiểm tra role ở đây cũng được
-        return adminUserService.getAllRegularUsers();
-    }
+
 
 
 

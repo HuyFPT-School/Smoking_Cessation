@@ -32,6 +32,7 @@ const SuperAdminPanelPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
   const navigate = useNavigate();
 
@@ -60,13 +61,14 @@ const SuperAdminPanelPage = () => {
   // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/regular-users?currentAdminId=${userId}`);
+      const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
         email: u.email,
         phone: u.phone || "N/A",
         days: u.daysSmokeFree,
+        avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to load user list");
@@ -117,6 +119,7 @@ const SuperAdminPanelPage = () => {
         phone: u.phone || "N/A",
         days: u.daysSmokeFree,
         role: u.role,
+        avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
       console.error("❌ Failed to fetch admin list", err);
@@ -228,6 +231,7 @@ const SuperAdminPanelPage = () => {
   const handleUserProfile = async (user) => {
     setIsModalOpen(true);
     setLoadingUserDetail(true);
+    setSelectedUser(user);
 
     try {
       const response = await axios.get(`http://localhost:8080/api/admin/user/${user.id}`);
@@ -265,9 +269,9 @@ const SuperAdminPanelPage = () => {
                   />
                 </svg>
               </span>
-              Admin Dashboard
+              SuperAdmin Page
             </div>
-            <div className="admin-subtitle">Manage users and platform content</div>
+            <div className="admin-subtitle">Manage users/admins and platform content</div>
           </div>
         </div>
       </header>
@@ -342,7 +346,7 @@ const SuperAdminPanelPage = () => {
                       <div className="analytics-title">
                         <UserOutlined /> New Users
                       </div>
-                      <div className="analytics-value">{dashboardStats?.newUsersThisMonth ?? "N/A"}%</div>
+                      <div className="analytics-value">{dashboardStats?.newUsersThisMonth ?? "N/A"}</div>
                       <div className="analytics-sub">This month</div>
                     </div>
                     <div className="analytics-card">
@@ -358,7 +362,7 @@ const SuperAdminPanelPage = () => {
                       <div className="analytics-title">
                         <AreaChartOutlined style={{ color: "#9254de" }} /> Avg. Days Quit
                       </div>
-                      <div className="analytics-value">{dashboardStats?.averageDailyUsers ?? "N/A"}%</div>
+                      <div className="analytics-value">{dashboardStats?.averageDailyUsers ?? "N/A"}</div>
                       <div className="analytics-sub">Per successful user</div>
                     </div>
                   </div>
@@ -482,7 +486,7 @@ const SuperAdminPanelPage = () => {
                           <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
                             <UserOutlined /> User Profile
                           </div>
-                           <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
+                          <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
                             <DeleteOutlined /> Delete User
                           </div>
                         </div>
@@ -581,7 +585,7 @@ const SuperAdminPanelPage = () => {
           <div>
             <div className="section-box">
               <div className="section-title">
-                <FileTextOutlined style={{ color: "#000" }} /> Community Blog
+                <FileTextOutlined style={{ color: "#000" }} /> SuperAdmin Community Management
               </div>
               <div className="section-sub">View and manage community blog posts</div>
               <CommunityBlogPage />
@@ -590,7 +594,11 @@ const SuperAdminPanelPage = () => {
         )}
       </div>
       <Modal
-        title="ADMIN Profile"
+        title={
+          selectedUser?.role === "ADMIN"
+            ? "ADMIN Profile"
+            : "User Profile"
+        }
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
@@ -599,31 +607,47 @@ const SuperAdminPanelPage = () => {
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <Spin tip="Loading..." />
           </div>
-        ) : userProfile ? (
+        ) : (
           <div>
+            {/* Avatar và tên từ entity User */}
             <div style={{ textAlign: "center", marginBottom: 16 }}>
               <Avatar
                 size={80}
-                src={userProfile.avatarUrl}
-                icon={!userProfile.avatarUrl && userProfile.name?.[0]}
+                src={selectedUser?.avatarUrl}
+                icon={!selectedUser?.avatarUrl && selectedUser?.name?.[0]}
                 style={{ backgroundColor: "#87d068" }}
               />
-              <div style={{ fontWeight: "bold", marginTop: 8 }}>{userProfile.name}</div>
+              <div style={{ fontWeight: "bold", marginTop: 8 }}>
+                {selectedUser?.name || "N/A"}
+              </div>
+
             </div>
+
+            {/* Thông báo nếu chưa có profile */}
+            {!userProfile && (
+              <p style={{ marginTop: 12, color: "#888", textAlign: "center" }}>
+                {selectedUser?.role === "ADMIN"
+                  ? "Admin này chưa điền thông tin hồ sơ."
+                  : "User này chưa điền thông tin hồ sơ."}
+              </p>
+            )}
+
+
+            {/* Bảng Descriptions */}
             <Descriptions bordered column={1} size="middle">
-              <Descriptions.Item label="Phone">{userProfile.phone || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Birthdate">{userProfile.birthdate || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Gender">{userProfile.gender || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Smoking Age">{userProfile.smokingAge ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Years Smoked">{userProfile.yearsSmoked ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Occupation">{userProfile.occupation || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Health Status">{userProfile.healthStatus || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Bio">{userProfile.bio || "No bio provided."}</Descriptions.Item>
+              <Descriptions.Item label="Phone">{userProfile?.phone || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Birthdate">{userProfile?.birthdate || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Gender">{userProfile?.gender || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Smoking Age">{userProfile?.smokingAge ?? "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Years Smoked">{userProfile?.yearsSmoked ?? "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Occupation">{userProfile?.occupation || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Health Status">{userProfile?.healthStatus || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Bio">{userProfile?.bio || "No bio provided."}</Descriptions.Item>
             </Descriptions>
           </div>
-        ) : (
-          <p>Không có thông tin hồ sơ ADMIN.</p>
         )}
+
+
       </Modal>
     </div>
   ); // Added the missing closing parenthesis here
