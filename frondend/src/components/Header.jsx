@@ -254,7 +254,7 @@ const Header = () => {
                       handleMenuClose();
                     }}
                   >
-                    Quản trị
+                    Admin
                   </MenuItem>
                 )}
 
@@ -265,7 +265,7 @@ const Header = () => {
                       handleMenuClose();
                     }}
                   >
-                    Quản trị (Super Admin)
+                    Admin (Super Admin)
                   </MenuItem>
                 )}
 
