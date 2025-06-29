@@ -38,6 +38,9 @@ const Register = () => {
   const [password, setPassword] = useState(""); // Mật khẩu
   const [agreeTerms, setAgreeTerms] = useState(false); // Có đồng ý điều khoản không
 
+  // State để theo dõi trạng thái loading (đang xử lý) - ngăn user bấm nhiều lần
+  const [isLoading, setIsLoading] = useState(false);
+
   // Các state để quản lý thông báo (snackbar)
   const [open, setOpen] = useState(false); // Có hiển thị thông báo không
   const [snackbarMsg, setSnackbarMsg] = useState(""); // Nội dung thông báo
@@ -98,6 +101,9 @@ const Register = () => {
     // Ngăn chặn hành vi mặc định của form (reload trang)
     event.preventDefault();
 
+    // Bật trạng thái loading để ngăn user bấm nhiều lần
+    setIsLoading(true);
+
     // Kiểm tra xem người dùng đã đồng ý điều khoản chưa
     if (!agreeTerms) {
       showSnackbar("⚠️ You must agree to the terms and policies.", "warning");
@@ -144,6 +150,9 @@ const Register = () => {
         // Lỗi khác
         showSnackbar("Registration failed. Please try again.", "error");
       }
+    } finally {
+      // Dù thành công hay thất bại, đều tắt trạng thái loading
+      setIsLoading(false);
     }
   } // Render giao diện của trang đăng ký
   return (
@@ -237,13 +246,15 @@ const Register = () => {
             fullWidth
             type="submit" // Kiểu submit để trigger form onSubmit
             variant="contained" // Nút nền đầy
+            disabled={isLoading}
             sx={{
               mt: 2, // Margin top
               bgcolor: "#16A34A", // Màu nền xanh lá
               "&:hover": { bgcolor: "#15803d" }, // Màu khi hover
             }}
           >
-            Register
+            {isLoading ? "Logging in..." : "Register"}{" "}
+            {/* Hiển thị "Logging in..." nếu đang đăng nhập */}
           </Button>
         </form>
 

@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Typography, Button, Row, Col, Card } from "antd";
-import { RiseOutlined, TeamOutlined, BookOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
+import {
+  RiseOutlined,
+  TeamOutlined,
+  BookOutlined,
+  MessageOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import CoachChat from "./CoachChat";
+import { AuthContext } from "../context/AuthContext";
 const { Title, Paragraph, Text } = Typography;
 
 const stats = [
@@ -61,7 +68,7 @@ const StatsSection = () => (
   </div>
 );
 
-const SupportSection = () => (
+const SupportSection = ({ onNavigate }) => (
   <div style={{ padding: "150px 24px", background: "#f5f7fa" }}>
     {/* Container với padding lớn, nền xám nhạt */}
     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
@@ -95,7 +102,10 @@ const SupportSection = () => (
               Monitor your smoke-free days, health improvements, and money
               saved.
             </Paragraph>
-            <Button type="link">Learn more</Button> {/* Nút liên kết */}
+            <Button type="link" onClick={() => onNavigate("/tracking")}>
+              Learn more
+            </Button>
+            {/* Nút liên kết */}
           </Card>
         </Col>
         <Col xs={24} md={8}>
@@ -105,7 +115,9 @@ const SupportSection = () => (
             <Paragraph>
               Connect with others on the same journey to stay motivated.
             </Paragraph>
-            <Button type="link">Learn more</Button>
+            <Button type="link" onClick={() => onNavigate("/blog")}>
+              Learn more
+            </Button>
           </Card>
         </Col>
         <Col xs={24} md={8}>
@@ -124,7 +136,7 @@ const SupportSection = () => (
 );
 
 // Định nghĩa một functional component có tên là SuccessStories, nhận prop là onNavigate (callback điều hướng route)
-const SuccessStories = ({ onNavigate }) => (
+const SuccessStories = ({ onNavigate, onLogout }) => (
   // Container chính với nền trắng, padding trên 80px, trái/phải 24px, dưới 0
   <div style={{ background: "#fff", padding: "80px 24px 0" }}>
     {/* Wrapper để giới hạn độ rộng tối đa là 960px và căn giữa */}
@@ -239,7 +251,10 @@ const SuccessStories = ({ onNavigate }) => (
           <Button
             type="primary"
             style={ctaButtonStyle}
-            onClick={() => onNavigate("/register")}
+            onClick={() => {
+              onLogout();
+              onNavigate("/register");
+            }}
           >
             Create Free Account
           </Button>
@@ -252,7 +267,7 @@ const SuccessStories = ({ onNavigate }) => (
   </div>
 );
 
-const HeroSection = () => (
+const HeroSection = ({ onNavigate, onLogout }) => (
   <div
     style={{
       background: "linear-gradient(to bottom, #f0fff4, #ffffff)",
@@ -270,7 +285,15 @@ const HeroSection = () => (
             Our platform provides personalized support to help you quit.
           </Paragraph>
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-            <Button type="primary" size="large" style={primaryButtonStyle}>
+            <Button
+              type="primary"
+              size="large"
+              style={primaryButtonStyle}
+              onClick={() => {
+                onLogout();
+                onNavigate("/register");
+              }}
+            >
               Start Your Journey
             </Button>
             <Button size="large" style={secondaryButtonStyle}>
@@ -353,16 +376,25 @@ const secondaryButtonStyle = {
 const HomePage = () => {
   const navigate = useNavigate();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const { setUser } = useContext(AuthContext);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.clear();
+    // Reset user state
+    setUser(null);
+  };
+
   return (
     <div style={{ position: "relative" }}>
-      <HeroSection />
+      <HeroSection onNavigate={navigate} onLogout={handleLogout} />
       <StatsSection />
-      <SupportSection />
-      <SuccessStories onNavigate={navigate} />
+      <SupportSection onNavigate={navigate} />
+      <SuccessStories onNavigate={navigate} onLogout={handleLogout} />
       {/* Floating Chat Button */}
       <div
         style={{
