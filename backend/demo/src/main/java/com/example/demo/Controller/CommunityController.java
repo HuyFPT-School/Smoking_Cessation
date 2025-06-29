@@ -383,7 +383,8 @@ public class CommunityController {
                 post.getUser().getId(),
                 post.getUser().getName(),
                 post.getUser().getEmail(),
-                post.getUser().getAvatarUrl()
+                post.getUser().getAvatarUrl(),
+                post.getUser().getRole()
         );
         // Tạo thông tin bài đăng cơ bản
         PostDTO postDTO = new PostDTO(
@@ -428,7 +429,8 @@ public class CommunityController {
                 comment.getUser().getId(),
                 comment.getUser().getName(),
                 comment.getUser().getEmail(),
-                comment.getUser().getAvatarUrl()
+                comment.getUser().getAvatarUrl(),
+                comment.getUser().getRole()
         );
         
         // Tạo DTO bình luận

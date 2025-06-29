@@ -448,7 +448,7 @@ const CoachChat = () => {
           >
             <TextArea
               ref={textAreaRef}
-              placeholder="Nhập tin nhắn của bạn... 💬"
+              placeholder="Enter your message... 💬"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onPressEnter={(e) => {
