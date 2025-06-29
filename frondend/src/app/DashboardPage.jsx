@@ -222,10 +222,10 @@ const DashboardPage = () => {
 
   return (
     <div className="Dashboard-Backgroup">
-      <h2 style={{ color: "#262626", marginBottom: "5px" }}>
+      <h2 style={{ color: "#262626", marginBottom: "5px", fontWeight: "bold", fontSize: "24px" }}>
         Welcome back, {dashboardData.userName || "User"}
       </h2>
-      <p style={{ color: "#595959", marginBottom: "24px" }}>
+      <p style={{ color: "#595959", marginBottom: "24px", fontSize: "14px" }}>
         You've accumulated {dashboardData.daysSmokeFree || 0} smoke-free days. Keep going!
       </p>
 

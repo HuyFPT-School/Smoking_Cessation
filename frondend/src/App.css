@@ -328,7 +328,7 @@
 .Leaderboard-Backgroup {
   max-width: 1400px;
   margin: 20px auto;
-  padding: 32px;
+  padding: 20px;
   margin-bottom: 0px;
   margin-top: 0px;
   padding-bottom: 32px;
@@ -1007,7 +1007,6 @@ body,
   font-size: 16px;
   font-weight: bold;
   color: #1e90ff; /* Blue color for title */
-  font-family: "Arial", sans-serif;
 }
 
 .chart-grid {
@@ -1040,7 +1039,6 @@ body,
 .chart-label {
   font-size: 12px;
   color: #666;
-  font-family: "Arial", sans-serif;
 }
 
 .tips-section {
@@ -1260,29 +1258,26 @@ button:hover,
 /* Định dạng chính cho container chính */
 .plan-tracking-container {
   padding: 20px;
-  max-width: 1350px;
+  max-width: 1400px;
   margin: 0 auto;
   position: relative;
-  font-family: "Arial", sans-serif; /* Font chữ mặc định */
 }
 
 /* Định dạng tiêu đề chính */
 .plan-plan-title {
   font-size: 24px;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: block;
   font-weight: bold;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng phụ đề */
 .plan-plan-subtitle {
   font-size: 14px;
   color: #666;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng thanh tiến trình */
@@ -1352,7 +1347,6 @@ button:hover,
   font-size: 14px;
   color: #666;
   text-align: center;
-  font-family: "Arial", sans-serif;
 }
 
 .plan-step-labels span {
@@ -1368,7 +1362,6 @@ button:hover,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
   margin-bottom: 20px;
   position: relative;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng tiêu đề của bước */
@@ -1378,7 +1371,6 @@ button:hover,
   color: #333;
   margin-bottom: 16px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng mô tả của bước */
@@ -1387,7 +1379,6 @@ button:hover,
   color: #666;
   margin-bottom: 16px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng khung lịch */
@@ -1425,7 +1416,6 @@ button:hover,
 .plan-calendar-month-year {
   font-size: 16px;
   font-weight: bold;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng lưới lịch */
@@ -1442,7 +1432,6 @@ button:hover,
   padding: 5px;
   font-weight: bold;
   color: #888;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng các ô ngày trong lịch */
@@ -1474,7 +1463,6 @@ button:hover,
   margin-top: 16px;
   margin-left: 30px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng nhóm form */
@@ -1490,7 +1478,6 @@ button:hover,
   margin-bottom: 30px;
   margin-top: 30px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng wrapper cho các tùy chọn */
@@ -1513,7 +1500,6 @@ button:hover,
   font-size: 15px;
   font-weight: 400;
   color: #1a1a1a;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng mô tả tùy chọn */
@@ -1523,7 +1509,6 @@ button:hover,
   margin-left: 0;
   margin-top: 5px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng container cho các nút điều hướng */
@@ -1560,7 +1545,6 @@ button:hover,
   color: #333;
   margin-bottom: 8px;
   display: block;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng input tùy chỉnh */
@@ -1572,7 +1556,6 @@ button:hover,
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   padding: 8px 12px;
-  font-family: "Arial", sans-serif;
 }
 
 .plan-custom-input:focus {
@@ -1590,7 +1573,6 @@ button:hover,
   font-size: 16px;
   color: #333;
   margin-right: 8px;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng phần lời khuyên */
@@ -1609,7 +1591,6 @@ button:hover,
   margin-bottom: 16px;
   display: block;
   font-weight: bold;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng card lời khuyên */
@@ -1627,7 +1608,6 @@ button:hover,
 /* Định dạng tiêu đề card lời khuyên */
 .plan-advice-card-title {
   font-weight: bold;
-  font-family: "Arial", sans-serif;
 }
 
 /* Định dạng văn bản trong card lời khuyên */
@@ -1635,13 +1615,11 @@ button:hover,
   font-size: 14px;
   color: #333;
   margin-top: 8px;
-  font-family: "Arial", sans-serif;
 }
 
 /* Ghi đè style của Ant Design */
 .ant-input {
   margin: 5px 0;
-  font-family: "Arial", sans-serif;
 }
 
 .ant-checkbox-wrapper {
@@ -1662,7 +1640,6 @@ button:hover,
 .ant-menu-item {
   margin: 0 10px;
   font-size: 16px;
-  font-family: "Arial", sans-serif;
 }
 
 /* Tùy chỉnh vị trí thông báo */
@@ -1671,7 +1648,6 @@ button:hover,
   bottom: 60px;
   right: 20px;
   z-index: 1000;
-  font-family: "Arial", sans-serif;
 }
 
 /* Đảm bảo layout của Row và Col gọn hơn */
@@ -1771,10 +1747,6 @@ button:hover,
 }
 /* ----------------------------------------------------- */
 /* CSS Profile */
-.profile-container {
-  font-family: "Segoe UI", sans-serif;
-}
-
 .cover-photo {
   background: linear-gradient(to right, #94e5a3, #8ec6f8);
   height: 180px;
@@ -1984,29 +1956,22 @@ button:hover,
 }
 
 /* ========== css BlogPage  ========== */
-
-.community-blog-page {
-  max-width: 65vw;
-  margin: 0 auto;
-}
-
 /* CommunityHeader */
 .community-header {
   margin-bottom: 32px;
 }
 
 .community-header-title {
-  font-size: clamp(20px, 5vw, 28px);
+  font-size: 24px;
   font-weight: 700;
   margin-bottom: 4px;
   color: #1f1f1f;
-  letter-spacing: -0.3px;
   line-height: 1.3;
 }
 
 .community-header-description {
   color: #595959;
-  font-size: clamp(12px, 3vw, 14px);
+  font-size: 14px;
   margin: 0;
   line-height: 1.5;
 }
@@ -2810,10 +2775,10 @@ button:hover,
 /*================================================================ CSS FOR COMMUNITY BLOG PAGE======================================================= */
 /* Container chính cho community blog page */
 .community-blog-container {
-  width: 65vw;
+  padding: 20px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding-top: 23px;
-  min-height: calc(100vh - 200px);
+  position: relative;
 }
 
 /* Class cho các element cần chiều rộng 100% */
