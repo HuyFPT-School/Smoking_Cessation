@@ -35,3 +35,4 @@ build/
 ### Firebase Service Account Keys ###
 src/main/resources/serviceAccountKey.json
 serviceAccountKey.json
+*~

@@ -16,56 +16,65 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// ✅ Service phục vụ cho trang quản trị người dùng của ADMIN và SUPER_ADMIN
 @Service
 public class AdminUserService {
 
-    @Autowired
-    private UserRepo userRepo;
+    // ==== Inject các repository cần dùng ====
+    @Autowired private UserRepo userRepo;
+    @Autowired private UserProfileRepo userProfileRepo;
+    @Autowired private PlanRepo planRepo;
+    @Autowired private CalculatorUtils calculatorUtils;
 
-    @Autowired
-    private UserProfileRepo userProfileRepo;
-
-    @Autowired
-    private PlanRepo planRepo;
-
-    @Autowired
-    private CalculatorUtils calculatorUtils;
-
-
-public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
-    User current = userRepo.findById(currentAdminId)
-            .orElseThrow(() -> new RuntimeException("Current admin not found"));
-
-    Role role = current.getRole();
-    if (role == null) {
-        throw new RuntimeException("User has no role assigned");
-    }
-
-    if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
-        throw new RuntimeException("Access denied: unsupported role");
-    }
-
-    // Cả ADMIN và SUPER_ADMIN đều được xem danh sách USER
-    List<User> users = userRepo.findByRole(Role.USER);
-
-    return users.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-}
-
-
+    // ============================================================================
+    // 📌 1. LẤY DANH SÁCH USER CHO ADMIN VÀ SUPER_ADMIN
+    // ============================================================================
 
     /**
-     * SUPER_ADMIN xem danh sách các ADMIN (không bao gồm SUPER_ADMIN)
+     * ✅ Cả ADMIN và SUPER_ADMIN đều được xem danh sách người dùng thường (USER)
+     */
+    public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
+
+        // Lấy admin hiện tại từ ID truyền lên
+        User current = userRepo.findById(currentAdminId)
+                .orElseThrow(() -> new RuntimeException("Current admin not found"));
+
+        Role role = current.getRole();
+        if (role == null) {
+            throw new RuntimeException("User has no role assigned");
+        }
+
+        // Chặn người không phải ADMIN hoặc SUPER_ADMIN
+        if (role != Role.ADMIN && role != Role.SUPER_ADMIN) {
+            throw new RuntimeException("Access denied: unsupported role");
+        }
+
+        // Lấy toàn bộ user có role là USER
+        List<User> users = userRepo.findByRole(Role.USER);
+
+        // Convert sang DTO để gửi cho frontend
+        return users.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ============================================================================
+    // 📌 2. LẤY DANH SÁCH ADMIN (chỉ dành cho SUPER_ADMIN)
+    // ============================================================================
+
+    /**
+     * ✅ Chỉ SUPER_ADMIN được xem danh sách ADMIN (loại bỏ SUPER_ADMIN khác)
      */
     public List<AdminUserDTO> getAllAdmins(int currentAdminId) {
         User current = userRepo.findById(currentAdminId)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
 
+        // Chặn nếu không phải SUPER_ADMIN
         if (current.getRole() != Role.SUPER_ADMIN) {
             throw new RuntimeException("Permission denied");
         }
 
+        // Lấy tất cả user có role ADMIN (loại trừ SUPER_ADMIN)
         List<User> adminUsers = userRepo.findByRole(Role.ADMIN);
 
         return adminUsers.stream()
@@ -73,7 +82,14 @@ public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
                 .collect(Collectors.toList());
     }
 
+    // ============================================================================
+    // 📌 3. XEM CHI TIẾT THÔNG TIN CÁ NHÂN CỦA USER (trong modal)
+    // ============================================================================
 
+    /**
+     * ✅ Trả về thông tin chi tiết hồ sơ cá nhân của người dùng (userId)
+     * → Gồm cả profile và user (id, name,…)
+     */
     public UserProfileDTO getUserProfileByUserId(Integer userId) {
         Optional<User> userOpt = userRepo.findById(userId);
         if (userOpt.isEmpty()) return null;
@@ -99,11 +115,22 @@ public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
         );
     }
 
+    // ============================================================================
+    // 📌 4. HÀM DÙNG CHUNG ĐỂ CONVERT USER → AdminUserDTO
+    // ============================================================================
+
+    /**
+     * ✅ Chuyển entity User sang DTO AdminUserDTO để hiển thị lên bảng quản lý
+     * → Gồm: id, tên, email, avatar, phone, role, và số ngày không hút thuốc
+     */
     private AdminUserDTO convertToDTO(User user) {
+
+        // Lấy số điện thoại từ bảng user_profile (nếu có)
         String phone = userProfileRepo.findByUserId(user.getId())
                 .map(UserProfile::getPhone)
                 .orElse("");
 
+        // Tính số ngày không hút thuốc từ Plan (nếu có)
         long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
                 .map(calculatorUtils::calculateDaysSmokeFree)
                 .orElse(0L);
