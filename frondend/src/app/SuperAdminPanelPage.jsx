@@ -67,7 +67,6 @@ const SuperAdminPanelPage = () => {
         name: u.name,
         email: u.email,
         phone: u.phone || "N/A",
-        days: u.daysSmokeFree,
         avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
@@ -117,7 +116,6 @@ const SuperAdminPanelPage = () => {
         name: u.name,
         email: u.email,
         phone: u.phone || "N/A",
-        days: u.daysSmokeFree,
         role: u.role,
         avatarUrl: u.avatarUrl,
       }));
@@ -469,11 +467,6 @@ const SuperAdminPanelPage = () => {
                             <PhoneOutlined /> {user.phone}
                           </span>
                         </div>
-                      </div>
-                    </div>
-                    <div className="user-right">
-                      <div className="right-top">
-                        <div className="smoke-days">{user.days} days smoke-free</div>
                       </div>
                     </div>
                     <div className="user-action-wrapper">
