@@ -12,7 +12,6 @@ public class AdminUserDTO {
     private String name;
     private String email;
     private String phone;
-    private long daysSmokeFree;
     private Role role;
     private String avatarUrl;
 
@@ -23,7 +22,6 @@ public class AdminUserDTO {
         this.email = user.getEmail();
         this.role = user.getRole();
         this.phone = ""; // Gán sau nếu cần
-        this.daysSmokeFree = 0L; // Gán sau nếu cần
         this.avatarUrl = user.getAvatarUrl();
 
     }
