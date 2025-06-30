@@ -66,7 +66,6 @@ const AdminPanelPage = () => {
         name: u.name,
         email: u.email,
         phone: u.phone || "N/A",
-        days: u.daysSmokeFree,
         avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
@@ -389,11 +388,7 @@ const AdminPanelPage = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="user-right">
-                      <div className="right-top">
-                        <div className="smoke-days">{user.days} days smoke-free</div>
-                      </div>
-                    </div>
+                
                     <div className="user-action-wrapper">
                       <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
                       {openMenu === index && (

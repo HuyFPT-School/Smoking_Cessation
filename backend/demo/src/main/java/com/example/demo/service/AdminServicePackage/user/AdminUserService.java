@@ -113,7 +113,6 @@ public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
                 user.getName(),
                 user.getEmail(),
                 phone,
-                daysSmokeFree,
                 user.getRole(),
                 user.getAvatarUrl()
         );
