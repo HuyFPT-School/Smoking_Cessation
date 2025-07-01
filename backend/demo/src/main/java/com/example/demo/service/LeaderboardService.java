@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class LeaderboardService {
 
     // === CÁC HẰNG SỐ ĐIỂM SỐ ===
+    
     //  Hệ thống điểm số được thiết kế để khuyến khích hành vi tích cực:
     //  
     //  ĐIỂM THƯỞNG (Khuyến khích):
@@ -580,20 +581,20 @@ public class LeaderboardService {
         int actualSmokFreeDays = Math.max(totalDaysSinceStart - smokingDates.size(), 0);
         
         // Điểm cơ bản cho ngày không hút thuốc
-        points += actualSmokFreeDays DAILY_SMOKE_FREE_POINTS;
+        points += actualSmokFreeDays * DAILY_SMOKE_FREE_POINTS;
         
         // Điểm thưởng cho chuỗi ngày liên tiếp
-        points += consecutiveSmokFreeDays STREAK_BONUS_POINTS;
+        points += consecutiveSmokFreeDays * STREAK_BONUS_POINTS;
         
         // Điểm thưởng cho chuỗi tuần và tháng
-        points += (consecutiveSmokFreeDays / 7) WEEKLY_STREAK_BONUS;
-        points += (consecutiveSmokFreeDays / 30) MONTHLY_STREAK_BONUS;
+        points += (consecutiveSmokFreeDays / 7) * WEEKLY_STREAK_BONUS;
+        points += (consecutiveSmokFreeDays / 30) * MONTHLY_STREAK_BONUS;
         
         // Điểm thưởng cho ghi lại cảm giác thèm thuốc
-        points += countCravingRecords(trackingEntries) CRAVING_RECORD_POINTS;
+        points += countCravingRecords(trackingEntries) * CRAVING_RECORD_POINTS;
         
         // Điểm phạt cho việc hút thuốc
-        points -= countSmokingIncidents(trackingEntries) SMOKING_PENALTY;
+        points -= countSmokingIncidents(trackingEntries) * SMOKING_PENALTY;
         
         return points;
     }
@@ -771,7 +772,7 @@ public class LeaderboardService {
         int smokeFreeDays = calculateSmokeFreeDaysInPeriod(startDate, daysInPeriod, smokingDates);
         
         // Điểm cơ bản
-        points += smokeFreeDays dailyPoints;
+        points += smokeFreeDays * dailyPoints;
         
         // Điểm thưởng tuần
         if (weeklyBonus && smokeFreeDays >= 7 && smokingDates.isEmpty()) {
@@ -780,15 +781,15 @@ public class LeaderboardService {
         
         // Điểm thưởng tháng 
         if (monthlyBonus) {
-            points += (smokeFreeDays / 7) WEEKLY_STREAK_BONUS; // Thưởng mỗi tuần
+            points += (smokeFreeDays / 7) * WEEKLY_STREAK_BONUS; // Thưởng mỗi tuần
             if (smokeFreeDays >= 30 && smokingDates.isEmpty()) {
                 points += MONTHLY_STREAK_BONUS; // Thưởng tháng hoàn chỉnh
             }
         }
         
         // Điểm thưởng và phạt
-        points += countCravingRecords(trackingEntries) CRAVING_RECORD_POINTS;
-        points -= countSmokingIncidents(trackingEntries) SMOKING_PENALTY;
+        points += countCravingRecords(trackingEntries) * CRAVING_RECORD_POINTS;
+        points -= countSmokingIncidents(trackingEntries) * SMOKING_PENALTY;
         
         return points;
     }
@@ -835,13 +836,13 @@ public class LeaderboardService {
     //   monthlyPoints Điểm tháng
     //   return Tier string
     private String calculateTierByTimeRange(String timeRange, int totalPoints, int weeklyPoints, int monthlyPoints) {
-    switch (timeRange) {
-        case "weekly":
-            return calculateTier(weeklyPoints);
-        case "monthly":
-            return calculateTier(monthlyPoints);
-        default:
-            return calculateTier(totalPoints);
+        switch (timeRange) {
+            case "weekly":
+                return calculateTier(weeklyPoints);
+            case "monthly":
+                return calculateTier(monthlyPoints);
+            default:
+                return calculateTier(totalPoints);
         }
     }
     //  Xác định hạng của người dùng dựa trên điểm số.
