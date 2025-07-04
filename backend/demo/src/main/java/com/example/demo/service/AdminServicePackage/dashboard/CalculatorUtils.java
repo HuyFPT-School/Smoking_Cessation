@@ -29,7 +29,7 @@ public class CalculatorUtils {
         Integer userId = plan.getUserId();
         if (userId == null) return 0;
 
-        long totalDays = ChronoUnit.DAYS.between(quitDate, today) + 1; // +1 để tính luôn ngày hôm nay
+        long totalDays = ChronoUnit.DAYS.between(quitDate, today) + 1;
         if (totalDays <= 0) return 0;
 
         // Lấy danh sách tracking theo userId

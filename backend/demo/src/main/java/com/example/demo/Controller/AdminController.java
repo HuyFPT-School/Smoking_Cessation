@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @CrossOrigin                             // Cho phép frontend ở domain khác (vd: React chạy ở http://localhost:3000) gọi API này
 @RestController                          // Controller kiểu RESTful, tự động trả JSON thay vì HTML
-@RequestMapping("/api/admin")         // Định nghĩa base URL cho tất cả API trong controller này
-@RequiredArgsConstructor                 // Tự động tạo constructor cho các trường final (dùng để inject service)
+@RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
     @Autowired
@@ -28,7 +28,7 @@ public class AdminController {
     @Autowired
     private AdminUserService adminUserService;
 
-    @Autowired  // tự động inject (tiêm) các dependency (phụ thuộc)
+    @Autowired
     private AdminRemoteService adminRemoteService;
 
 
