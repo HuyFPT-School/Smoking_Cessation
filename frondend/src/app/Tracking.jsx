@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { Radio, Input, Select, Slider, Button, Tabs } from "antd";
 import moment from "moment";
-import axios from "axios"; // Import axios
+import axios from "axios"; 
 import "antd/dist/reset.css";
 import "../App.css";
 const { TabPane } = Tabs;
 
 // Khai báo một mảng các lựa chọn (options) để dùng cho select, checkbox, radio,...
 const triggerOptions = [
-  { label: "Stress", value: "stress" }, // Nhãn hiển thị: Stress | Giá trị lưu: stress
-  { label: "Social", value: "social" }, // Nhãn hiển thị: Social | Giá trị lưu: social
-  { label: "Habit", value: "habit" }, // Nhãn hiển thị: Habit | Giá trị lưu: habit
-  { label: "Breath time", value: "breathtime" }, // Nhãn hiển thị: Breath time | Giá trị lưu: breathtime
-  { label: "After meals", value: "aftermeals" }, // Nhãn hiển thị: After meals | Giá trị lưu: aftermeals
-  { label: "Drinking Coffee", value: "drinkingcoffee" }, // Nhãn hiển thị: Drinking Coffee | Giá trị lưu: drinkingcoffee
-  { label: "Drinking Alcohol", value: "drinkingalcohol" }, // Nhãn hiển thị: Drinking Alcohol | Giá trị lưu: drinkingalcohol
-  { label: "Boredom", value: "boredom" }, // Nhãn hiển thị: Boredom | Giá trị lưu: boredom
-  { label: "Social Interaction", value: "socialinteraction" }, // Nhãn hiển thị: Social Interaction | Giá trị lưu: socialinteraction
-  { label: "Other", value: "other" }, // Nhãn hiển thị: Other | Giá trị lưu: other
+  { label: "Stress", value: "stress" }, 
+  { label: "Social", value: "social" }, 
+  { label: "Habit", value: "habit" }, 
+  { label: "Breath time", value: "breathtime" }, 
+  { label: "After meals", value: "aftermeals" }, 
+  { label: "Drinking Coffee", value: "drinkingcoffee" }, 
+  { label: "Drinking Alcohol", value: "drinkingalcohol" }, 
+  { label: "Boredom", value: "boredom" }, 
+  { label: "Social Interaction", value: "socialinteraction" }, 
+  { label: "Other", value: "other" }, 
 ];
 
 // Ánh xạ các giá trị trigger
 const triggerLabels = {
-  stress: "Stress", // Gây căng thẳng
-  social: "Social", // Liên quan xã hội
-  habit: "Habit", // Thói quen
-  other: "Other", // Khác
-  breathtime: "Breath time", // Thời gian hít thở
-  aftermeals: "After meals", // Sau khi ăn
-  drinkingcoffee: "Drinking Coffee", // Uống cà phê
-  drinkingalcohol: "Drinking Alcohol", // Uống rượu/bia
-  boredom: "Boredom", // Buồn chán
-  socialinteraction: "Social Interaction", // Tương tác xã hội
+  stress: "Stress", 
+  social: "Social", 
+  habit: "Habit", 
+  other: "Other", 
+  breathtime: "Breath time", 
+  aftermeals: "After meals", 
+  drinkingcoffee: "Drinking Coffee", 
+  drinkingalcohol: "Drinking Alcohol", 
+  boredom: "Boredom", 
+  socialinteraction: "Social Interaction", 
 };
 
 const Tracking = () => {
@@ -44,34 +44,16 @@ const Tracking = () => {
   // Khởi tạo state lưu giờ hiện tại (theo định dạng hh:mm A, ví dụ: 08:30 AM)
   const [time, setTime] = useState(moment().format("hh:mm A"));
 
-  // Khởi tạo state lưu địa điểm nhập từ người dùng (mặc định là gợi ý ví dụ)
   const [location, setLocation] = useState("E.g., Balcony, Coffee shop");
-
-  // Khởi tạo state lưu nguyên nhân kích hoạt hành vi (trigger), mặc định là "stress"
   const [trigger, setTrigger] = useState("stress");
-
-  // Khởi tạo state lưu mức độ hài lòng sau hành vi, mặc định là 10 (thang điểm)
   const [satisfaction, setSatisfaction] = useState(10);
-
-  // Khởi tạo state lưu mức độ thèm muốn (craving), mặc định là 5
   const [cravingIntensity, setCravingIntensity] = useState(5);
-
-  // Khởi tạo state lưu ghi chú người dùng nhập vào
   const [notes, setNotes] = useState("");
-
-  // Khởi tạo state lưu loại hoạt động (ví dụ: smoking), mặc định là "smoking"
   const [activityType, setActivityType] = useState("smoking");
-
-  // Khởi tạo state lưu danh sách các sự kiện (incidents), ban đầu là mảng rỗng
   const [incidents, setIncidents] = useState([]);
 
-  // Lấy chuỗi thông tin user từ localStorage (nếu có)
   const userStr = localStorage.getItem("user");
-
-  // Parse chuỗi JSON thành object, nếu không có thì null
   const userObj = userStr ? JSON.parse(userStr) : null;
-
-  // Lấy userId từ object user nếu tồn tại, nếu không thì null
   const userId = userObj ? userObj.id : null;
 
   useEffect(() => {
@@ -81,23 +63,19 @@ const Tracking = () => {
       if (!userId) return;
 
       try {
-        // Gọi API GET đến backend để lấy dữ liệu log của userId
         const response = await axios.get(
           `http://localhost:8080/api/tracking/user/${userId}`
         );
 
         // Nếu phản hồi thành công (status code = 200)
         if (response.status === 200) {
-          // Cập nhật state incidents bằng dữ liệu trả về từ server
           setIncidents(response.data); // Dữ liệu là một array các incident
         } else {
-          // Nếu không thành công thì gán mảng incidents thành rỗng
           setIncidents([]);
         }
       } catch (error) {
-        // Nếu có lỗi xảy ra khi gọi API (mạng, server lỗi,...)
-        setIncidents([]); // Gán dữ liệu là mảng rỗng để tránh lỗi
-        console.error("Error fetching tracking data:", error); // Ghi log lỗi ra console
+        setIncidents([]); 
+        console.error("Error fetching tracking data:", error); 
       }
     };
 
@@ -106,14 +84,12 @@ const Tracking = () => {
   }, [userId]); // useEffect sẽ chạy lại mỗi khi userId thay đổi
 
   const handleSubmit = async (e) => {
-    // Đánh dấu đây là một hàm bất đồng bộ (async)
     e.preventDefault(); // Ngăn trình duyệt reload lại trang khi submit form
 
     // Kiểm tra xem userId có tồn tại không
     if (!userId) {
-      console.error("User ID not found in localStorage"); // Ghi log lỗi
-      // Tùy chọn: Có thể hiển thị thông báo lỗi cho người dùng
-      return; // Không thực hiện gì thêm nếu không có userId
+      console.error("User ID not found in localStorage");
+      return;
     }
 
     // Tạo đối tượng mới chứa thông tin sự kiện (incident) từ dữ liệu người dùng nhập
@@ -132,15 +108,13 @@ const Tracking = () => {
     };
 
     try {
-      // Gửi dữ liệu newIncident lên server thông qua POST request
       const response = await axios.post(
-        "http://localhost:8080/api/tracking", // API endpoint trên backend
-        newIncident // Dữ liệu gửi đi
+        "http://localhost:8080/api/tracking", 
+        newIncident 
       );
 
       // Nếu response trả về thành công (status code 200 hoặc 201)
       if (response.status === 200 || response.status === 201) {
-        // Cập nhật state incidents bằng cách thêm sự kiện mới vào mảng hiện có
         setIncidents([...incidents, newIncident]);
 
         // Reset lại form về trạng thái mặc định sau khi submit thành công
@@ -151,20 +125,16 @@ const Tracking = () => {
         setCravingIntensity(5);
         setNotes("");
 
-        console.log("Incident recorded successfully:", response.data); // In log thành công
+        console.log("Incident recorded successfully:", response.data); 
       } else {
-        // Nếu response không thành công, ghi log lỗi kèm status và nội dung
         console.error(
           "Failed to record incident:",
           response.status,
           response.data
         );
-        // Tùy chọn: Hiển thị thông báo lỗi cho người dùng
       }
     } catch (error) {
-      // Nếu có lỗi xảy ra khi gửi dữ liệu (ví dụ server không chạy hoặc mất mạng)
       console.error("Error submitting incident:", error);
-      // Tùy chọn: Hiển thị thông báo lỗi cho người dùng
     }
   };
 
@@ -354,7 +324,6 @@ const Tracking = () => {
         ) : (
           <div className="chart-bars">
             {chartData.map((data, index) => {
-              //lặp qua chartData bằng map()
               const heightPx = data.smoking * 20; // tính chều cao cột dựa trên số lần hút thuốc
               // Highlight cột nếu là ngày đang chọn
               //isSelected có giá trị true nếu ngày đang chọn (selectedDate) trùng với ngày của data.date
@@ -368,7 +337,7 @@ const Tracking = () => {
                       height: `${heightPx}px`, //Gán chiều cao của cột dựa trên giá trị heightPx đã tính trước đó (số lần hút thuốc * 20px)
                       minHeight: data.smoking > 0 ? "20px" : "2px", // nếu có hút thuốc thì height tối thiểu là 20px, ko có : 2px
                       background: isSelected ? "#1890ff" : undefined, //if cột đang đc chọn thì màu xanh, ko thì màu css
-                      border: isSelected ? "0px solid #0050b3" : undefined, // giống trên
+                      border: isSelected ? "0px solid #0050b3" : undefined,
                     }}
                   />
                   <span className="bar-label">{data.day}</span>{" "}
@@ -430,7 +399,6 @@ const Tracking = () => {
     // Gọi hàm getWeekIncidents() để lấy các sự kiện xảy ra trong tuần hiện tại
     const weekIncidents = getWeekIncidents();
     weekIncidents.forEach((incident) => {
-      //Duyệt qua từng phần tử (incident) trong mảng weekIncidents
       if (incident.trigger in triggerCount) {
         // kiểm tra xem cái skien hiện tại có trong triggerCount ko , có thì tăng số đếm
         triggerCount[incident.trigger]++;
@@ -464,7 +432,6 @@ const Tracking = () => {
             <h3>Record Activity</h3>
             <p>Log a smoking incident</p>
             <form onSubmit={handleSubmit} className="tracking-form">
-              {/*gọi hàm handleSubmit khi người dùng nhấn nút submit */}
               <Radio.Group
                 value={activityType} // Giá trị hiện tại của lựa chọn (được lưu trong state activityType)
                 onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn một lựa chọn mới, cập nhật activityType
@@ -480,7 +447,6 @@ const Tracking = () => {
                     <label>Time</label>
                     <Input
                       value={time}
-                      //Cập nhật giá trị time trong state mỗi khi người dùng thay đổi nội dung trong ô nhập thời gian.
                       onChange={(e) => setTime(e.target.value)}
                       placeholder="06:36 PM"
                       readOnly
@@ -490,7 +456,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)} // cho ng dùng nhập địa điểm xảy ra sự liện
+                      onChange={(e) => setLocation(e.target.value)} 
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -502,7 +468,7 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)} // cho ng dùng chọn cái nguyên nhân xảy ra hành vi bằng option
+                      onChange={(value) => setTrigger(value)} 
                       options={triggerOptions}
                     />
                   </div>
@@ -514,13 +480,12 @@ const Tracking = () => {
                         border: "0px",
                       }}
                       value={satisfaction}
-                      onChange={(value) => setSatisfaction(value)} // ng dùng chọn mức độ hài lòng bằng thanh kéo
+                      onChange={(value) => setSatisfaction(value)} 
                       min={1}
                       max={10}
                     />
                     <p>
                       Current: {satisfaction} -{" "}
-                      {/*nếu <=3 mức độ hài lòng là low , <=7 thì medium, còn lại thì là hight */}
                       {satisfaction <= 3
                         ? "Low satisfaction"
                         : satisfaction <= 7
@@ -535,7 +500,6 @@ const Tracking = () => {
                     <label>Time</label>
                     <Input
                       value={time}
-                      //Cập nhật giá trị time trong state mỗi khi người dùng thay đổi nội dung trong ô nhập thời gian.
                       onChange={(e) => setTime(e.target.value)}
                       placeholder="06:36 PM"
                       readOnly
@@ -545,7 +509,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)} // cho ng dùng nhập địa điểm xảy ra sự liện
+                      onChange={(e) => setLocation(e.target.value)} 
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -557,25 +521,23 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)} // cho ng dùng chọn cái nguyên nhân xảy ra hành vi bằng option
+                      onChange={(value) => setTrigger(value)} 
                       options={triggerOptions}
                     />
                   </div>
                   <div className="form-group">
                     <label>Craving Intensity Level (1-10)</label>
-                    {/*đánh giá mức độ cơn thèm thuốc*/}
                     <Slider
                       style={{
                         padding: "4px",
                         border: "0px",
                       }}
-                      value={cravingIntensity} //Gán giá trị hiện tại của thanh trượt (lưu trong state cravingIntensity).
-                      onChange={(value) => setCravingIntensity(value)} //Cập nhật state khi người dùng thay đổi giá trị slider.
+                      value={cravingIntensity} 
+                      onChange={(value) => setCravingIntensity(value)} 
                       min={1}
                       max={10}
                     />
                     <p>
-                      {/*nếu <=3 mức độ cơn thèm thuốc là low , <=7 thì medium, còn lại thì là hight */}
                       Current: {cravingIntensity} -{" "}
                       {cravingIntensity <= 3
                         ? "Low intensity"
@@ -588,10 +550,9 @@ const Tracking = () => {
               )}
               <div className="form-group">
                 <label>Notes</label>
-                {/*Ô nhập nhiều dòng, phù hợp văn bnr dài */}
                 <Input.TextArea
-                  value={notes} //Hiển thị nội dung hiện tại từ biến notes.
-                  onChange={(e) => setNotes(e.target.value)} //Cập nhật notes khi người dùng nhập.
+                  value={notes} 
+                  onChange={(e) => setNotes(e.target.value)} 
                   placeholder="Emotions, thoughts, effectiveness of coping strategy..."
                   rows={3}
                 />
@@ -625,7 +586,6 @@ const Tracking = () => {
                 style={{ marginBottom: "10px" }}
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
-                {/*hiển thị 2 lựa chọn*/}
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
             </div>
@@ -643,8 +603,8 @@ const Tracking = () => {
                 }}
               >
                 <Radio.Group
-                  value={activityType} //Gắn giá trị hiện tại (state) để hiển thị lựa chọn đang chọn.
-                  onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn mục khác → cập nhật lại activityType.
+                  value={activityType} 
+                  onChange={(e) => setActivityType(e.target.value)} 
                   className="activity-type"
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
@@ -688,22 +648,16 @@ const Tracking = () => {
                   {filteredIncidents.map(
                     (
                       incident,
-                      index //Lặp qua các sự kiện đã lọc trong tuần (filteredIncidents)
+                      index 
                     ) => (
                       <tr key={index}>
                         {/*Tạo 1 dòng trong bảng cho mỗi sự kiện (mỗi incident).*/}
                         <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
-                        {/*ngày sự kiện*/}
                         <td>{incident.time}</td>
-                        {/*Thời gian diễn ra sự kiện*/}
                         <td>{incident.location || "-"}</td>
-                        {/*nơi diễn ra*/}
                         <td>{incident.trigger}</td>
-                        {/*nguyên nhân*/}
                         <td>{incident.satisfaction}/10</td>
-                        {/* mức độ hài lòng*/}
                         <td>{incident.notes}</td>
-                        {/*ghi chú*/}
                       </tr>
                     )
                   )}
@@ -722,13 +676,12 @@ const Tracking = () => {
             >
               <div style={{ display: "flex", alignItems: "center" }}>
                 <Radio.Group
-                  value={activityType} //Liên kết trạng thái hiện tại (activityType) với nhóm radio.
-                  onChange={(e) => setActivityType(e.target.value)} //Cập nhật trạng thái khi người dùng thay đổi lựa chọn.
+                  value={activityType} 
+                  onChange={(e) => setActivityType(e.target.value)} 
                   className="activity-type"
                   style={{ marginRight: "15px" }}
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
-                  {/*2 sự lựa chọn*/}
                   <Radio.Button value="craving">Craving Incidents</Radio.Button>
                 </Radio.Group>
                 <h3 style={{ margin: 0 }}>Most Common Triggers</h3>
@@ -753,13 +706,11 @@ const Tracking = () => {
                   {triggersData.map(
                     (
                       trigger,
-                      index // Duyệt qua mảng triggersData để vẽ từng thanh trigger
+                      index 
                     ) => (
                       <div key={index} className="trigger-bar-group">
                         <span className="trigger-label">{trigger.label}</span>
-                        {/*Nhãn trigger (ví dụ: Stress, Habit, ... ) */}
                         <div
-                          // Thanh thể hiện độ dài tỉ lệ theo số lượng trigger
                           className="trigger-bar"
                           style={{
                             width: `${
@@ -784,7 +735,6 @@ const Tracking = () => {
                 </div>
                 <p>
                   Chart shows the most common triggers leading to{" "}
-                  {/* Nếu activityType là "smoking" thì hiển thị "smoking", ngược lại hiển thị "craving" */}
                   {activityType === "smoking" ? "smoking" : "craving"}
                 </p>
               </>

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react"; // Hook để lưu trạng thái (state) và chạy code khi component render
-import { Card, Row, Col, message, Divider, Tag, Segmented } from "antd"; // Ant Design UI components
-import { Line } from "@ant-design/charts"; // Thư viện vẽ biểu đồ dạng đường
-import { Link, Navigate } from "react-router-dom"; // Điều hướng trang
-import { ArrowUpOutlined, DollarCircleOutlined, FireOutlined, FlagOutlined } from "@ant-design/icons"; // Icon từ Ant
-import { Client } from "@stomp/stompjs"; // Thư viện STOMP để dùng WebSocket
-import SockJS from "sockjs-client"; // Client hỗ trợ kết nối WebSocket
+import { useState, useEffect } from "react"; 
+import { Card, Row, Col, message, Divider, Tag, Segmented } from "antd"; 
+import { Line } from "@ant-design/charts"; 
+import { Link, Navigate } from "react-router-dom"; 
+import { ArrowUpOutlined, DollarCircleOutlined, FireOutlined, FlagOutlined } from "@ant-design/icons"; 
+import { Client } from "@stomp/stompjs"; 
+import SockJS from "sockjs-client"; 
 import EmptyDashboard from "../components/EmptyDashboard";
 
 const DashboardPage = () => {
@@ -17,7 +17,6 @@ const DashboardPage = () => {
   // Lưu loại biểu đồ đang chọn ("cigarettes" hoặc "averageCravingSatisfaction")
   const [chartMetric, setChartMetric] = useState("cigarettes");
 
-  // Cờ loading để hiển thị trạng thái đang tải
   const [loading, setLoading] = useState(true);
 
   // Lấy userId từ localStorage (đã lưu khi đăng nhập)
@@ -25,9 +24,7 @@ const DashboardPage = () => {
   const userObj = userStr ? JSON.parse(userStr) : null;
   const userId = userObj ? userObj.id : null;
 
-  // useEffect sẽ chạy khi component được render lần đầu
   useEffect(() => {
-    // Nếu không có userId (hoặc userId không hợp lệ) thì hiện lỗi và ngưng xử lý
     if (!userId || isNaN(userId)) {
       console.error("Invalid or missing user ID:", userId);
       message.error("Invalid user ID. Please provide a valid user ID.");
@@ -35,7 +32,6 @@ const DashboardPage = () => {
       return;
     }
 
-    // Hàm bất đồng bộ để lấy dữ liệu từ server
     const fetchData = async () => {
       setLoading(true); // bật loading
       try {
@@ -119,7 +115,7 @@ const DashboardPage = () => {
 
     // Cleanup: khi rời khỏi trang thì đóng kết nối WebSocket
     return () => client.deactivate();
-  }, [userId]); // useEffect sẽ chạy lại nếu userId thay đổi
+  }, [userId]); 
 
   // Cấu hình cho biểu đồ mức độ thèm thuốc trung bình mỗi ngày
   const satisfactionChartConfig = {
@@ -217,12 +213,6 @@ const DashboardPage = () => {
   if (!dashboardData) {
     return <EmptyDashboard onRetry={() => window.location.reload()} />;
   }
-
-  // Phần dưới là giao diện render (JSX) - không cần comment lại toàn bộ vì đã khá rõ
-  // Nếu bạn muốn mình giải thích chi tiết phần render HTML/JSX thì mình có thể tiếp tục
-
-
-
   return (
     <div className="Dashboard-Backgroup">
       <h2 style={{ color: "#262626", marginBottom: "5px", fontWeight: "bold", fontSize: "24px" }}>

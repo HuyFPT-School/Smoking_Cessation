@@ -1,24 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
-  AppBar, // Thanh điều hướng chính ở trên cùng
-  Toolbar, // Container bên trong AppBar để bố trí các thành phần
-  Typography, // Component văn bản với các kiểu dáng khác nhau
-  Box, // Component container đa năng (tương tự div nhưng có thêm styling)
-  Button, // Nút bấm tiêu chuẩn
-  IconButton, // Nút bấm dạng biểu tượng, thường nhỏ và tròn
-  Avatar, // Hiển thị ảnh đại diện người dùng
-  Menu, // Menu dropdown
-  MenuItem, // Mục trong menu dropdown
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Box, 
+  Button, 
+  IconButton, 
+  Avatar, 
+  Menu, 
+  MenuItem, 
   Drawer, // Panel trượt từ cạnh màn hình (dùng cho menu mobile)
-  List, // Danh sách các mục
-  ListItem, // Mục trong danh sách
-  ListItemText, // Văn bản trong mục danh sách
+  List, 
+  ListItem, 
+  ListItemText, 
   useMediaQuery, // Hook để kiểm tra kích thước màn hình
-  useTheme, // Hook để truy cập theme MUI
+  useTheme, 
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
-// Import context xác thực người dùng
 import { AuthContext } from "../context/AuthContext";
 
 const Header = () => {
@@ -26,21 +25,19 @@ const Header = () => {
   const { user, setUser } = useContext(AuthContext);
   // State lưu phần tử anchor cho menu dropdown (vị trí hiển thị menu)
   const [anchorEl, setAnchorEl] = useState(null);
-  // Hook điều hướng của react-router
+
   const navigate = useNavigate();
   // Lấy theme của MUI để sử dụng trong useMediaQuery
   const theme = useTheme();
   // Kiểm tra xem màn hình có phải là kích thước di động không (nhỏ hơn breakpoint medium)
   // Nếu isMobile = true: đang xem trên điện thoại, false: đang xem trên máy tính
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  // State để điều khiển trạng thái đóng/mở của menu di động
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
 
-  // Handle opening the profile menu
   const handleMenuOpen = (event) => {
-    // Ngăn sự kiện lan truyền (bubbling) lên các phần tử cha
     // Điều này giúp tránh việc menu tự động đóng ngay khi mở do sự kiện click
     event.stopPropagation();
     // Lưu phần tử được click (avatar) làm điểm neo để hiển thị menu
@@ -53,7 +50,6 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  // Toggle the mobile navigation drawer
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -62,7 +58,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-    setMobileMenuOpen(false); // Đóng menu di động khi đăng xuất
+    setMobileMenuOpen(false); 
     navigate("/login");
   };
 
@@ -77,10 +73,8 @@ const Header = () => {
 
   // Hook useEffect để xử lý sự kiện click ra ngoài menu profile
   useEffect(() => {
-    // Hàm xử lý khi người dùng click vào bất kỳ vị trí nào trên trang
     const handleClickOutside = (event) => {
       if (anchorEl && !anchorEl.contains(event.target)) {
-        // Đóng menu bằng cách đặt anchorEl về null
         setAnchorEl(null);
       }
     };
@@ -110,7 +104,7 @@ const Header = () => {
           }}
         >
           <IconButton
-            disableRipple //Tắt hiệu ứng gợn sóng khi nhấp vào nút
+            disableRipple 
             component={RouterLink}
             to="/"
             sx={{ mr: 1 }}
@@ -137,7 +131,6 @@ const Header = () => {
               color: "black",
             }}
           >
-            {/* MuiLink: Component liên kết của MUI */}
             <MuiLink
               component={RouterLink} // Sử dụng RouterLink để điều hướng nội bộ
               to="/"
@@ -159,7 +152,7 @@ const Header = () => {
             {navLinks.map((item) => (
               <MuiLink
                 key={item.label} // Key là bắt buộc khi render danh sách trong React
-                component={RouterLink} // Sử dụng RouterLink để điều hướng nội bộ
+                component={RouterLink} 
                 to={item.path}
                 underline="none"
                 color="text.primary"
@@ -216,7 +209,7 @@ const Header = () => {
                   width: 36,
                   height: 36,
                   cursor: "pointer",
-                  ml: isMobile ? 0 : 18, // Margin-left: 0px trên mobile, 18 * 8px = 144px trên desktop
+                  ml: isMobile ? 0 : 18, 
                 }}
                 onClick={handleMenuOpen}
               />
@@ -246,7 +239,6 @@ const Header = () => {
                 >
                   Profile
                 </MenuItem>
-                {/* Hiển thị tùy chọn Quản trị chỉ khi người dùng có vai trò ADMIN */}
                 {user.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => {
@@ -277,8 +269,8 @@ const Header = () => {
               {!isMobile && (
                 <>
                   <Button
-                    variant="outlined" // Kiểu nút có viền, không có nền
-                    color="success" // Màu xanh lá (màu thành công)
+                    variant="outlined" 
+                    color="success" 
                   >
                     <MuiLink
                       component={RouterLink}
@@ -291,8 +283,8 @@ const Header = () => {
                     </MuiLink>
                   </Button>
                   <Button
-                    variant="contained" // Kiểu nút có nền màu đậm
-                    color="success" // Màu xanh lá (màu thành công)
+                    variant="contained" 
+                    color="success" 
                   >
                     <MuiLink
                       component={RouterLink}
@@ -313,7 +305,7 @@ const Header = () => {
 
       {/* Menu trượt cho điện thoại di động - Hiển thị từ bên trái màn hình khi mobileMenuOpen = true */}
       <Drawer
-        anchor="left" // Hiển thị từ cạnh trái màn hình
+        anchor="left" 
         open={mobileMenuOpen}
         onClose={handleMobileMenuToggle}
       >
@@ -321,11 +313,10 @@ const Header = () => {
           sx={{ width: 250 }}
           role="presentation" // Thuộc tính ARIA cho trình đọc màn hình, chỉ ra đây là phần trình bày
           onClick={handleMobileMenuToggle}
-          onKeyDown={handleMobileMenuToggle} // Đóng menu khi nhấn phím (như Esc)
+          onKeyDown={handleMobileMenuToggle} 
         >
           {/* Danh sách các liên kết điều hướng trên mobile */}
           <List sx={{ pt: 2 }}>
-            {/* 👉 Chỉ hiển thị navLinks nếu KHÔNG phải ADMIN hoặc SUPER_ADMIN */}
             {user &&
               user.role !== "ADMIN" &&
               user.role !== "SUPER_ADMIN" &&
@@ -345,7 +336,6 @@ const Header = () => {
                     },
                   }}
                 >
-                  {/* Text hiển thị tên của liên kết */}
                   <ListItemText
                     primary={item.label}
                     sx={{

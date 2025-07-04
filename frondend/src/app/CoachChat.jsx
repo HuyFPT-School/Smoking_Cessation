@@ -26,7 +26,7 @@ const CoachChat = () => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   };
 
-  // ✅ THÊM: Function để load lịch sử chat
+  // Function để load lịch sử chat
   const loadChatHistory = async () => {
     setIsLoadingHistory(true);
     try {
@@ -38,7 +38,6 @@ const CoachChat = () => {
       const history = response.data;
 
       if (history && history.length > 0) {
-        // Convert backend format to frontend format
         const formattedMessages = history.map((msg) => ({
           from: msg.senderType === "USER" ? "user" : "coach",
           text: msg.message,
@@ -80,7 +79,7 @@ const CoachChat = () => {
     }
   };
 
-  // ✅ THÊM: Load lịch sử khi component mount
+  // Load lịch sử khi component mount
   useEffect(() => {
     loadChatHistory();
   }, [userId]);
@@ -113,7 +112,6 @@ const CoachChat = () => {
     setInput("");
     setIsLoading(true);
     try {
-      // ✅ CHUYỂN: Từ fetch sang axios
       const response = await axios.post(
         "http://localhost:8080/api/ai-coach/chat",
         {
@@ -124,11 +122,7 @@ const CoachChat = () => {
           timeout: 30000, // 30 seconds timeout
         }
       );
-
-      // ✅ SỬA: Axios tự động parse JSON, không cần .json()
       const data = response.data;
-
-      // ✅ THÊM: Kiểm tra response data
       if (!data || !data.response) {
         throw new Error("Empty response from server");
       }
@@ -150,8 +144,6 @@ const CoachChat = () => {
       }, 1000);
     } catch (error) {
       console.error("Error calling AI API:", error);
-
-      // ✅ CẢI THIỆN: Axios error handling tốt hơn
       let fallbackMessage =
         "Sorry, I'm experiencing technical difficulties. But I believe you can overcome this challenge! 💪";
 
