@@ -5,6 +5,7 @@ import { Link, Navigate } from "react-router-dom"; // Điều hướng trang
 import { ArrowUpOutlined, DollarCircleOutlined, FireOutlined, FlagOutlined } from "@ant-design/icons"; // Icon từ Ant
 import { Client } from "@stomp/stompjs"; // Thư viện STOMP để dùng WebSocket
 import SockJS from "sockjs-client"; // Client hỗ trợ kết nối WebSocket
+import EmptyDashboard from "../components/EmptyDashboard";
 
 const DashboardPage = () => {
   // useState để lưu trữ dữ liệu dashboard lấy từ backend
@@ -213,7 +214,9 @@ const DashboardPage = () => {
   if (loading) return <div>Loading...</div>;
 
   // Nếu không có dữ liệu dashboard (null) thì hiển thị thông báo
-  if (!dashboardData) return <div>No data available.</div>;
+  if (!dashboardData) {
+    return <EmptyDashboard onRetry={() => window.location.reload()} />;
+  }
 
   // Phần dưới là giao diện render (JSX) - không cần comment lại toàn bộ vì đã khá rõ
   // Nếu bạn muốn mình giải thích chi tiết phần render HTML/JSX thì mình có thể tiếp tục
