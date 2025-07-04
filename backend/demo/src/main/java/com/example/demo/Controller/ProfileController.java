@@ -29,8 +29,8 @@ public class ProfileController {
     public ResponseEntity<?> getProfileByUserId(@PathVariable String userId) {
         try {
             // 1. CHUYỂN ĐỔI VÀ KIỂM TRA USERID
-            // Chuyển đổi userId từ String sang int. Nếu userId là null thì gán bằng 0
-            int id = userId != null ? Integer.parseInt(userId) : 0;
+            // Chuyển đổi userId từ String sang Integer.
+            Integer id = Integer.parseInt(userId);
             
             // 2. TÌM KIẾM HỒ SƠ TRONG DATABASE
             // Sử dụng UserProfileRepo để tìm hồ sơ của người dùng này

@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "dashboard")
@@ -68,8 +67,4 @@ public class Dashboard {
     void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
-    // Getter/Setter
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

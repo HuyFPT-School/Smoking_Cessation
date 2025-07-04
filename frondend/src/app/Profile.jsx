@@ -229,7 +229,7 @@ const UserProfile = () => {
 
       const profileData = {
         ...values, // giữ lại những trường cũ mà ng dùng đã nhập trong form
-        userId: userId.toString(), // thêm userid và chuyển sang chuỗi
+        userId: parseInt(userId) || userId, // thêm userid 
       };
 
       const response = await axios.post(
