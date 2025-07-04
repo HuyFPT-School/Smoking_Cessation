@@ -131,7 +131,7 @@ public class AdminUserService {
                 .orElse("");
 
         // Tính số ngày không hút thuốc từ Plan (nếu có)
-        long daysSmokeFree = planRepo.findByUserId(String.valueOf(user.getId()))
+        long daysSmokeFree = planRepo.findByUserId(user.getId())
                 .map(calculatorUtils::calculateDaysSmokeFree)
                 .orElse(0L);
 

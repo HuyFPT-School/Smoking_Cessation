@@ -236,7 +236,7 @@ public class LeaderboardService {
     private LocalDate determineStartDate(User user) {
         try {
             // Mức ưu tiên 1: Tìm Plan và lấy quitDate
-            Optional<Plan> planOpt = planRepo.findByUserId(String.valueOf(user.getId()));
+            Optional<Plan> planOpt = planRepo.findByUserId(user.getId());
             if (planOpt.isPresent() && planOpt.get().getQuitDate() != null) {
                 return planOpt.get().getQuitDate();
             }

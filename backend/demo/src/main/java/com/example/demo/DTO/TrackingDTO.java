@@ -13,5 +13,5 @@ public class TrackingDTO {
     private int satisfaction;
     private String type; // "smoking"
     private String notes;
-    private String userId; // To link with the User
+    private Integer userId; // To link with the User
 }

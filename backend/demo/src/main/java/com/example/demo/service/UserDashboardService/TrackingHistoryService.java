@@ -28,7 +28,7 @@ public class TrackingHistoryService {
     private final TrackingRepo trackingRepo;
 
     public ResponseEntity<List<Map<String, Object>>> getHistory(Integer userId) {
-        Optional<Plan> planOpt = planRepo.findByUserId(String.valueOf(userId));
+        Optional<Plan> planOpt = planRepo.findByUserId(userId);
         if (planOpt.isEmpty()) {
             logger.warn("Plan not found for userId: {}", userId);
             return ResponseEntity.notFound().build();

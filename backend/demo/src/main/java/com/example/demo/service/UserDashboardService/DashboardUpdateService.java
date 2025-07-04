@@ -38,7 +38,7 @@ public class DashboardUpdateService {
         if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
 
         //➡️ Tìm Plan xem có tồn tai chưa
-        Optional<Plan> planOpt = planRepo.findByUserId(String.valueOf(userId));
+        Optional<Plan> planOpt = planRepo.findByUserId(userId);
         if (planOpt.isEmpty()) return ResponseEntity.notFound().build();
 
 
@@ -85,7 +85,7 @@ public class DashboardUpdateService {
 
         //Tìm Plan tương ứng với userId
         //Nếu không có Plan (người dùng chưa thiết lập kế hoạch cai thuốc) → kết thúc luôn
-        Optional<Plan> planOpt = planRepo.findByUserId(String.valueOf(userId));
+        Optional<Plan> planOpt = planRepo.findByUserId(userId);
         if (planOpt.isEmpty()) return;
 
 
