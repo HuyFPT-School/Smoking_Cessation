@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"; // Thêm useEffect
+import React, { useState, useEffect } from "react"; 
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
-import axios from "axios"; // Thêm axios
+import axios from "axios"; 
 
 import {
   Row,
@@ -15,7 +15,7 @@ import {
   Form,
   Radio,
 } from "antd";
-import { Line } from "react-chartjs-2"; // Import Line chart từ react-chartjs-2 để hiển thị biểu đồ
+import { Line } from "react-chartjs-2"; 
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -25,21 +25,21 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js"; // Import các thành phần cần thiết để cấu hình Chart.js
+} from "chart.js"; 
 import "../index.css";
 import { Select } from "antd";
 import {
   DeleteOutlined,
   PushpinOutlined,
   GiftOutlined,
-  CalendarOutlined, // Added
-  AimOutlined, // Added
-  AuditOutlined, // Added for cigarettes
-  WarningOutlined, // Added for triggers/info
-  SolutionOutlined, // Added for coping strategies/approved
-  TeamOutlined, // Added for support network
-  ReadOutlined, // Added for notes
-  CheckCircleOutlined, // Added for step title
+  CalendarOutlined,
+  AimOutlined,
+  AuditOutlined,
+  WarningOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+  ReadOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 const { Option } = Select;
 
@@ -59,37 +59,24 @@ ChartJS.register(
 
 // Component chính để tạo kế hoạch cai thuốc lá
 const Plan = () => {
-  // State để theo dõi bước hiện tại trong quy trình tạo kế hoạch
-  const [currentStep, setCurrentStep] = useState(1); // State để lưu ngày cai thuốc được chọn, mặc định là ngày hiện tại
+  const [currentStep, setCurrentStep] = useState(1); 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  // State để lưu phương pháp cai thuốc (Cold Turkey, Gradual reduction, v.v.)
   const [quitMethod, setQuitMethod] = useState("");
-  // State để lưu số lượng điếu thuốc hút mỗi ngày
   const [cigarettesPerDay, setCigarettesPerDay] = useState(20);
-  // State để lưu các yếu tố kích hoạt hút thuốc
   const [triggers, setTriggers] = useState([]);
-  // State để lưu các chiến lược đối phó với cơn thèm thuốc
   const [copingStrategies, setCopingStrategies] = useState([]);
-  // State để lưu mạng lưới hỗ trợ (gia đình, bạn bè, v.v.)
   const [supportNetwork, setSupportNetwork] = useState([]);
-  // State để lưu ghi chú bổ sung cho bước 4
   const [additionalNotes, setAdditionalNotes] = useState("");
-  // State để lưu danh sách phần thưởng khi đạt mốc quan trọng
   const [rewards, setRewards] = useState([]);
-  // State để kiểm soát hiển thị modal thêm phần thưởng
   const [isModalVisible, setIsModalVisible] = useState(false);
-  // Khởi tạo instance Form của Ant Design để quản lý form trong modal
   const [form] = Form.useForm();
-  // State để hiển thị thông báo khi thêm phần thưởng thành công
   const [showNotification, setShowNotification] = useState(false);
-  // State để hiển thị thông báo khi hoàn thành kế hoạch
   const [showCompleteNotification, setShowCompleteNotification] =
     useState(false);
 
-  // Function to handle deleting a reward
+
   const handleDeleteReward = (indexToDelete) => {
     // nhận vào 1 index của phần thưởng bạn muốn xóa
-    //Hàm cập nhật rewards
     setRewards(
       (
         prevRewards //	Callback nhận state cũ và trả về state mới, luôn trả về giá trị mới nhất của state
@@ -113,11 +100,11 @@ const Plan = () => {
       if (!userId) return;
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/plans/user/${userId}` // Điều chỉnh API endpoint
+          `http://localhost:8080/api/plans/user/${userId}` 
         );
         if (response.status === 200 && response.data) {
           const plan = response.data;
-          setSelectedDate(new Date(plan.quitDate)); // lấy data từ backend và gán dữ liệu vào các state
+          setSelectedDate(new Date(plan.quitDate)); 
           setQuitMethod(plan.quitMethod);
           setCigarettesPerDay(plan.cigarettesPerDay);
           setTriggers(plan.triggers || []);
@@ -126,18 +113,17 @@ const Plan = () => {
           setAdditionalNotes(plan.additionalNotes || "");
           setRewards(plan.rewards || []);
 
-          setCurrentStep(5); // đưa ng dùng đến bước xem lại kế hoạch
+          setCurrentStep(5); 
         }
       } catch (error) {
         console.error("Error fetching plan data:", error);
-        // Xử lý trường hợp không có kế hoạch hoặc lỗi
       }
     };
 
     fetchPlanData();
   }, [userId]);
 
-  // Tạo lịch cho tháng 5 năm 2025
+
   for (let i = 0; i < 35; i++) {
     // tại mỗi ô lặp tạo 1 date đại diện cho từng ô ngày
     const date = new Date(currentDate); //Tạo một bản sao của currentDaten tránh sửa trực tiếp của currentDate
@@ -175,20 +161,17 @@ const Plan = () => {
     "On the phone",
   ];
 
-  // Chia danh sách yếu tố kích hoạt thành hai cột để hiển thị
   const half = Math.ceil(smokingTriggers.length / 2);
-  const leftColumnTriggers = smokingTriggers.slice(0, half); // hiển thị bên trái
-  const rightColumnTriggers = smokingTriggers.slice(half); // hiển thị bên phải
+  const leftColumnTriggers = smokingTriggers.slice(0, half); 
+  const rightColumnTriggers = smokingTriggers.slice(half); 
 
   // Hàm xử lý khi chọn hoặc bỏ chọn yếu tố kích hoạt
   const handleTriggerChange = (trigger) => {
     // hàm nhận vào trigger
     if (triggers.includes(trigger)) {
-      // trigger đã tồn tại trong danh sách (đã chọn)
-      setTriggers(triggers.filter((t) => t !== trigger)); //xóa nó ra khỏi mảng (bỏ chọn)
+      setTriggers(triggers.filter((t) => t !== trigger)); 
     } else {
-      //setTriggers(...) để cập nhật state.
-      setTriggers([...triggers, trigger]); //Thêm trigger vào mảng
+      setTriggers([...triggers, trigger]); 
     }
   };
 
@@ -206,20 +189,16 @@ const Plan = () => {
     "Play games",
   ];
 
-  // Chia danh sách chiến lược đối phó thành hai cột
   const halfCoping = Math.ceil(copingStrategiesList.length / 2);
-  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping); //cột trái
-  const rightCopingStrategies = copingStrategiesList.slice(halfCoping); // cột phải
+  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping); 
+  const rightCopingStrategies = copingStrategiesList.slice(halfCoping); 
 
   // Hàm xử lý khi chọn hoặc bỏ chọn chiến lược đối phó
   const handleCopingStrategyChange = (strategy) => {
-    // hàm nhận vào strategy
     if (copingStrategies.includes(strategy)) {
-      // strategy đã tồn tại trong danh sách (đã chọn)
-      setCopingStrategies(copingStrategies.filter((s) => s !== strategy)); //xóa nó ra khỏi mảng (bỏ chọn)
+      setCopingStrategies(copingStrategies.filter((s) => s !== strategy)); 
     } else {
-      //setCopingStrategies(...) để cập nhật state.
-      setCopingStrategies([...copingStrategies, strategy]); //Thêm strategy vào mảng
+      setCopingStrategies([...copingStrategies, strategy]); 
     }
   };
 
@@ -258,19 +237,18 @@ const Plan = () => {
     setIsModalVisible(true); // khi isModalVisible là true thì giao diện add reward sẽ hiện
   };
 
-  // Hàm  xác nhận thêm phần thưởng trong modal khi nhấn add reward
+  // Hàm xác nhận thêm phần thưởng trong modal khi nhấn add reward
   const handleModalOk = () => {
     form
       .validateFields() // check xem các ô nhập có hợp lệ ko, Trả về Promise chứa values nếu hợp lệ
       .then((values) => {
         setRewards([
-          // Thêm phần thưởng mới vào danh sách
-          ...rewards, // copy mảng cũ
+          ...rewards, 
           { milestone: values.milestone, reward: values.reward },
         ]);
-        setIsModalVisible(false); // Đóng modal
-        form.resetFields(); // Xóa dữ liệu form
-        setShowNotification(true); // Hiển thị thông báo thành công
+        setIsModalVisible(false); 
+        form.resetFields(); 
+        setShowNotification(true); 
         setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
       })
       .catch((info) => {
@@ -278,24 +256,19 @@ const Plan = () => {
       });
   };
 
-  // Hàm xử lý khi hủy modal
   const handleModalCancel = () => {
-    setIsModalVisible(false); // ẩn modal
+    setIsModalVisible(false); 
     form.resetFields(); // xóa dữ liệu trong form
   };
 
-  // Khi người dùng nhấn nút "Complete" để hoàn tất kế hoạch cai thuốc, hàm này sẽ được gọi để gửi kế hoạch lên backend.
   const handleComplete = async () => {
-    // Thêm async
     if (!userId) {
       console.error("User ID not found in localStorage");
-      // Optionally, display a message to the user
       return;
     }
-    //Tạo planData chứa all kế hoạch cai thuốc, để gửi lên backend
     const planData = {
       userId,
-      quitDate: selectedDate.toISOString().split("T")[0], // Format YYYY-MM-DD
+      quitDate: selectedDate.toISOString().split("T")[0], 
       quitMethod,
       cigarettesPerDay,
       triggers,
@@ -306,8 +279,7 @@ const Plan = () => {
     };
 
     try {
-      // Kiểm tra xem đã có kế hoạch cho userId này chưa
-      let existingPlan = null; // biến lưu kế hoạch hiện tại của user
+      let existingPlan = null; 
       try {
         const checkResponse = await axios.get(
           `http://localhost:8080/api/plans/user/${userId}`
@@ -316,10 +288,8 @@ const Plan = () => {
           existingPlan = checkResponse.data; // if phản hồi 200 và có data thì gán kế hoạch hiện có cho existingPlan
         }
       } catch (error) {
-        // Không tìm thấy kế hoạch, không sao cả, sẽ tạo mới
         if (error.response && error.response.status !== 404) {
           console.error("Error checking for existing plan:", error);
-          // Xử lý lỗi khác 404 nếu cần
         }
       }
 
@@ -327,7 +297,7 @@ const Plan = () => {
       if (existingPlan && existingPlan.id) {
         // Nếu có kế hoạch, cập nhật (PUT)
         response = await axios.put(
-          `http://localhost:8080/api/plans/${existingPlan.id}`, // Giả sử API cập nhật theo planId
+          `http://localhost:8080/api/plans/${existingPlan.id}`, 
           planData
         );
       } else {
@@ -339,16 +309,14 @@ const Plan = () => {
       }
 
       if (response.status === 200 || response.status === 201) {
-        setShowCompleteNotification(true); // Hiển thị thông báo hoàn thành
+        setShowCompleteNotification(true); 
         setTimeout(() => setShowCompleteNotification(false), 3000); // Ẩn sau 3 giây
         console.log("Plan saved successfully:", response.data);
       } else {
         console.error("Failed to save plan:", response.status, response.data);
-        // Optionally, display an error message to the user
       }
     } catch (error) {
       console.error("Error saving plan:", error);
-      // Optionally, display an error message to the user
     }
   };
   // Tính dữ liệu cho biểu đồ dựa trên phương pháp cai thuốc
@@ -521,17 +489,13 @@ const Plan = () => {
       className="plan-tracking-container"
       style={{ backgroundColor: "#F9FAFB" }}
     >
-      {/* Tiêu đề và phụ đề của kế hoạch */}
       <Text className="plan-plan-title">Create a Quit Plan</Text>
       <Text className="plan-plan-subtitle">
         Create a personalized quit plan to increase your chances of success
       </Text>
-      {/* Thanh tiến trình hiển thị các bước */}
       <div className="plan-progress-bar">
-        {/* Hiển thị các bước với trạng thái active hoặc completed */}
         <div
           className={`plan-step ${
-            // nếu ở bc 1 thì active , qua 1 thì complete, nếu chưa tới bc n ko có class j thêm
             currentStep === 1 ? "active" : currentStep > 1 ? "completed" : ""
           }`}
         >
@@ -604,7 +568,6 @@ const Plan = () => {
             <span className="plan-quit-method-title">Quit method</span>
             <Radio.Group
               value={quitMethod}
-              // user chọn pp cai mới , lấy giá trị đó truyền vào hàm xử lí để cập nhật state
               onChange={(e) => handleQuitMethodChange(e.target.value)}
             >
               <div className="plan-option-wrapper">
@@ -663,7 +626,7 @@ const Plan = () => {
               type="primary"
               className="plan-nav-button"
               style={{ backgroundColor: "black", borderColor: "#16A34A" }}
-              onClick={() => setCurrentStep(2)} // user click -> setCurrentStep thành 2
+              onClick={() => setCurrentStep(2)} 
             >
               Next
             </Button>
@@ -685,7 +648,7 @@ const Plan = () => {
             <InputNumber
               min={0}
               value={cigarettesPerDay}
-              onChange={(value) => setCigarettesPerDay(value)} // khi user thay đổi số điếu nhập , cập nhật state
+              onChange={(value) => setCigarettesPerDay(value)} 
               className="plan-custom-input"
             />
           </div>
@@ -697,12 +660,12 @@ const Plan = () => {
                 {leftColumnTriggers.map(
                   (
                     trigger,
-                    index // Lặp qua mảng các trigger ở cột bên trái
+                    index 
                   ) => (
                     <div key={index} className="plan-option-wrapper">
                       <Checkbox
-                        checked={triggers.includes(trigger)} // 	Nếu trigger đang được chọn, đánh dấu checkbox.
-                        onChange={() => handleTriggerChange(trigger)} // 	Khi user tick/bỏ tick, gọi hàm handleTriggerChange(trigger).
+                        checked={triggers.includes(trigger)} 
+                        onChange={() => handleTriggerChange(trigger)} 
                       >
                         {trigger}
                       </Checkbox>
@@ -718,8 +681,8 @@ const Plan = () => {
                   ) => (
                     <div key={index} className="plan-option-wrapper">
                       <Checkbox
-                        checked={triggers.includes(trigger)} // 	Nếu trigger đang được chọn, đánh dấu checkbox.
-                        onChange={() => handleTriggerChange(trigger)} // 	Khi user tick/bỏ tick, gọi hàm handleTriggerChange(trigger).
+                        checked={triggers.includes(trigger)} 
+                        onChange={() => handleTriggerChange(trigger)} 
                       >
                         {trigger}
                       </Checkbox>
@@ -775,13 +738,11 @@ const Plan = () => {
                 {leftCopingStrategies.map(
                   (
                     strategy,
-                    index // lặp qua các strategy bên trái
+                    index 
                   ) => (
                     <div key={index} className="plan-option-wrapper">
                       <Checkbox
-                        //Nếu strategy đã có trong danh sách copingStrategies, thì checkbox sẽ được đánh dấu (ticked).
                         checked={copingStrategies.includes(strategy)}
-                        //Khi người dùng tick hoặc bỏ tick checkbox, gọi hàm handleCopingStrategyChange(strategy) để cập nhật danh sách copingStrategies.
                         onChange={() => handleCopingStrategyChange(strategy)}
                       >
                         {strategy}
@@ -794,9 +755,7 @@ const Plan = () => {
                 {rightCopingStrategies.map((strategy, index) => (
                   <div key={index} className="plan-option-wrapper">
                     <Checkbox
-                      //Nếu strategy đã có trong danh sách copingStrategies, thì checkbox sẽ được đánh dấu (ticked).
                       checked={copingStrategies.includes(strategy)}
-                      //Khi người dùng tick hoặc bỏ tick checkbox, gọi hàm handleCopingStrategyChange(strategy) để cập nhật danh sách copingStrategies.
                       onChange={() => handleCopingStrategyChange(strategy)}
                     >
                       {strategy}
@@ -814,10 +773,10 @@ const Plan = () => {
                 {leftSupportNetwork.map((support, index) => (
                   <div key={index} className="plan-option-wrapper">
                     <Checkbox
-                      checked={supportNetwork.includes(support)} // Checkbox được tick nếu đã chọn
-                      onChange={() => handleSupportNetworkChange(support)} // Thay đổi khi click
+                      checked={supportNetwork.includes(support)} 
+                      onChange={() => handleSupportNetworkChange(support)} 
                     >
-                      {support} {/* Hiển thị tên nguồn hỗ trợ*/}
+                      {support}
                     </Checkbox>
                   </div>
                 ))}
@@ -826,10 +785,10 @@ const Plan = () => {
                 {rightSupportNetwork.map((support, index) => (
                   <div key={index} className="plan-option-wrapper">
                     <Checkbox
-                      checked={supportNetwork.includes(support)} // Checkbox được tick nếu đã chọn
-                      onChange={() => handleSupportNetworkChange(support)} // Thay đổi khi click
+                      checked={supportNetwork.includes(support)} 
+                      onChange={() => handleSupportNetworkChange(support)} 
                     >
-                      {support} {/* Hiển thị tên nguồn hỗ trợ*/}
+                      {support} 
                     </Checkbox>
                   </div>
                 ))}
@@ -876,7 +835,7 @@ const Plan = () => {
           <div className="plan-form-group">
             <Text className="plan-form-label">
               Rewards for important milestones
-            </Text>
+            </Text>{" "}
             <div
               style={{
                 display: "flex",
@@ -887,7 +846,7 @@ const Plan = () => {
               <Button
                 type="primary"
                 className="plan-nav-button"
-                onClick={handleAddReward} // gọi hàm addReward
+                onClick={handleAddReward}
                 style={{
                   backgroundColor: "#F3F4F6",
                   borderColor: "#fff",
@@ -898,8 +857,7 @@ const Plan = () => {
                 Add reward
               </Button>
             </div>
-
-            {showNotification && ( // log ra thông báo thành công
+            {showNotification && (
               <div
                 style={{
                   backgroundColor: "#f6ffed",
@@ -914,62 +872,54 @@ const Plan = () => {
                 ✓ Reward added successfully!
               </div>
             )}
-
-            {rewards.length === 0 ? ( // check người dùng chưa thêm phần thưởng
+            {rewards.length === 0 ? (
               <Text className="plan-form-label" style={{ color: "#666" }}>
                 No rewards added yet. Add rewards to create motivation!
               </Text>
             ) : (
               <div style={{ marginTop: "20px" }}>
                 <Typography.Title level={4}>Your Reward:</Typography.Title>
-                {rewards.map(
-                  (
-                    rewardItem,
-                    index // nếu đã có phần thưởng liệt kê từng rewardItem bằng map()
-                  ) => (
-                    <div
-                      key={index} // Định danh duy nhất	Giúp React phân biệt các phần tử
-                      style={{
-                        padding: "10px",
-                        border: "1px solid #d9d9d9",
-                        borderRadius: "4px",
-                        marginBottom: "10px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div>
-                        <Text strong>
-                          <PushpinOutlined style={{ marginRight: "8px" }} />
-                          Milestone:
-                        </Text>{" "}
-                        {rewardItem.milestone} <br />{" "}
-                        {/*Cột mốc đạt được (VD: 3 ngày không hút thuốc)*/}
-                        <Text strong>
-                          <GiftOutlined style={{ marginRight: "8px" }} />
-                          Reward:
-                        </Text>{" "}
-                        {rewardItem.reward} {/*phần thưởng tương ứng*/}
-                      </div>
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDeleteReward(index)} // gọi hàm xóa phần thưởng
-                        danger
-                        aria-label="Delete reward"
-                      />
+                {rewards.map((rewardItem, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: "10px",
+                      border: "1px solid #d9d9d9",
+                      borderRadius: "4px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div>
+                      <Text strong>
+                        <PushpinOutlined style={{ marginRight: "8px" }} />
+                        Milestone:
+                      </Text>{" "}
+                      {rewardItem.milestone} <br />{" "}
+                      <Text strong>
+                        <GiftOutlined style={{ marginRight: "8px" }} />
+                        Reward:
+                      </Text>{" "}
+                      {rewardItem.reward}
                     </div>
-                  )
-                )}
+                    <Button
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteReward(index)}
+                      danger
+                      aria-label="Delete reward"
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Modal hộp thoại để thêm phần thưởng */}
           <Modal
             title="Add reward"
-            visible={isModalVisible} // Điều kiện hiển thị modal (kiểm soát bởi isModalVisible)
+            visible={isModalVisible}
             onOk={handleModalOk}
             onCancel={handleModalCancel}
             okText="Add"
@@ -977,7 +927,6 @@ const Plan = () => {
           >
             <Form form={form} layout="vertical">
               <Form.Item
-                // Đây là các mốc quan trọng
                 name="milestone"
                 label="Important milestone"
                 rules={[
@@ -1039,8 +988,6 @@ const Plan = () => {
           </div>
 
           <div className="plan-nav-buttons">
-            {" "}
-            {/*back quay lại b3 , next b5*/}
             <Button
               type="default"
               className="plan-nav-button"
@@ -1069,8 +1016,6 @@ const Plan = () => {
       {currentStep === 5 && (
         <div className="plan-container" style={{ padding: "20px" }}>
           <Typography.Title level={2} style={{ textAlign: "center" }}>
-            {" "}
-            {/*  hiển thị Review quit plan*/}
             <CheckCircleOutlined
               style={{ marginRight: "8px", color: "#52c41a" }}
             />
@@ -1086,7 +1031,6 @@ const Plan = () => {
             }}
           >
             <Typography.Paragraph
-              //ngày người dùng chọn để bắt đầu kế hoạch cai thuốc
               style={{ fontSize: "16px", marginBottom: "12px" }}
             >
               <Text style={{ fontSize: "16px" }} strong>
@@ -1100,11 +1044,9 @@ const Plan = () => {
                 Start date:
               </Text>{" "}
               <br />
-              {/*Chuyển selectedDate (kiểu Date) thành định dạng ngày Việt Nam (dd/mm/yyyy)*/}
               {selectedDate.toLocaleDateString("vi-VN")}
             </Typography.Paragraph>
             <Typography.Paragraph
-              // hiển thị phương pháp cai thuốc
               style={{ fontSize: "16px", marginBottom: "12px" }}
             >
               <Text style={{ fontSize: "16px" }} strong>
@@ -1121,7 +1063,6 @@ const Plan = () => {
               {quitMethod || "Chưa chọn"}
             </Typography.Paragraph>
             <Typography.Paragraph
-              // số lượng thuốc lá hút mỗi ngày trc khi cai
               style={{ fontSize: "16px", marginBottom: "12px" }}
             >
               <Text style={{ fontSize: "16px" }} strong>
@@ -1139,7 +1080,7 @@ const Plan = () => {
             </Typography.Paragraph>
 
             <Typography.Title
-              level={4} // tạo tiêu đề cấp độ 4
+              level={4}
               style={{
                 marginTop: "25px",
                 marginBottom: "10px",
@@ -1147,7 +1088,6 @@ const Plan = () => {
               }}
             >
               <WarningOutlined
-                // logo cảnh báo
                 style={{
                   marginRight: "8px",
                   color: "#16A34A",
@@ -1155,8 +1095,7 @@ const Plan = () => {
               />
               Triggers:
             </Typography.Title>
-            {/* hiển thị các tác nhaan hây hút thuốc*/}
-            {triggers.length > 0 ? ( // Nếu có ít nhất 1 trigger được chọn
+            {triggers.length > 0 ? (
               <ul
                 style={{
                   listStyleType: "none",
@@ -1164,27 +1103,22 @@ const Plan = () => {
                   fontSize: "16px",
                 }}
               >
-                {triggers.map(
-                  (
-                    item,
-                    i // dùng map( ) để hiển thị ra các trigger dạng thẻ
-                  ) => (
-                    <li
-                      key={i}
-                      style={{
-                        marginRight: "5px",
-                        padding: "5px 10px",
-                        backgroundColor: "#FEF2F2",
-                        borderRadius: "20px",
-                        border: "1px solid #E4E4E7",
-                        display: "inline",
-                        fontWeight: "200",
-                      }}
-                    >
-                      {item}
-                    </li>
-                  )
-                )}
+                {triggers.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "#FEF2F2",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
               </ul>
             ) : (
               <Text italic> No triggers are selected.</Text>
@@ -1203,36 +1137,30 @@ const Plan = () => {
               />
               Coping strategies:
             </Typography.Title>
-            {copingStrategies.length > 0 ? ( // Nếu có ít nhất 1 chiến lược đối phó
+            {copingStrategies.length > 0 ? (
               <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
-                {copingStrategies.map(
-                  (
-                    item,
-                    i // dùng map để duyệt qua các chiến lược đối phó
-                  ) => (
-                    <li
-                      key={i} // Key duy nhất cho mỗi phần tử trong danh sách
-                      style={{
-                        marginRight: "5px",
-                        padding: "5px 10px",
-                        backgroundColor: "#F0FDF4",
-                        borderRadius: "20px",
-                        border: "1px solid #E4E4E7",
-                        display: "inline",
-                        fontWeight: "200",
-                      }}
-                    >
-                      {item} {/*nội dung chiến lược*/}
-                    </li>
-                  )
-                )}
+                {copingStrategies.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "#F0FDF4",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
               </ul>
             ) : (
               <Text italic> No coping strategy was selected.</Text>
             )}
 
             <Typography.Title
-              // hiển thị danh sách hỗ trợ
               level={4}
               style={{
                 marginTop: "25px",
@@ -1243,36 +1171,30 @@ const Plan = () => {
               <TeamOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
               Support Network:
             </Typography.Title>
-            {supportNetwork.length > 0 ? ( // nếu có ít nhất 1 nền tảng hỗ trợ
+            {supportNetwork.length > 0 ? (
               <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
-                {supportNetwork.map(
-                  (
-                    item,
-                    i // dùng map để duyệt qua các nền tảng hỗ trợ
-                  ) => (
-                    <li
-                      key={i}
-                      style={{
-                        marginRight: "5px",
-                        padding: "5px 10px",
-                        backgroundColor: "rgb(249, 249, 190)",
-                        borderRadius: "20px",
-                        border: "1px solid #E4E4E7",
-                        display: "inline",
-                        fontWeight: "200",
-                      }}
-                    >
-                      {item} {/* danh sách hỗ trợ*/}
-                    </li>
-                  )
-                )}
+                {supportNetwork.map((item, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      marginRight: "5px",
+                      padding: "5px 10px",
+                      backgroundColor: "rgb(249, 249, 190)",
+                      borderRadius: "20px",
+                      border: "1px solid #E4E4E7",
+                      display: "inline",
+                      fontWeight: "200",
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
               </ul>
             ) : (
               <Text italic> No support network selected.</Text>
             )}
 
             <Typography.Title
-              // hiển thị rewward
               level={4}
               style={{
                 marginTop: "25px",
@@ -1283,20 +1205,18 @@ const Plan = () => {
               <GiftOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
               Reward:
             </Typography.Title>
-            {rewards.length > 0 ? ( // nếu có ít nhất 1 phần thưởng
+            {rewards.length > 0 ? (
               rewards.map((rewardItem, index) => (
                 <div
                   key={index}
                   style={{ paddingLeft: "20px", marginBottom: "10px" }}
                 >
                   <Text strong>
-                    {/*mốc quan trọng ng dùng đạt đc*/}
                     <PushpinOutlined style={{ marginRight: "8px" }} />
                     Milestone:
                   </Text>{" "}
                   {rewardItem.milestone} <br />
                   <Text strong>
-                    {/* phần thưởng*/}
                     <GiftOutlined style={{ marginRight: "8px" }} />
                     Reward:
                   </Text>{" "}
@@ -1308,7 +1228,6 @@ const Plan = () => {
             )}
 
             <Typography.Title
-              // ghi chú
               level={4}
               style={{
                 marginTop: "25px",
@@ -1319,14 +1238,10 @@ const Plan = () => {
               <ReadOutlined style={{ marginRight: "8px", color: "#16A34A" }} />
               Notes:
             </Typography.Title>
-            {/*nếu ng dùng có nhập ghi chú gọi additionalNotes, ko thì hện thoong báo ko có ghi chú*/}
             <Text italic>{additionalNotes || "No additional notes"}</Text>
           </div>
 
-          {/* Chart display */}
           <div className="plan-chart-section">
-            {/*Dùng component <Line /> từ thư viện react-chartjs-2 để hiển thị biểu đồ dạng đường (line chart).*/}
-            {/*Dữ liệu được truyền từ chartData, cấu hình từ chartOptions.*/}
             <Line data={chartData} options={chartOptions} />
           </div>
 
@@ -1354,7 +1269,7 @@ const Plan = () => {
               Complete
             </Button>
           </div>
-          {showCompleteNotification && ( // show log thông báo lưu thành công
+          {showCompleteNotification && (
             <div
               style={{
                 backgroundColor: "#f6ffed",
@@ -1372,7 +1287,6 @@ const Plan = () => {
           )}
         </div>
       )}
-      {/* Phần lời khuyên để cai thuốc thành công */}
       <div className="plan-advice-section">
         <Text strong className="plan-advice-title">
           Tips for a successful quit plan
