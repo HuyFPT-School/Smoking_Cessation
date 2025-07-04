@@ -25,7 +25,7 @@ public class UserGrowthService {
      * ✅ Trả về tổng số người dùng có role là USER (bỏ qua ADMIN, SUPER_ADMIN)
      */
     public long countTotalUsers() {
-        return userRepo.countByRole(Role.USER);  // Đếm số dòng trong bảng user có role là USER
+        return userRepo.countByRole(Role.USER);
     }
 
     // ===========================================

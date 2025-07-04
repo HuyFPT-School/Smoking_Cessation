@@ -1,15 +1,5 @@
 package com.example.demo.service.UserDashboardService;
 
-
-// service
-// └── 📁 UserDashboardServce
-//      ├── DashboardService.java            // Quản lý xử lý chính (giao tiếp với controller)
-//      ├── DashboardUpdateService.java      // Xử lý cập nhật dashboard
-//      ├── DashboardMetricsService.java     // Tính toán số liệu (basic, time-based)
-//      ├── MilestoneService.java            // Tính mốc phần thưởng tiếp theo
-//      └── TrackingHistoryService.java      // Trả về lịch sử tracking từng ngày
-
-
 import com.example.demo.DTO.DashboardDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +11,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 
-//Service này dùng để tổng hợp các service khác lại để controller goi
 public class DashboardService {
 
         private final DashboardUpdateService dashboardUpdateService;
