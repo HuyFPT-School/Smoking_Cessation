@@ -16,11 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// ✅ Service phục vụ cho trang quản trị người dùng của ADMIN và SUPER_ADMIN
 @Service
 public class AdminUserService {
 
-    // ==== Inject các repository cần dùng ====
     @Autowired private UserRepo userRepo;
     @Autowired private UserProfileRepo userProfileRepo;
     @Autowired private PlanRepo planRepo;

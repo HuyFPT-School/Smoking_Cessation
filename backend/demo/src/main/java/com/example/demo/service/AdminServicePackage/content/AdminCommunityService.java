@@ -12,12 +12,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-// ✅ Service dùng cho ADMIN / SUPER_ADMIN để quản lý Community (xóa bài viết, bình luận,...)
+
 @Service
 @RequiredArgsConstructor  // Tự động tạo constructor với các final field
 public class AdminCommunityService {
 
-    // ===== Repository cần dùng =====
     private final PostRepo postRepo;
     private final CommentRepo commentRepo;
     private final PostLikeRepo postLikeRepo;

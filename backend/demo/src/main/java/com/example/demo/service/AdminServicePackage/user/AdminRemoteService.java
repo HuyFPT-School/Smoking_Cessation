@@ -13,11 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// ✅ Service xử lý các thao tác từ xa liên quan đến user: promote, demote, delete
+
 @Service
 public class AdminRemoteService {
 
-    // Inject các repository dùng để xóa dữ liệu liên quan
     @Autowired private UserRepo userRepo;
     @Autowired private UserProfileRepo userProfileRepo;
     @Autowired private PlanRepo planRepo;

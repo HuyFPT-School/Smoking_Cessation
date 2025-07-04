@@ -117,6 +117,7 @@ public class DashboardUpdateService {
 
         //➡️ Nếu đã có bản ghi dashboard cho hôm nay → xóa đi để ghi bản mới (tránh trùng), vì khi render lại do update thì dashboard hôm đó đã có rồi ta xóa đi và thêm mới (Update trá hình)
         dashboardRepo.findByUserIdAndRecordedDate(userId, today).ifPresent(dashboardRepo::delete);
+
         //➡️ Lưu dũ liệu mới nhất xuống database
         Dashboard dashboard = dashboardMetricsService.saveDashboard(userId, basic, milestone, timeMetrics);
 

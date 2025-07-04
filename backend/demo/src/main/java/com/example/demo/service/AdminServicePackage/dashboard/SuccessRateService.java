@@ -29,8 +29,8 @@ public class SuccessRateService {
         // Lấy toàn bộ kế hoạch bỏ thuốc
         List<Plan> plans = planRepo.findAll();
 
-        int usersWithRewards = 0;      // Số người dùng có ít nhất 1 phần thưởng trong kế hoạch
-        int usersCompletedAll = 0;     // Số người đã hoàn thành toàn bộ mốc phần thưởng
+        int usersWithRewards = 0;
+        int usersCompletedAll = 0;
 
         // Duyệt qua từng kế hoạch
         for (Plan plan : plans) {
@@ -39,7 +39,7 @@ public class SuccessRateService {
             // Nếu không có reward thì bỏ qua (không tính vào mẫu khảo sát)
             if (rewards == null || rewards.isEmpty()) continue;
 
-            usersWithRewards++;  // Đếm người dùng hợp lệ (có phần thưởng)
+            usersWithRewards++;
 
             // ✅ Tìm mốc thời gian dài nhất trong phần thưởng (ví dụ: "3 months" → 90 ngày)
             long maxRequiredDays = rewards.stream()
@@ -48,16 +48,12 @@ public class SuccessRateService {
 
             // ✅ Tính số ngày người dùng đã không hút thuốc thực tế
             long actualDays = calculatorUtils.calculateDaysSmokeFree(plan);
-
-            // Nếu người dùng vượt qua được mốc reward lớn nhất → tính là thành công
             if (actualDays >= maxRequiredDays) {
                 usersCompletedAll++;
             }
         }
-
-        // ✅ Tính phần trăm thành công, làm tròn đến 1 chữ số thập phân
         return usersWithRewards == 0
-                ? 0  // Tránh chia 0 nếu không có người dùng nào có reward
+                ? 0
                 : Math.round((double) usersCompletedAll / usersWithRewards * 1000) / 10.0;
     }
 
@@ -72,8 +68,8 @@ public class SuccessRateService {
         // Lấy tất cả các kế hoạch bỏ thuốc của người dùng
         List<Plan> plans = planRepo.findAll();
 
-        long totalSmokeFreeDays = 0;  // Tổng số ngày mà người dùng không hút thuốc (gộp tất cả user)
-        long totalPlanDays = 0;       // Tổng số ngày kể từ quitDate đến hiện tại của tất cả user
+        long totalSmokeFreeDays = 0;
+        long totalPlanDays = 0;
 
         // Duyệt từng plan
         for (Plan plan : plans) {
@@ -92,8 +88,6 @@ public class SuccessRateService {
                     LocalDate.now()
             );
         }
-
-        // ✅ Tính tỉ lệ phần trăm, làm tròn đến 1 chữ số thập phân
         return totalPlanDays == 0
                 ? 0  // Tránh chia 0 nếu không có dữ liệu nào hợp lệ
                 : Math.round((double) totalSmokeFreeDays / totalPlanDays * 1000) / 10.0;
@@ -110,8 +104,8 @@ public class SuccessRateService {
         // Lấy toàn bộ kế hoạch bỏ thuốc của người dùng
         List<Plan> plans = planRepo.findAll();
 
-        long totalSmokeFreeDaysLastMonth = 0;  // Tổng số ngày không hút trong tháng trước (gộp tất cả người dùng)
-        long totalAllPlanDays = 0;             // Tổng số ngày kể từ ngày bỏ thuốc (quitDate) đến hôm nay
+        long totalSmokeFreeDaysLastMonth = 0;
+        long totalAllPlanDays = 0;
 
         // Xác định khoảng thời gian tháng trước
         LocalDate today = LocalDate.now();
@@ -139,8 +133,6 @@ public class SuccessRateService {
                     today
             );
         }
-
-        // ✅ Trả về tỷ lệ phần trăm, làm tròn 1 chữ số thập phân (ví dụ: 76.8%)
         return totalAllPlanDays == 0
                 ? 0
                 : Math.round((double) totalSmokeFreeDaysLastMonth / totalAllPlanDays * 1000) / 10.0;
@@ -157,12 +149,12 @@ public class SuccessRateService {
         // Lấy toàn bộ kế hoạch bỏ thuốc (mỗi user có thể có 1 Plan riêng)
         List<Plan> plans = planRepo.findAll();
 
-        int usersCompletedAll = 0;         // Đếm số người dùng đã hoàn thành toàn bộ milestone
-        long totalSmokeFreeDays = 0;       // Tổng số ngày không hút thuốc của những người đó
+        int usersCompletedAll = 0;
+        long totalSmokeFreeDays = 0;
 
         // Duyệt qua từng Plan để kiểm tra tiến độ của người dùng
         for (Plan plan : plans) {
-            List<RewardItem> rewards = plan.getRewards();  // Danh sách phần thưởng của kế hoạch (có milestone)
+            List<RewardItem> rewards = plan.getRewards();
 
             // Bỏ qua nếu kế hoạch không có mốc phần thưởng
             if (rewards == null || rewards.isEmpty()) continue;
@@ -177,13 +169,10 @@ public class SuccessRateService {
 
             // Nếu user đã vượt qua mốc cao nhất → tính vào nhóm "thành công"
             if (daysSmokeFree >= maxRequiredDays) {
-                usersCompletedAll++;                       // +1 người thành công
-                totalSmokeFreeDays += daysSmokeFree;       // Cộng số ngày cai của người đó vào tổng
+                usersCompletedAll++;
+                totalSmokeFreeDays += daysSmokeFree;
             }
         }
-
-        // ✅ Tính trung bình: tổng số ngày / số người thành công
-        // Làm tròn đến 1 chữ số thập phân
         return usersCompletedAll == 0 ? 0 : Math.round((double) totalSmokeFreeDays / usersCompletedAll * 10) / 10.0;
     }
 

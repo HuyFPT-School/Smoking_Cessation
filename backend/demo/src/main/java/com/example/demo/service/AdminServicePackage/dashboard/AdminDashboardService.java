@@ -4,15 +4,15 @@ import com.example.demo.DTO.AdminDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-// ✅ Service cung cấp dữ liệu thống kê tổng quan cho trang dashboard của ADMIN / SUPER_ADMIN
-@Service  // Đánh dấu đây là 1 Spring Service — Spring sẽ quản lý instance này
+
+@Service
 public class AdminDashboardService {
 
     // ===================== INJECTION =====================
 
-    @Autowired private UserGrowthService userGrowthService;  // Service tính toán số lượng user và tốc độ tăng trưởng
-    @Autowired private SuccessRateService successRateService;  // Service tính toán tỉ lệ thành công, smoke-free...
-    @Autowired private UserProgressDistributionService userProgressDistributionService;  // Phân bố tiến trình bỏ thuốc
+    @Autowired private UserGrowthService userGrowthService;
+    @Autowired private SuccessRateService successRateService;
+    @Autowired private UserProgressDistributionService userProgressDistributionService;  
 
     // ===================== MAIN METHOD =====================
 
@@ -48,10 +48,10 @@ public class AdminDashboardService {
 
         // 8️⃣ Phân bố người dùng theo tiến trình (1 tuần, 1 tháng, 3 tháng trở lên)
         var distribution = userProgressDistributionService.getProgressDistribution();
-        dto.setFirstWeekPercent(distribution.firstWeekPercent());               // % người vượt qua tuần đầu
-        dto.setFirstMonthPercent(distribution.firstMonthPercent());             // % người vượt qua tháng đầu
-        dto.setThreeMonthsOrMorePercent(distribution.threeMonthsOrMorePercent()); // % người bỏ được ≥ 3 tháng
+        dto.setFirstWeekPercent(distribution.firstWeekPercent());
+        dto.setFirstMonthPercent(distribution.firstMonthPercent());
+        dto.setThreeMonthsOrMorePercent(distribution.threeMonthsOrMorePercent());
 
-        return dto;  // Trả về DTO chứa toàn bộ thống kê cho dashboard
+        return dto;
     }
 }
