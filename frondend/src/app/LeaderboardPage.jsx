@@ -80,22 +80,6 @@ const LeaderboardPage = () => {
     Bronze: "#FFFBEB",
   };
 
-  // Ngày hiện tại được cố định là 31/05/2025
-  const currentDate = new Date("2025-05-31"); // Tạo đối tượng ngày với giá trị cố định
-
-  // Tính toán ngày bắt đầu của tuần hiện tại (bắt đầu từ Chủ Nhật)
-  const startOfWeek = new Date(currentDate); // Tạo bản sao của currentDate
-  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Đặt ngày về Chủ Nhật của tuần hiện tại
-  startOfWeek.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00.000
-
-  // Tính toán ngày bắt đầu của tháng hiện tại
-  const startOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  ); // Tạo ngày đầu tiên của tháng
-  startOfMonth.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00.000
-
   // Hàm lọc dữ liệu bảng xếp hạng theo khoảng thời gian
   const getFilteredData = () => {
     return leaderboardData.map((user, index) => ({
@@ -310,85 +294,91 @@ const LeaderboardPage = () => {
           </p>
         </div>
       </div>
-
-      <Card className="user-highlight-card">
-        <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 16]} align="middle">
-          <Col xs={24} sm={12} md={12}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <div className="user-avatar-container">
-                <Avatar
-                  alt="User"
-                  src={user?.avatarUrl}
-                  style={{
-                    width: 60,
-                    height: 60,
-                  }}
-                />
-                <span className="user-rank">
-                  {currentUserData?.rank || "N/A"}
-                </span>
-              </div>
-              <div className="user-info" style={{ marginLeft: "16px" }}>
-                <div className="user-name" style={{ marginTop: "0px" }}>
-                  {user?.name || "User"}
-                </div>
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
-                  <div
-                    className="user-tier"
+      {/* Thêm điều kiện kiểm tra user trước khi hiển thị card */}
+      {user && (
+        <Card className="user-highlight-card">
+          <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 16]} align="middle">
+            <Col xs={24} sm={12} md={12}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div className="user-avatar-container">
+                  <Avatar
+                    alt="User"
+                    src={user?.avatarUrl}
                     style={{
-                      backgroundColor:
-                        tierColors[currentUserData?.tier || "Bronze"] ||
-                        "#FFFBEB",
+                      width: 60,
+                      height: 60,
+                    }}
+                  />
+                  <span className="user-rank">
+                    {currentUserData?.rank || "N/A"}
+                  </span>
+                </div>
+                <div className="user-info" style={{ marginLeft: "16px" }}>
+                  <div className="user-name" style={{ marginTop: "0px" }}>
+                    {user?.name || "User"}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
                     }}
                   >
-                    {currentUserData?.tier || "Bronze"}
+                    <div
+                      className="user-tier"
+                      style={{
+                        backgroundColor:
+                          tierColors[currentUserData?.tier || "Bronze"] ||
+                          "#FFFBEB",
+                      }}
+                    >
+                      {currentUserData?.tier || "Bronze"}
+                    </div>
+                    <p className="user-days">
+                      {currentUserData?.consecutiveSmokFreeDays || 0} days on
+                      the streak
+                    </p>
                   </div>
-                  <p className="user-days">
-                    {currentUserData?.consecutiveSmokFreeDays || 0} days on the
-                    streak
-                  </p>
                 </div>
               </div>
-            </div>
-          </Col>
-          <Col
-            xs={24}
-            sm={12}
-            md={12}
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-              gap: "24px",
-            }}
-          >
-            <div style={{ textAlign: "center" }}>
-              <div className="user-points-title">Points</div>
-              <div className="user-points-value">
-                {timeRange === "weekly"
-                  ? currentUserData?.weeklyPoints || 0
-                  : timeRange === "monthly"
-                  ? currentUserData?.monthlyPoints || 0
-                  : currentUserData?.totalPoints || 0}
+            </Col>
+            <Col
+              xs={24}
+              sm={12}
+              md={12}
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: "24px",
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
+                <div className="user-points-title">Points</div>
+                <div className="user-points-value">
+                  {timeRange === "weekly"
+                    ? currentUserData?.weeklyPoints || 0
+                    : timeRange === "monthly"
+                    ? currentUserData?.monthlyPoints || 0
+                    : currentUserData?.totalPoints || 0}
+                </div>
               </div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div className="user-rank-title">Rank</div>
-              <div className="user-rank-value">
-                {currentUserData?.rank || "N/A"}
-                <ArrowUpOutlined style={{ color: "#52c41a" }} />
+              <div style={{ textAlign: "center" }}>
+                <div className="user-rank-title">Rank</div>
+                <div className="user-rank-value">
+                  {currentUserData?.rank || "N/A"}
+                  <ArrowUpOutlined style={{ color: "#52c41a" }} />
+                </div>
               </div>
-            </div>
-            <Link to="/profile">
-              <Button type="primary" className="view-profile-button">
-                View Profile
-              </Button>
-            </Link>
-          </Col>
-        </Row>
-      </Card>
+              <Link to="/profile">
+                <Button type="primary" className="view-profile-button">
+                  View Profile
+                </Button>
+              </Link>
+            </Col>
+          </Row>
+        </Card>
+      )}
       <Row
         gutter={[{ xs: 8, sm: 16, md: 24 }, 16]}
         style={{ marginBottom: "20px" }}

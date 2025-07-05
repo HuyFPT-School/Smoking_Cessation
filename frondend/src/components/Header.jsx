@@ -1,20 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Box, 
-  Button, 
-  IconButton, 
-  Avatar, 
-  Menu, 
-  MenuItem, 
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
   Drawer, // Panel trượt từ cạnh màn hình (dùng cho menu mobile)
-  List, 
-  ListItem, 
-  ListItemText, 
+  List,
+  ListItem,
+  ListItemText,
   useMediaQuery, // Hook để kiểm tra kích thước màn hình
-  useTheme, 
+  useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
@@ -25,6 +27,10 @@ const Header = () => {
   const { user, setUser } = useContext(AuthContext);
   // State lưu phần tử anchor cho menu dropdown (vị trí hiển thị menu)
   const [anchorEl, setAnchorEl] = useState(null);
+
+  // State cho notification
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const navigate = useNavigate();
   // Lấy theme của MUI để sử dụng trong useMediaQuery
@@ -58,18 +64,35 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-    setMobileMenuOpen(false); 
+    setMobileMenuOpen(false);
     navigate("/login");
   };
 
   // Mảng chứa thông tin các liên kết chính trong menu
   const navLinks = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Plan", path: "/plan" },
-    { label: "Tracking", path: "/tracking" },
-    { label: "Leaderboard", path: "/leaderboard" },
-    { label: "Blog", path: "/blog" },
+    { label: "Dashboard", path: "/dashboard", protected: true },
+    { label: "Plan", path: "/plan", protected: true },
+    { label: "Tracking", path: "/tracking", protected: true },
+    { label: "Leaderboard", path: "/leaderboard", protected: false },
+    { label: "Blog", path: "/blog", protected: false },
   ];
+
+  // Hàm xử lý click vào navigation link
+  const handleNavClick = (event, link) => {
+    // Nếu link cần đăng nhập mà user chưa đăng nhập
+    if (link.protected && (!user || !user.id)) {
+      event.preventDefault(); // Ngăn navigation
+      setNotificationMessage("You need to login to access " + link.label);
+      setShowNotification(true);
+      return;
+    }
+    // Nếu đã đăng nhập hoặc link không cần bảo vệ thì cho phép navigation bình thường
+  };
+
+  // Hàm đóng notification
+  const handleCloseNotification = () => {
+    setShowNotification(false);
+  };
 
   // Hook useEffect để xử lý sự kiện click ra ngoài menu profile
   useEffect(() => {
@@ -104,7 +127,7 @@ const Header = () => {
           }}
         >
           <IconButton
-            disableRipple 
+            disableRipple
             component={RouterLink}
             to="/"
             sx={{ mr: 1 }}
@@ -152,10 +175,11 @@ const Header = () => {
             {navLinks.map((item) => (
               <MuiLink
                 key={item.label} // Key là bắt buộc khi render danh sách trong React
-                component={RouterLink} 
+                component={RouterLink}
                 to={item.path}
                 underline="none"
                 color="text.primary"
+                onClick={(event) => handleNavClick(event, item)}
                 sx={{
                   fontWeight: "bold",
                   transition: "0.2s",
@@ -209,7 +233,7 @@ const Header = () => {
                   width: 36,
                   height: 36,
                   cursor: "pointer",
-                  ml: isMobile ? 0 : 18, 
+                  ml: isMobile ? 0 : 18,
                 }}
                 onClick={handleMenuOpen}
               />
@@ -268,10 +292,7 @@ const Header = () => {
             <>
               {!isMobile && (
                 <>
-                  <Button
-                    variant="outlined" 
-                    color="success" 
-                  >
+                  <Button variant="outlined" color="success">
                     <MuiLink
                       component={RouterLink}
                       to="/login"
@@ -282,10 +303,7 @@ const Header = () => {
                       Log In
                     </MuiLink>
                   </Button>
-                  <Button
-                    variant="contained" 
-                    color="success" 
-                  >
+                  <Button variant="contained" color="success">
                     <MuiLink
                       component={RouterLink}
                       to="/register"
@@ -305,7 +323,7 @@ const Header = () => {
 
       {/* Menu trượt cho điện thoại di động - Hiển thị từ bên trái màn hình khi mobileMenuOpen = true */}
       <Drawer
-        anchor="left" 
+        anchor="left"
         open={mobileMenuOpen}
         onClose={handleMobileMenuToggle}
       >
@@ -313,7 +331,7 @@ const Header = () => {
           sx={{ width: 250 }}
           role="presentation" // Thuộc tính ARIA cho trình đọc màn hình, chỉ ra đây là phần trình bày
           onClick={handleMobileMenuToggle}
-          onKeyDown={handleMobileMenuToggle} 
+          onKeyDown={handleMobileMenuToggle}
         >
           {/* Danh sách các liên kết điều hướng trên mobile */}
           <List sx={{ pt: 2 }}>
@@ -326,6 +344,7 @@ const Header = () => {
                   key={item.label}
                   component={RouterLink}
                   to={item.path}
+                  onClick={(event) => handleNavClick(event, item)}
                   sx={{
                     py: 1.5,
                     "&:hover": {
@@ -376,6 +395,53 @@ const Header = () => {
           </List>
         </Box>
       </Drawer>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={showNotification}
+        autoHideDuration={4000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseNotification}
+          severity="warning"
+          sx={{ width: "100%" }}
+        >
+          {notificationMessage}
+          <Box sx={{ mt: 1 }}>
+            <Button
+              size="small"
+              onClick={() => {
+                handleCloseNotification();
+                navigate("/login");
+              }}
+              sx={{
+                color: "inherit",
+                textDecoration: "underline",
+                minWidth: "auto",
+                mr: 1,
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              size="small"
+              onClick={() => {
+                handleCloseNotification();
+                navigate("/register");
+              }}
+              sx={{
+                color: "inherit",
+                textDecoration: "underline",
+                minWidth: "auto",
+              }}
+            >
+              Sign up
+            </Button>
+          </Box>
+        </Alert>
+      </Snackbar>
     </AppBar>
   );
 };
