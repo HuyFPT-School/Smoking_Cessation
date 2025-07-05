@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PlanDTO {
     private Long id; // For responses
-    private String userId;
+    private Integer userId;
     private String quitDate; // Expecting YYYY-MM-DD string from frontend
     private String quitMethod;
     private int cigarettesPerDay;

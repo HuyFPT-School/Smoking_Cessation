@@ -39,7 +39,7 @@ public class TrackingController {
     public ResponseEntity<?> createTracking(@RequestBody TrackingDTO trackingDTO) {
         // 1. KIỂM TRA NGƯỜI DÙNG CÓ TỒN TẠI KHÔNG
         // Tìm người dùng trong database dựa trên userId được gửi từ frontend
-        Optional<User> userOptional = userRepo.findById(Integer.valueOf(trackingDTO.getUserId()));
+        Optional<User> userOptional = userRepo.findById(trackingDTO.getUserId());
         
         // Nếu không tìm thấy người dùng, trả về lỗi 400 Bad Request
         if (userOptional.isEmpty()) {
@@ -67,7 +67,7 @@ public class TrackingController {
         // 4. THÔNG BÁO SỰ KIỆN
         // Gửi thông báo cho hệ thống rằng có dữ liệu mới được thêm vào
         // Điều này có thể kích hoạt việc cập nhật dashboard, thống kê, v.v.
-        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.valueOf(trackingDTO.getUserId())));
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, trackingDTO.getUserId()));
         
         // 5. TRẢ VỀ KẾT QUẢ
         // Chuyển đối tượng tracking đã lưu thành DTO để trả về cho frontend
@@ -77,15 +77,17 @@ public class TrackingController {
 
     // API này dùng để lấy tất cả dữ liệu theo dõi của một người dùng cụ thể. 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getTrackingByUserId(@PathVariable String userId) {
+    public ResponseEntity<?> getTrackingByUserId(@PathVariable Integer userId) {
         try {
-            // 1. CHUYỂN ĐỔI VÀ KIỂM TRA USERID
-            // Chuyển đổi userId từ String sang int. Nếu userId là null thì gán bằng 0
-            int id = userId != null ? Integer.parseInt(userId) : 0;
+            // 1. KIỂM TRA USERID
+            // Kiểm tra userId có null không
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user ID.");
+            }
             
             // 2. TÌM KIẾM DỮ LIỆU TRONG DATABASE
             // Sử dụng TrackingRepo để tìm tất cả bản ghi tracking của người dùng này
-            List<Tracking> trackings = trackingRepo.findByUserId(id);
+            List<Tracking> trackings = trackingRepo.findByUserId(userId);
             
             // 3. KIỂM TRA KẾT QUẢ
             // Nếu không tìm thấy dữ liệu nào, trả về lỗi 404 Not Found
@@ -102,9 +104,9 @@ public class TrackingController {
             // Trả về danh sách TrackingDTO với mã trạng thái 200 OK
             return ResponseEntity.ok(trackingDTOs);
             
-        } catch (NumberFormatException e) {
-            // Nếu userId không thể chuyển đổi thành số (ví dụ: userId = "abc"), trả về lỗi 400 Bad Request
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user ID format.");
+        } catch (Exception e) {
+            // Xử lý lỗi chung
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving tracking data.");
         }
     }
 
@@ -131,8 +133,8 @@ public class TrackingController {
         
         // Kiểm tra xem tracking có liên kết với user hay không
         if (tracking.getUser() != null) {
-            // Nếu có, lấy ID của user và chuyển thành String để đưa vào DTO
-            dto.setUserId(String.valueOf(tracking.getUser().getId()));
+            // Nếu có, lấy ID của user và đưa vào DTO
+            dto.setUserId(tracking.getUser().getId());
         }
         
         // Trả về đối tượng DTO đã hoàn chỉnh

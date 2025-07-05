@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface PlanRepo extends JpaRepository<Plan, Long> {
-    Optional<Plan> findByUserId(String userId);
-    void deleteByUserId(String userId); // Nếu userId kiểu String
+    Optional<Plan> findByUserId(Integer userId);
+    void deleteByUserId(Integer userId); // Nếu userId kiểu String
 
 }

@@ -22,7 +22,7 @@ public class Plan {
     private Long id;
 
     @Column(nullable = false)
-    private String userId; // To link with the User (e.g., Firebase UID)
+    private Integer userId;
 
     private LocalDate quitDate;
     private String quitMethod;

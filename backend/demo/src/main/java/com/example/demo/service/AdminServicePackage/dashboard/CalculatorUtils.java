@@ -26,7 +26,7 @@ public class CalculatorUtils {
         if (quitDate == null) return 0;
 
         LocalDate today = LocalDate.now();
-        Integer userId = tryParseUserId(plan.getUserId());
+        Integer userId = plan.getUserId();
         if (userId == null) return 0;
 
         long totalDays = ChronoUnit.DAYS.between(quitDate, today) + 1;
@@ -53,7 +53,7 @@ public class CalculatorUtils {
     public long calculateSmokeFreeDaysInRange(Plan plan, LocalDate start, LocalDate end) {
         if (plan.getQuitDate() == null || plan.getQuitDate().isAfter(end)) return 0;
 
-        Integer userId = tryParseUserId(plan.getUserId());
+        Integer userId = plan.getUserId();
         if (userId == null) return 0;
 
         // Start giới hạn từ quitDate trở đi
@@ -123,14 +123,4 @@ public class CalculatorUtils {
         }
     }
 
-    // =====================================================================================
-    // ✅ 6. Parse userId từ String sang Integer an toàn
-    // =====================================================================================
-    private Integer tryParseUserId(String id) {
-        try {
-            return Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 }

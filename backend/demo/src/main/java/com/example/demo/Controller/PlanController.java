@@ -137,7 +137,7 @@ public class PlanController {
         Plan savedPlan = planRepo.save(plan);  // Lưu vào database
 
         // Gửi thông báo cập nhật dữ liệu (để leaderboard, notification... cập nhật lại)
-        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(planDTO.getUserId())));
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, planDTO.getUserId()));
 
         // Trả về kế hoạch vừa tạo với status 201 CREATED
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(savedPlan));
@@ -178,7 +178,7 @@ public class PlanController {
     //   } 
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<PlanDTO> getPlanByUserId(@PathVariable String userId) {
+    public ResponseEntity<PlanDTO> getPlanByUserId(@PathVariable Integer userId) {
         // Tìm kế hoạch theo userId
         Optional<Plan> plan = planRepo.findByUserId(userId);
 
@@ -236,7 +236,7 @@ public class PlanController {
         Plan updatedPlan = planRepo.save(planToUpdate); // Lưu vào database
 
         // Gửi thông báo cập nhật dữ liệu
-        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(planDTO.getUserId())));
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, planDTO.getUserId()));
 
         // Trả về kế hoạch đã cập nhật
         return ResponseEntity.ok(convertToDTO(updatedPlan));
@@ -281,7 +281,7 @@ public class PlanController {
     //   Response cập nhật (200): { "id": 456, "userId": "123", ... }
 
     @PutMapping("/user/{userId}")
-    public ResponseEntity<PlanDTO> createOrUpdatePlanByUserId(@PathVariable String userId, @RequestBody PlanDTO planDTO) {
+    public ResponseEntity<PlanDTO> createOrUpdatePlanByUserId(@PathVariable Integer userId, @RequestBody PlanDTO planDTO) {
         // Xử lý và validate userId
         if (planDTO.getUserId() == null ) {
             // Nếu userId không có trong body, lấy từ path
@@ -312,7 +312,7 @@ public class PlanController {
         Plan savedPlan = planRepo.save(planToSave);
 
         // Gửi thông báo cập nhật dữ liệu cho các component khác
-        eventPublisher.publishEvent(new DataUpdatedEvent(this, Integer.parseInt(userId)));
+        eventPublisher.publishEvent(new DataUpdatedEvent(this, userId));
 
         // Chuyển đổi thành DTO để trả về
         PlanDTO responseDTO = convertToDTO(savedPlan);

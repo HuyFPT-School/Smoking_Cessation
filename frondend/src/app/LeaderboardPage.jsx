@@ -1,5 +1,5 @@
-import { Segmented } from "antd"; // Nhập component Segmented từ thư viện Ant Design để tạo các nút chọn (weekly, monthly, all time)
-import { useState, useContext, useEffect } from "react"; // Nhập các hook từ React: useState để quản lý state, useContext để lấy dữ liệu từ context, useEffect để xử lý side effects
+import { Segmented } from "antd";
+import { useState, useContext, useEffect } from "react";
 import {
   Card,
   Row,
@@ -10,83 +10,74 @@ import {
   Divider,
   Spin,
   message,
-} from "antd"; // Nhập các component từ Ant Design: Card (thẻ), Row/Col (hệ thống lưới), Button (nút), Avatar (hình đại diện), Typography (văn bản), Divider (đường phân cách), Spin (loading), message (thông báo)
-import { Link } from "react-router-dom"; // Nhập Link từ react-router-dom để tạo liên kết điều hướng
+} from "antd";
+import { Link } from "react-router-dom";
 import {
   ClockCircleOutlined,
   FileDoneOutlined,
   UserOutlined,
-} from "@ant-design/icons"; // Nhập các icon từ Ant Design để hiển thị biểu tượng
-import { TrophyOutlined } from "@ant-design/icons"; // Nhập icon TrophyOutlined để hiển thị cúp cho người dẫn đầu
-import "antd/dist/reset.css"; // Nhập file CSS reset của Ant Design để chuẩn hóa giao diện
-import React from "react"; // Nhập React để sử dụng JSX
-import { ArrowUpOutlined } from "@ant-design/icons"; // Nhập icon ArrowUpOutlined để hiển thị mũi tên lên (biểu thị thứ hạng)
-import { AuthContext } from "../context/AuthContext"; // Nhập AuthContext để lấy thông tin người dùng hiện tại
-import axios from "axios"; // Nhập axios để thực hiện các yêu cầu HTTP (gọi API)
+} from "@ant-design/icons";
+import { TrophyOutlined } from "@ant-design/icons";
+import "antd/dist/reset.css";
+import React from "react";
+import { ArrowUpOutlined } from "@ant-design/icons";
+import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
 
-const { Text, Title } = Typography; // Lấy các component Text và Title từ Typography để hiển thị văn bản với kiểu dáng khác nhau
+const { Text, Title } = Typography;
 
-// Component chính hiển thị trang Leaderboard
 const LeaderboardPage = () => {
-  // Lấy thông tin người dùng từ AuthContext
-  const { user } = useContext(AuthContext); // Sử dụng useContext để lấy đối tượng user từ AuthContext
+  const { user } = useContext(AuthContext);
 
-  // State để lưu khoảng thời gian hiển thị bảng xếp hạng (weekly, monthly, all time)
-  const [timeRange, setTimeRange] = useState("weekly"); // Khởi tạo state timeRange với giá trị mặc định là "weekly"
+  // State quản lý giao diện và dữ liệu
+  const [timeRange, setTimeRange] = useState("weekly");
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [currentUserData, setCurrentUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // State để lưu dữ liệu bảng xếp hạng
-  const [leaderboardData, setLeaderboardData] = useState([]); // Khởi tạo state leaderboardData là mảng rỗng để lưu danh sách người dùng
-  const [currentUserData, setCurrentUserData] = useState(null); // Khởi tạo state currentUserData để lưu thông tin người dùng hiện tại
-  const [loading, setLoading] = useState(true); // Khởi tạo state loading để kiểm soát trạng thái tải dữ liệu
-
-  // Hook useEffect để gọi API lấy dữ liệu bảng xếp hạng khi component được mount hoặc khi timeRange/user.id thay đổi
+  // Lấy dữ liệu bảng xếp hạng
   useEffect(() => {
-    // Hàm lấy dữ liệu bảng xếp hạng từ API
-    const fetchLeaderboardData = async (range = "weekly") => { // Hàm async nhận tham số range với giá trị mặc định là "weekly"
+    const fetchLeaderboardData = async (range = "weekly") => {
       try {
-        setLoading(true); // Bật trạng thái loading khi bắt đầu gọi API
+        setLoading(true);
         const params = {
-          timeRange: range, // Thêm tham số timeRange vào query của API
+          timeRange: range,
         };
 
-        // Chỉ thêm currentUserId vào params nếu user tồn tại và có id
         if (user?.id) {
-          params.currentUserId = user.id; // Thêm ID của người dùng hiện tại vào params
+          params.currentUserId = user.id;
         }
 
-        // Gọi API để lấy dữ liệu bảng xếp hạng
         const response = await axios.get(
-          "http://localhost:8080/api/leaderboard", // URL của API
-          { params } // Truyền params vào yêu cầu GET
+          "http://localhost:8080/api/leaderboard",
+          { params }
         );
 
-        // Kiểm tra nếu API trả về trạng thái thành công
         if (response.status === 200) {
-          setLeaderboardData(response.data.leaderboard || []); // Cập nhật state leaderboardData với dữ liệu từ API hoặc mảng rỗng
-          setCurrentUserData(response.data.currentUser); // Cập nhật state currentUserData với thông tin người dùng hiện tại
+          setLeaderboardData(response.data.leaderboard || []);
+          setCurrentUserData(response.data.currentUser);
         }
       } catch (error) {
-        console.error("Error fetching leaderboard data:", error); // In lỗi ra console nếu gọi API thất bại
-        message.error("Failed to load leaderboard data"); // Hiển thị thông báo lỗi cho người dùng
-        setLeaderboardData([]); // Đặt lại leaderboardData là mảng rỗng
-        setCurrentUserData(null); // Đặt lại currentUserData là null
+        console.error("Error fetching leaderboard data:", error);
+        message.error("Failed to load leaderboard data");
+        setLeaderboardData([]);
+        setCurrentUserData(null);
       } finally {
-        setLoading(false); // Tắt trạng thái loading sau khi hoàn tất gọi API
+        setLoading(false);
       }
     };
 
-    // Gọi hàm fetchLeaderboardData với timeRange hiện tại
-    fetchLeaderboardData(timeRange); // Luôn gọi API, kể cả khi người dùng chưa đăng nhập
-  }, [timeRange, user?.id]); // useEffect chạy lại khi timeRange hoặc user.id thay đổi
+    fetchLeaderboardData(timeRange);
+  }, [timeRange, user?.id]);
 
-  // Định nghĩa màu nền cho từng cấp bậc (tier) của người dùng
+  // Cấu hình màu tier và thời gian
   const tierColors = {
-    Legend: "#D3C9FF", // Màu nền cho tier Legend
-    Diamond: "#F8632F", // Màu nền cho tier Diamond
-    Platinum: "#97D0EF", // Màu nền cho tier Platinum
-    Gold: "#F4C220", // Màu nền cho tier Gold
-    Silver: "#F9FAFB", // Màu nền cho tier Silver
-    Bronze: "#FFFBEB", // Màu nền cho tier Bronze
+    Legend: "#D3C9FF",
+    Diamond: "#F8632F",
+    Platinum: "#97D0EF",
+    Gold: "#F4C220",
+    Silver: "#F9FAFB",
+    Bronze: "#FFFBEB",
   };
 
   // Ngày hiện tại được cố định là 31/05/2025
@@ -107,7 +98,6 @@ const LeaderboardPage = () => {
 
   // Hàm lọc dữ liệu bảng xếp hạng theo khoảng thời gian
   const getFilteredData = () => {
-    // Vì API đã trả về dữ liệu được lọc và sắp xếp theo timeRange, chỉ cần thêm thứ hạng (rank)
     return leaderboardData.map((user, index) => ({
       ...user, // Giữ nguyên các thuộc tính của user
       rank: index + 1, // Thêm thuộc tính rank dựa trên chỉ số (bắt đầu từ 1)
@@ -119,9 +109,7 @@ const LeaderboardPage = () => {
 
   // Hàm hiển thị bảng xếp hạng chung
   const renderLeaderboard = (data, title) => (
-    // Container cho section bảng xếp hạng
     <div className="leaderboard-section">
-      {/* Tiêu đề của bảng xếp hạng */}
       <p
         style={{
           color: "#000",
@@ -131,25 +119,21 @@ const LeaderboardPage = () => {
           marginBottom: "7px",
         }}
       >
-        {title} {/* Hiển thị tiêu đề (ví dụ: This Week's Leaderboard) */}
+        {title}
       </p>
-      {/* Thời gian cập nhật bảng xếp hạng */}
       <p style={{ color: "#595959", margin: "0 0 16px 0" }}>
         Updated at 00:00 every{" "}
         {timeRange === "weekly"
-          ? "Sunday" // Nếu là weekly, hiển thị "Sunday"
+          ? "Sunday"
           : timeRange === "monthly"
-          ? "1st of the month" // Nếu là monthly, hiển thị "1st of the month"
-          : "day"} {/* Nếu là all time, hiển thị "day" */}
+          ? "1st of the month"
+          : "day"}
       </p>
 
-
-      {/* Header của bảng xếp hạng (tên các cột) */}
       <Row
         gutter={[{ xs: 8, sm: 16, md: 24 }, 24]}
         className="leaderboard-header"
       >
-        {/* Cột Rank */}
         <Col
           span={2}
           style={{
@@ -158,9 +142,8 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          Rank {/* Tiêu đề cột Rank */}
+          Rank
         </Col>
-        {/* Cột User */}
         <Col
           span={6}
           style={{
@@ -169,9 +152,8 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          User {/* Tiêu đề cột User */}
+          User
         </Col>
-        {/* Cột Badge */}
         <Col
           span={8}
           style={{
@@ -180,9 +162,8 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          Badge {/* Tiêu đề cột Badge */}
+          Badge
         </Col>
-        {/* Cột Consecutive Streak */}
         <Col
           span={4}
           style={{
@@ -191,9 +172,8 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          Consecutive Streak {/* Tiêu đề cột Consecutive Streak */}
+          Consecutive Streak
         </Col>
-        {/* Cột Points */}
         <Col
           span={4}
           style={{
@@ -202,46 +182,41 @@ const LeaderboardPage = () => {
             alignItems: "center",
           }}
         >
-          Points {/* Tiêu đề cột Points */}
+          Points
         </Col>
       </Row>
 
-
-      {/* Hiển thị dữ liệu bảng xếp hạng */}
-      {data.length === 0 ? ( // Nếu không có dữ liệu
-        <p>No users found for {timeRange}.</p> // Hiển thị thông báo không có người dùng
+      {data.length === 0 ? (
+        <p>No users found for {timeRange}.</p>
       ) : (
-        // Lặp qua danh sách người dùng để hiển thị từng hàng
         data.map((user, index) => (
-          <React.Fragment key={user.id}> {/* Sử dụng Fragment để nhóm các phần tử */}
+          <React.Fragment key={user.id}>
             <Row
               gutter={[{ xs: 8, sm: 16, md: 24 }, 0]}
-              className={`leaderboard-card ${user.tier.toLowerCase()}`} // Class động dựa trên tier của người dùng
+              className={`leaderboard-card ${user.tier.toLowerCase()}`}
               style={{
                 padding: "10px",
-                transition: "background-color 0.3s ease", // Hiệu ứng chuyển màu khi hover
-                ":hover": { backgroundColor: "#f5f5f5" }, // Màu nền khi hover
+                transition: "background-color 0.3s ease",
+                ":hover": { backgroundColor: "#f5f5f5" },
               }}
             >
-              {/* Cột Rank */}
               <Col span={2}>
                 <div
                   className="Rank-list"
                   style={{
                     backgroundColor:
                       user.rank === 1
-                        ? "#fadb14" // Màu vàng cho rank 1
+                        ? "#fadb14"
                         : user.rank === 2
-                        ? "#d9d9d9" // Màu bạc cho rank 2
+                        ? "#d9d9d9"
                         : user.rank === 3
-                        ? "#fa8c16" // Màu đồng cho rank 3
-                        : "#fff", // Màu trắng cho các rank khác
+                        ? "#fa8c16"
+                        : "#fff",
                   }}
                 >
-                  {user.rank} {/* Hiển thị thứ hạng */}
+                  {user.rank}
                 </div>
               </Col>
-              {/* Cột User */}
               <Col
                 span={6}
                 style={{
@@ -251,16 +226,15 @@ const LeaderboardPage = () => {
                 }}
               >
                 <Avatar
-                  alt={user.name} // Tên người dùng làm alt cho hình ảnh
-                  size={36} // Kích thước avatar
-                  src={user.avatarUrl} // URL hình ảnh avatar
+                  alt={user.name}
+                  size={36}
+                  src={user.avatarUrl}
                   style={{
-                    marginRight: "10px", // Khoảng cách bên phải avatar
+                    marginRight: "10px",
                   }}
                 />
-                {user.name} {/* Hiển thị tên người dùng */}
+                {user.name}
               </Col>
-              {/* Cột Badge */}
               <Col
                 span={8}
                 style={{
@@ -271,12 +245,11 @@ const LeaderboardPage = () => {
               >
                 <div
                   className="user-tier"
-                  style={{ backgroundColor: tierColors[user.tier] || "#fff" }} // Màu nền dựa trên tier của người dùng
+                  style={{ backgroundColor: tierColors[user.tier] || "#fff" }}
                 >
-                  {user.tier} {/* Hiển thị tier của người dùng */}
+                  {user.tier}
                 </div>
               </Col>
-              {/* Cột Smoke-Free Days */}
               <Col
                 span={4}
                 style={{
@@ -285,9 +258,8 @@ const LeaderboardPage = () => {
                   alignItems: "center",
                 }}
               >
-                {user.days} {/* Hiển thị số ngày không hút thuốc */}
+                {user.days}
               </Col>
-              {/* Cột Points */}
               <Col
                 span={4}
                 style={{
@@ -298,24 +270,22 @@ const LeaderboardPage = () => {
               >
                 <strong>
                   {timeRange === "weekly"
-                    ? user.weeklyPoints 
+                    ? user.weeklyPoints
                     : timeRange === "monthly"
-                    ? user.monthlyPoints 
-                    : user.totalPoints} 
+                    ? user.monthlyPoints
+                    : user.totalPoints}
                 </strong>
               </Col>
             </Row>
-            {index < data.length - 1 && <Divider style={{ margin: "0" }} />} {/* Thêm đường phân cách giữa các người dùng, trừ người cuối */}
+            {index < data.length - 1 && <Divider style={{ margin: "0" }} />}
           </React.Fragment>
         ))
       )}
     </div>
   );
-  // Kết thúc hàm renderLeaderboard
 
   return (
-    <div className="Leaderboard-Backgroup"> {/* Container chính của trang Leaderboard */}
-      {/* Phần chào mừng */}
+    <div className="Leaderboard-Backgroup">
       <div
         style={{
           display: "flex",
@@ -333,36 +303,34 @@ const LeaderboardPage = () => {
               fontSize: "24px",
             }}
           >
-            Leaderboard {/* Tiêu đề trang */}
+            Leaderboard
           </h2>
           <p style={{ color: "#595959", margin: 0, fontSize: "14px" }}>
-            Track your progress and others' in the smoking cessation journey {/* Mô tả trang */}
+            Track your progress and others' in the smoking cessation journey
           </p>
         </div>
       </div>
 
-      
-      {/* Card hiển thị thông tin người dùng hiện tại */}
       <Card className="user-highlight-card">
         <Row gutter={[{ xs: 8, sm: 16, md: 24 }, 16]} align="middle">
           <Col xs={24} sm={12} md={12}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div className="user-avatar-container">
                 <Avatar
-                  alt="User" // Alt cho avatar của người dùng
-                  src={user?.avatarUrl} // URL avatar của người dùng
+                  alt="User"
+                  src={user?.avatarUrl}
                   style={{
                     width: 60,
-                    height: 60, // Kích thước avatar
+                    height: 60,
                   }}
                 />
                 <span className="user-rank">
-                  {currentUserData?.rank || "N/A"} {/* Hiển thị thứ hạng của người dùng hiện tại */}
+                  {currentUserData?.rank || "N/A"}
                 </span>
               </div>
               <div className="user-info" style={{ marginLeft: "16px" }}>
                 <div className="user-name" style={{ marginTop: "0px" }}>
-                  {user?.name || "User"} {/* Hiển thị tên người dùng hoặc "User" nếu không có */}
+                  {user?.name || "User"}
                 </div>
                 <div
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
@@ -372,13 +340,14 @@ const LeaderboardPage = () => {
                     style={{
                       backgroundColor:
                         tierColors[currentUserData?.tier || "Bronze"] ||
-                        "#FFFBEB", // Màu nền tier của người dùng hiện tại
+                        "#FFFBEB",
                     }}
                   >
-                    {currentUserData?.tier || "Bronze"} {/* Hiển thị tier của người dùng */}
+                    {currentUserData?.tier || "Bronze"}
                   </div>
                   <p className="user-days">
-                    {currentUserData?.consecutiveSmokFreeDays || 0} days on the streak {/* Hiển thị số ngày không hút thuốc */}
+                    {currentUserData?.consecutiveSmokFreeDays || 0} days on the
+                    streak
                   </p>
                 </div>
               </div>
@@ -396,45 +365,44 @@ const LeaderboardPage = () => {
             }}
           >
             <div style={{ textAlign: "center" }}>
-              <div className="user-points-title">Points</div> {/* Tiêu đề cột điểm */}
+              <div className="user-points-title">Points</div>
               <div className="user-points-value">
                 {timeRange === "weekly"
-                  ? currentUserData?.weeklyPoints || 0 // Điểm tuần
+                  ? currentUserData?.weeklyPoints || 0
                   : timeRange === "monthly"
-                  ? currentUserData?.monthlyPoints || 0 // Điểm tháng
-                  : currentUserData?.totalPoints || 0} {/* Tổng điểm */}
+                  ? currentUserData?.monthlyPoints || 0
+                  : currentUserData?.totalPoints || 0}
               </div>
             </div>
             <div style={{ textAlign: "center" }}>
-              <div className="user-rank-title">Rank</div> {/* Tiêu đề cột thứ hạng */}
+              <div className="user-rank-title">Rank</div>
               <div className="user-rank-value">
-                {currentUserData?.rank || "N/A"} {/* Hiển thị thứ hạng */}
-                <ArrowUpOutlined style={{ color: "#52c41a" }} /> {/* Icon mũi tên lên */}
+                {currentUserData?.rank || "N/A"}
+                <ArrowUpOutlined style={{ color: "#52c41a" }} />
               </div>
             </div>
             <Link to="/profile">
               <Button type="primary" className="view-profile-button">
-                View Profile {/* Nút điều hướng đến trang profile */}
+                View Profile
               </Button>
             </Link>
           </Col>
         </Row>
       </Card>
-      {/* Hiển thị top 3 người dùng */}
       <Row
         gutter={[{ xs: 8, sm: 16, md: 24 }, 16]}
         style={{ marginBottom: "20px" }}
       >
-        {filteredLeaderboardData.slice(0, 3).map((user) => ( // Lấy 3 người dùng đầu tiên
+        {filteredLeaderboardData.slice(0, 3).map((user) => (
           <Col xs={24} sm={12} md={8} key={user.id}>
             <Card
               className="flex flex-col items-center text-center shadow-lg"
               style={{
                 borderRadius: "8px",
                 padding: "16px",
-                backgroundColor: user.rank === 1 ? "#fffbe6" : "#ffffff", // Màu nền đặc biệt cho rank 1
+                backgroundColor: user.rank === 1 ? "#fffbe6" : "#ffffff",
                 height: "310px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Hiệu ứng bóng
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
               }}
             >
               <div
@@ -452,15 +420,15 @@ const LeaderboardPage = () => {
                   }}
                 >
                   <Avatar
-                    alt={user.name} // Alt cho avatar
-                    src={user.avatarUrl} // URL avatar
-                    size={64} // Kích thước avatar
+                    alt={user.name}
+                    src={user.avatarUrl}
+                    size={64}
                     style={{
                       display: "block",
                       border:
                         user.rank === 1
-                          ? "2px solid #fadb14" // Viền vàng cho rank 1
-                          : "2px solid transparent", // Viền trong suốt cho các rank khác
+                          ? "2px solid #fadb14"
+                          : "2px solid transparent",
                     }}
                   />
                   <div
@@ -468,13 +436,13 @@ const LeaderboardPage = () => {
                     style={{
                       backgroundColor:
                         user.rank === 1
-                          ? "#fadb14" // Màu vàng cho rank 1
+                          ? "#fadb14"
                           : user.rank === 2
-                          ? "#d9d9d9" // Màu bạc cho rank 2
-                          : "#fa8c16", // Màu đồng cho rank 3
+                          ? "#d9d9d9"
+                          : "#fa8c16",
                     }}
                   >
-                    {user.rank} {/* Hiển thị thứ hạng */}
+                    {user.rank}
                   </div>
                 </div>
               </div>
@@ -487,31 +455,31 @@ const LeaderboardPage = () => {
                 }}
               >
                 <Title level={4} style={{ marginBottom: 0 }}>
-                  {user.name} {/* Hiển thị tên người dùng */}
+                  {user.name}
                 </Title>
                 <div
                   className="user-tier"
-                  style={{ backgroundColor: tierColors[user.tier] || "#fff" }} // Màu nền tier
+                  style={{ backgroundColor: tierColors[user.tier] || "#fff" }}
                 >
-                  {user.tier} {/* Hiển thị tier */}
+                  {user.tier}
                 </div>
                 <Text style={{ color: "#666" }}>
-                  {user.days} consecutive smoke-free days {/* Hiển thị số ngày không hút thuốc */}
+                  {user.days} consecutive smoke-free days
                 </Text>
                 <Text strong style={{ fontSize: "1.125rem" }}>
                   {timeRange === "weekly"
-                    ? user.weeklyPoints // Điểm tuần
+                    ? user.weeklyPoints
                     : timeRange === "monthly"
-                    ? user.monthlyPoints // Điểm tháng
+                    ? user.monthlyPoints
                     : user.totalPoints}{" "}
-                  points {/* Tổng điểm */}
+                  points
                 </Text>
                 {user.rank === 1 && (
                   <TrophyOutlined
                     style={{
                       marginTop: "8px",
                       fontSize: "24px",
-                      color: "#fadb14", // Icon cúp vàng cho rank 1
+                      color: "#fadb14",
                     }}
                   />
                 )}
@@ -520,24 +488,23 @@ const LeaderboardPage = () => {
           </Col>
         ))}
       </Row>
-      {/* Nút chọn khoảng thời gian (weekly, monthly, all time) */}
       <Segmented
         className="custom-segmented"
         options={[
-          { label: "This Week", value: "weekly" }, // Nút tuần
-          { label: "This Month", value: "monthly" }, // Nút tháng
-          { label: "All Time", value: "all" }, // Nút tất cả
+          { label: "This Week", value: "weekly" },
+          { label: "This Month", value: "monthly" },
+          { label: "All Time", value: "all" },
         ]}
-        value={timeRange} // Giá trị hiện tại của timeRange
-        onChange={setTimeRange} // Hàm xử lý khi thay đổi lựa chọn
-        style={{ marginTop: "24px", marginBottom: "14px" }} // Style cho component Segmented
-        block // Chiếm toàn bộ chiều rộng
+        value={timeRange}
+        onChange={setTimeRange}
+        style={{ marginTop: "24px", marginBottom: "14px" }}
+        block
       />
-      {/* Hiển thị bảng xếp hạng dựa trên timeRange */}
-      {loading ? ( // Nếu đang tải dữ liệu
+
+      {loading ? (
         <div style={{ textAlign: "center", padding: "40px" }}>
-          <Spin size="large" /> {/* Hiển thị spinner loading */}
-          <p style={{ marginTop: "16px" }}>Loading leaderboard...</p> {/* Thông báo đang tải */}
+          <Spin size="large" />
+          <p style={{ marginTop: "16px" }}>Loading leaderboard...</p>
         </div>
       ) : (
         <>
@@ -545,85 +512,81 @@ const LeaderboardPage = () => {
             renderLeaderboard(
               filteredLeaderboardData,
               "This Week's Leaderboard"
-            )} {/* Bảng xếp hạng tuần */}
+            )}
           {timeRange === "monthly" &&
             renderLeaderboard(
               filteredLeaderboardData,
               "This Month's Leaderboard"
-            )} {/* Bảng xếp hạng tháng */}
+            )}
           {timeRange === "all" &&
-            renderLeaderboard(filteredLeaderboardData, "All Time Leaderboard")} {/* Bảng xếp hạng tất cả */}
+            renderLeaderboard(filteredLeaderboardData, "All Time Leaderboard")}
         </>
       )}
-      {/* Phần hướng dẫn cách tính điểm */}
       <Card className="points-card">
         <Title level={3} className="card-title">
-          How Points are Calculated {/* Tiêu đề phần hướng dẫn */}
+          How Points are Calculated
         </Title>
         <Text className="card-subtitle">
-          Understand how we calculate points and rankings {/* Mô tả phần hướng dẫn */}
+          Understand how we calculate points and rankings
         </Text>
         <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-          {/* Cột Daily Progress */}
           <Col span={8}>
             <div className="points-column">
-              <ClockCircleOutlined className="column-icon" /> {/* Icon đồng hồ */}
+              <ClockCircleOutlined className="column-icon" />
               <Text strong className="column-title">
-                Daily Progress {/* Tiêu đề cột */}
+                Daily Progress
               </Text>
               <div className="points-list">
                 <Text className="points-item">
-                  Accumulated smoke-free days: +8 points each {/* Điểm cho mỗi ngày không hút thuốc */}
+                  Accumulated smoke-free days: +8 points each
                 </Text>
                 <Text className="points-item">
-                  Consecutive smoke-free days: +2 bonus each {/* Điểm thưởng cho chuỗi ngày không hút thuốc */}
+                  Consecutive smoke-free days: +2 bonus each
                 </Text>
-                <Text className="points-item">Record a craving: +4 points</Text> {/* Điểm cho việc ghi lại cơn thèm */}
+                <Text className="points-item">Record a craving: +4 points</Text>
                 <Text className="points-item" style={{ color: "#ff4d4f" }}>
-                  Smoking incident: -15 points {/* Điểm trừ khi hút thuốc */}
+                  Smoking incident: -15 points
                 </Text>
               </div>
             </div>
           </Col>
-          {/* Cột Streak Bonuses */}
           <Col span={8}>
             <div className="points-column">
-              <FileDoneOutlined className="column-icon" /> {/* Icon tài liệu */}
+              <FileDoneOutlined className="column-icon" />
               <Text strong className="column-title">
-                Streak Bonuses {/* Tiêu đề cột */}
+                Streak Bonuses
               </Text>
               <div className="points-list">
                 <Text className="points-item">
-                  7-day consecutive streak: +40 points {/* Điểm thưởng cho chuỗi 7 ngày */}
+                  7-day consecutive streak: +40 points
                 </Text>
                 <Text className="points-item">
-                  30-day consecutive streak: +150 points {/* Điểm thưởng cho chuỗi 30 ngày */}
+                  30-day consecutive streak: +150 points
                 </Text>
                 <Text className="points-item" style={{ color: "#faad14" }}>
-                  Consecutive streaks reset after smoking {/* Chuỗi ngày liên tục reset khi hút thuốc */}
+                  Consecutive streaks reset after smoking
                 </Text>
                 <Text className="points-item" style={{ color: "#52c41a" }}>
-                  Accumulated progress never resets {/* Tiến độ tích lũy không reset */}
+                  Accumulated progress never resets
                 </Text>
               </div>
             </div>
           </Col>
-          {/* Cột Leaderboard Views */}
           <Col span={8}>
             <div className="points-column">
-              <UserOutlined className="column-icon" /> {/* Icon người dùng */}
+              <UserOutlined className="column-icon" />
               <Text strong className="column-title">
-                Leaderboard Views {/* Tiêu đề cột */}
+                Leaderboard Views
               </Text>
               <div className="points-list">
                 <Text className="points-item">
-                  Weekly: Points from last 7 days {/* Bảng xếp hạng tuần: Điểm 7 ngày qua */}
+                  Weekly: Points from last 7 days
                 </Text>
                 <Text className="points-item">
-                  Monthly: Points from last 30 days {/* Bảng xếp hạng tháng: Điểm 30 ngày qua */}
+                  Monthly: Points from last 30 days
                 </Text>
                 <Text className="points-item">
-                  All Time: Total accumulated points {/* Bảng xếp hạng tất cả: Tổng điểm tích lũy */}
+                  All Time: Total accumulated points
                 </Text>
               </div>
             </div>
@@ -634,4 +597,4 @@ const LeaderboardPage = () => {
   );
 };
 
-export default LeaderboardPage; // Xuất component LeaderboardPage để sử dụng ở nơi khác
+export default LeaderboardPage;

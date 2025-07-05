@@ -132,7 +132,7 @@ public class AdminRemoteService {
             trackingRepo.deleteByUser(target);                        // Xóa tracking
             dashboardRepo.deleteByUserId(targetId);                   // Xóa dashboard
             chatMessageRepository.deleteByUserId((long) targetId);    // Xóa chat
-            planRepo.deleteByUserId(String.valueOf(targetId));        // Xóa kế hoạch cai thuốc
+            planRepo.deleteByUserId(targetId);        // Xóa kế hoạch cai thuốc
             userProfileRepo.deleteByUser(target);                     // Xóa hồ sơ
             postRepo.deleteByUser(target);                            // Xóa bài viết
             userRepo.delete(target);                                  // Xóa user chính

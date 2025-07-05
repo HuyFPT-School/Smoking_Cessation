@@ -34,8 +34,7 @@ public class TrackingHistoryService {
      * Trả về danh sách mỗi ngày gồm: số lần hút thuốc, số cravings, trung bình satisfaction.
      */
     public ResponseEntity<List<Map<String, Object>>> getHistory(Integer userId) {
-        // Tìm Plan theo userId
-        Optional<Plan> planOpt = planRepo.findByUserId(String.valueOf(userId));
+        Optional<Plan> planOpt = planRepo.findByUserId(userId);
         if (planOpt.isEmpty()) {
             logger.warn("Plan not found for userId: {}", userId);
             return ResponseEntity.notFound().build();
