@@ -27,8 +27,10 @@ public class DashboardMetricsService {
     private final TrackingRepo trackingRepo;
 
 
-    //👉 Dùng khi đã có dữ liệu Dashboard lưu trong database, tức là đã tính toán từ trước.
-    //   Không tính toán gì thêm, chỉ trích xuất dữ liệu sẵn có.
+    /**
+     * Tạo DTO từ dashboard đã có sẵn trong database
+     * Không tính toán lại toàn bộ mà chỉ thêm remainingDaysToMilestone để cập nhật chính xác.
+     */
     public DashboardDTO createDTOFromExisting(Dashboard dashboard, Plan plan, Integer userId) {
 
         //Lọc ra top 3 trigger đứng đầu (sử dụng method trong Repo)
@@ -36,6 +38,7 @@ public class DashboardMetricsService {
 
         //gọi method calculate để tính và trả về RemainingDaysToMilestone
         var milestone = new MilestoneService().calculate(plan, dashboard.getDaysSmokeFree());
+
         return DashboardDTO.builder()
                 .userId(dashboard.getUserId())
                 .daysSmokeFree(dashboard.getDaysSmokeFree())
@@ -59,15 +62,25 @@ public class DashboardMetricsService {
                 .build();
     }
 
+
+    /**
+     * Tính toán các chỉ số cơ bản:
+     * - Tổng ngày bỏ thuốc
+     * - Ngày không hút thuốc
+     * - Số thuốc tránh được
+     * - Tiền tiết kiệm
+     */
     public BasicMetrics calculateBasic(Integer userId, LocalDate quitDate, List<Tracking> trackings, int cigsPerDay) {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
         long totalDays = ChronoUnit.DAYS.between(quitDate, today) + 1;
         if (totalDays <= 0) {
+            // Trường hợp người dùng chưa bắt đầu cai
             return new BasicMetrics(0, 0, 0.0, 0);  // Quit date ở tương lai → không tính
         }
 
+        // Lấy các ngày có hành vi hút thuốc
         Set<LocalDate> smokingDays = trackings.stream()
                 .filter(t -> "smoking".equalsIgnoreCase(t.getType()))
                 .map(t -> LocalDate.parse(t.getDate()))
@@ -81,7 +94,7 @@ public class DashboardMetricsService {
         Optional<Dashboard> yesterdayDashboard = dashboardRepo.findByUserIdAndRecordedDate(userId, yesterday);
 
         if (yesterdayDashboard.isPresent()) {
-            // Tính tiếp từ hôm qua
+            // Nếu hôm qua đã có Dashboard, tiếp tục tính tiếp từ dữ liệu đó
             moneySaved = yesterdayDashboard.get().getMoneySaved();
             cigarettesAvoided = yesterdayDashboard.get().getCigarettesAvoided();
 
@@ -114,7 +127,7 @@ public class DashboardMetricsService {
             moneySaved = Math.round(moneySaved * 100.0) / 100.0;
 
         } else {
-            // Trường hợp tổng quát (ngày >= 2)
+            // Trường hợp tổng quát: tính tổng số thuốc lẽ ra sẽ hút, trừ đi số đã hút
             long totalExpectedCigarettes = totalDays * cigsPerDay;
             long totalCigarettesSmoked = trackings.stream()
                     .filter(t -> "smoking".equalsIgnoreCase(t.getType()))
@@ -131,6 +144,9 @@ public class DashboardMetricsService {
     }
 
 
+    /**
+     * Tính toán các chỉ số theo thời gian: hôm nay, hôm qua, 7 ngày gần nhất
+     */
     public TimeBasedMetrics calculateTimeBased(List<Tracking> trackings) {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
@@ -144,6 +160,7 @@ public class DashboardMetricsService {
             LocalDate trackDate = LocalDate.parse(t.getDate());
             boolean isCraving = !"smoking".equalsIgnoreCase(t.getType());
 
+            // Phân loại theo ngày
             if (trackDate.equals(today)) {
                 if (isCraving) todayCravings++;
                 else todayCigs++;
@@ -152,20 +169,25 @@ public class DashboardMetricsService {
                 else yCigs++;
             }
 
+            // Tính trong 7 ngày gần nhất
             if (!trackDate.isBefore(weekAgo) && !trackDate.isAfter(today)) {
                 if (isCraving) last7Cravings++;
                 else last7Cigs++;
             }
         }
 
-        double rawRate = (last7Cravings + last7Cigs == 0) ? 0 :
-                (last7Cravings * 100.0) / (last7Cravings + last7Cigs);
+        // Tỷ lệ cưỡng lại cơn thèm thuốc = cravings / (cravings + hút)
+        double rawRate = (last7Cravings + last7Cigs == 0) ? 0 : (last7Cravings * 100.0) / (last7Cravings + last7Cigs);
         double resistanceRate = Math.round(rawRate * 100.0) / 100.0;
 
         return new TimeBasedMetrics(todayCigs, todayCravings, yCigs, yCravings,
                 last7Cigs, last7Cravings, resistanceRate);
     }
 
+
+    /**
+     * Lưu Dashboard đã tính vào database
+     */
     public Dashboard saveDashboard(Integer userId, BasicMetrics basic, MilestoneResult milestone, TimeBasedMetrics timeMetrics) {
         Dashboard dashboard = new Dashboard();
         dashboard.setUserId(userId);
@@ -185,7 +207,9 @@ public class DashboardMetricsService {
         return dashboardRepo.save(dashboard);
     }
 
-
+    /**
+     * Tạo DTO mới từ các metric tính toán (trường hợp chưa có sẵn trong DB)
+     */
     public DashboardDTO createDashboardDTO(Integer userId, BasicMetrics basic,
                                            MilestoneResult milestone,
                                            TimeBasedMetrics timeMetrics,
