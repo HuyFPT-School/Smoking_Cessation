@@ -1,5 +1,5 @@
 import "../App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import CommunityBlogPage from "./CommunityBlogPage";
 import axios from "axios";
@@ -18,11 +18,11 @@ import {
   MailOutlined,
   PhoneOutlined,
   MoreOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Descriptions, Avatar, Modal, Spin, Alert, Button } from "antd";
+import { Descriptions, Avatar, Modal, Spin, Alert, Button, Input } from "antd";
 
 const SuperAdminPanelPage = () => {
-
   const [userProfile, setUserProfile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
@@ -32,8 +32,17 @@ const SuperAdminPanelPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
+  // State lưu từ khóa tìm kiếm cho tab người dùng thường
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  // State lưu từ khóa tìm kiếm cho tab quản trị viên
+  const [adminSearchTerm, setAdminSearchTerm] = useState("");
+  // Danh sách người dùng đã lọc theo từ khóa tìm kiếm
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  // Danh sách quản trị viên đã lọc theo từ khóa tìm kiếm
+  const [filteredAdmins, setFilteredAdmins] = useState([]);
   const navigate = useNavigate();
 
   const tabs = [
@@ -58,8 +67,8 @@ const SuperAdminPanelPage = () => {
     }
   };
 
-  // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
-  const fetchUsers = async () => {
+  // Gọi API lấy danh sách user (tùy theo quyền của người gọi)
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
       return res.data.map((u) => ({
@@ -72,7 +81,23 @@ const SuperAdminPanelPage = () => {
     } catch (err) {
       throw new Error(err.response?.data?.message || "Failed to load user list");
     }
-  };
+  }, [userId]);
+
+  // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
+  const fetchAdmins = useCallback(async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/admin/admins?currentAdminId=${userId}`);
+      return res.data.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        phone: u.phone || "N/A",
+        avatarUrl: u.avatarUrl,
+      }));
+    } catch (err) {
+      throw new Error(err.response?.data?.message || "Failed to load admin list");
+    }
+  }, [userId]);
 
   const demoteAdminById = async (targetAdminId) => {
     try {
@@ -103,25 +128,6 @@ const SuperAdminPanelPage = () => {
           ? JSON.stringify(err.response.data)
           : err.response?.data || "Failed to delete user";
       alert(`❌ ${message}`);
-    }
-  };
-
-  const fetchAdmins = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8080/api/admin/admins?currentAdminId=${userId}`
-      );
-      return res.data.map((u) => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        phone: u.phone || "N/A",
-        role: u.role,
-        avatarUrl: u.avatarUrl,
-      }));
-    } catch (err) {
-      console.error("❌ Failed to fetch admin list", err);
-      throw new Error(err.response?.data?.message || "Failed to load admin list");
     }
   };
 
@@ -172,6 +178,8 @@ const SuperAdminPanelPage = () => {
       fetchUsers()
         .then((data) => {
           setUsers(data);
+          // Khởi tạo danh sách người dùng đã lọc với toàn bộ dữ liệu ban đầu
+          setFilteredUsers(data);
           setIsLoading(false);
         })
         .catch((err) => {
@@ -187,7 +195,9 @@ const SuperAdminPanelPage = () => {
       setError(null);
       fetchAdmins()
         .then((data) => {
-          setUsers(data);
+          setAdmins(data);
+          // Khởi tạo danh sách quản trị viên đã lọc với toàn bộ dữ liệu ban đầu
+          setFilteredAdmins(data);
           setIsLoading(false);
         })
         .catch((err) => {
@@ -201,7 +211,7 @@ const SuperAdminPanelPage = () => {
     }
 
     return () => unsubscribe();
-  }, [activeAdminTab, navigate]);
+  }, [activeAdminTab, navigate, fetchUsers, fetchAdmins, userId]);
 
   const toggleMenu = (index) => {
     setOpenMenu(openMenu === index ? null : index);
@@ -243,9 +253,45 @@ const SuperAdminPanelPage = () => {
     }
   };
 
+  // Effect hook để lọc danh sách người dùng thường khi từ khóa tìm kiếm hoặc danh sách người dùng thay đổi
+  useEffect(() => {
+    if (userSearchTerm.trim() === "") {
+      // Nếu từ khóa tìm kiếm trống, hiển thị tất cả người dùng
+      setFilteredUsers(users);
+    } else {
+      // Tìm kiếm không phân biệt hoa thường
+      const lowerCaseSearchTerm = userSearchTerm.toLowerCase();
+      setFilteredUsers(
+        users.filter(
+          (user) =>
+            user.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+            user.email.toLowerCase().includes(lowerCaseSearchTerm)
+        )
+      );
+    }
+  }, [userSearchTerm, users]);
+
+  // Effect hook để lọc danh sách quản trị viên khi từ khóa tìm kiếm hoặc danh sách quản trị viên thay đổi
+  useEffect(() => {
+    if (adminSearchTerm.trim() === "") {
+      // Nếu từ khóa tìm kiếm trống, hiển thị tất cả quản trị viên
+      setFilteredAdmins(admins);
+    } else {
+      // Tìm kiếm không phân biệt hoa thường
+      const lowerCaseSearchTerm = adminSearchTerm.toLowerCase();
+      setFilteredAdmins(
+        admins.filter(
+          (admin) =>
+            admin.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+            admin.email.toLowerCase().includes(lowerCaseSearchTerm)
+        )
+      );
+    }
+  }, [adminSearchTerm, admins]);
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
+    <div data-admin-page="true" style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
       <header className="admin-header">
         <div className="admin-header-top">
           <div className="admin-logo">
@@ -257,8 +303,8 @@ const SuperAdminPanelPage = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  width="20"
-                  height="20"
+                  width="32"
+                  height="32"
                 >
                   <path
                     strokeLinecap="round"
@@ -434,8 +480,16 @@ const SuperAdminPanelPage = () => {
                     <div className="user-title">User Management</div>
                     <div className="user-sub">Manage all users and their progress</div>
                   </div>
+                  <div className="user-search">
+                    <Input
+                      placeholder="Search by name or email"
+                      value={userSearchTerm}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                      prefix={<SearchOutlined />}
+                    />
+                  </div>
                 </div>
-                {users.map((user, index) => (
+                {filteredUsers.map((user, index) => (
                   <div className="user-row" key={index}>
                     <div className="user-left">
                       <div className="avatar">
@@ -518,8 +572,16 @@ const SuperAdminPanelPage = () => {
                     <div className="user-title">Admin Management</div>
                     <div className="user-sub">Manage all admins and their progress</div>
                   </div>
+                  <div className="user-search">
+                    <Input
+                      placeholder="Search by name or email"
+                      value={adminSearchTerm}
+                      onChange={(e) => setAdminSearchTerm(e.target.value)}
+                      prefix={<SearchOutlined />}
+                    />
+                  </div>
                 </div>
-                {users.map((user, index) => (
+                {filteredAdmins.map((user, index) => (
                   <div className="user-row" key={index}>
                     <div className="user-left">
                       <div className="avatar">

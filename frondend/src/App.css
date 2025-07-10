@@ -3928,6 +3928,7 @@ textarea {
   gap: 6px;
 }
 
+
 /* Vô hiệu hóa  Footer trên admin pages */
 body:has(.admin-header) footer {
   pointer-events: none !important;
@@ -3953,17 +3954,14 @@ body:has(.admin-header) footer {
   position: relative;
 }
 
-.user-dropdown {
-  position: absolute;
-  background-color: white;
-  min-width: 200px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  padding: 8px 0;
-  right: 0;
-  top: 100%;
-  z-index: 10;
+
+/* Vô hiệu hóa Header và Footer trên admin pages */
+body:has(.admin-header) header,
+body:has(.admin-header) footer {
+  pointer-events: none !important;
+  user-select: none !important;
 }
+
 .dropdown-item {
   padding: 10px 16px;
   cursor: pointer;
