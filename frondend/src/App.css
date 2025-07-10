@@ -3947,3 +3947,49 @@ body:has(.admin-header) footer {
   pointer-events: none !important;
   user-select: none !important;
 }
+
+/* User action dropdown styling */
+.user-action-wrapper {
+  position: relative;
+}
+
+.user-dropdown {
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 8px 0;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+}
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-item.delete-option {
+  color: #ff4d4f;
+}
+
+.dropdown-item.delete-option:hover {
+  background-color: #fff1f0;
+}
+
+.admin-action {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.admin-action:hover {
+  background-color: #f0f0f0;
+}
