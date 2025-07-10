@@ -245,7 +245,8 @@ const SuperAdminPanelPage = () => {
 
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
+    <div data-admin-page="true" style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
       <header className="admin-header">
         <div className="admin-header-top">
           <div className="admin-logo">
@@ -257,8 +258,8 @@ const SuperAdminPanelPage = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  width="20"
-                  height="20"
+                  width="32"
+                  height="32"
                 >
                   <path
                     strokeLinecap="round"
