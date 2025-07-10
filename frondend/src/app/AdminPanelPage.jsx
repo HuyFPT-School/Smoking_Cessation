@@ -18,8 +18,9 @@ import {
   MailOutlined,
   PhoneOutlined,
   MoreOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Descriptions, Avatar, Modal, Spin, Alert, Button } from "antd";
+import { Descriptions, Avatar, Modal, Spin, Alert, Button, Input } from "antd";
 
 const AdminPanelPage = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -32,6 +33,10 @@ const AdminPanelPage = () => {
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  // State để lưu trữ từ khóa tìm kiếm người dùng
+  const [searchTerm, setSearchTerm] = useState("");
+  // State để lưu trữ danh sách người dùng đã được lọc theo từ khóa tìm kiếm
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   const [openMenu, setOpenMenu] = useState(null);
   const navigate = useNavigate();
@@ -53,14 +58,20 @@ const AdminPanelPage = () => {
       const res = await axios.get("http://localhost:8080/api/admin/dashboard");
       return res.data;
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to load dashboard data");
+      throw new Error(
+        err.response?.data?.message || "Failed to load dashboard data"
+      );
     }
   };
 
   // Gọi API lấy danh sách user (tùy theo quyền của người gọi)
+  // Lưu ý: Trong SuperAdminPanelPage chúng ta đã sử dụng useCallback cho các hàm fetch
+  // để tối ưu hiệu suất và tránh cảnh báo "missing dependencies" trong useEffect
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
+      const res = await axios.get(
+        `http://localhost:8080/api/admin/users?currentAdminId=${userId}`
+      );
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -69,13 +80,17 @@ const AdminPanelPage = () => {
         avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to load user list");
+      throw new Error(
+        err.response?.data?.message || "Failed to load user list"
+      );
     }
   };
 
   const deleteUserById = async (targetUserId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`);
+      await axios.delete(
+        `http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`
+      );
       alert("✅ User deleted successfully");
       fetchUsers().then(setUsers); // load lại danh sách
     } catch (err) {
@@ -90,7 +105,10 @@ const AdminPanelPage = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user && (activeAdminTab === "dashboard" || activeAdminTab === "users")) {
+      if (
+        !user &&
+        (activeAdminTab === "dashboard" || activeAdminTab === "users")
+      ) {
         setError("Please log in to access this page");
         navigate("/login");
       }
@@ -150,7 +168,9 @@ const AdminPanelPage = () => {
     setSelectedUser(user);
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/admin/user/${user.id}`);
+      const response = await axios.get(
+        `http://localhost:8080/api/admin/user/${user.id}`
+      );
       console.log("Fetched data:", response.data); // Xem có đúng dữ liệu không
       setUserProfile(response.data); // CHỈ LẤY PHẦN PROFILE
     } catch (error) {
@@ -161,6 +181,25 @@ const AdminPanelPage = () => {
     }
   };
 
+  // Effect hook để lọc danh sách người dùng dựa trên từ khóa tìm kiếm
+  // Chạy lại mỗi khi searchTerm hoặc users thay đổi
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      // Nếu từ khóa tìm kiếm trống, hiển thị tất cả người dùng
+      setFilteredUsers(users);
+    } else {
+      // Chuyển đổi từ khóa tìm kiếm thành chữ thường để tìm kiếm không phân biệt hoa thường
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      // Lọc danh sách người dùng dựa trên tên hoặc email chứa từ khóa tìm kiếm
+      setFilteredUsers(
+        users.filter(
+          (user) =>
+            user.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+            user.email.toLowerCase().includes(lowerCaseSearchTerm)
+        )
+      );
+    }
+  }, [searchTerm, users]);
 
   return (
     // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
@@ -188,7 +227,9 @@ const AdminPanelPage = () => {
               </span>
               Admin Page
             </div>
-            <div className="admin-subtitle">Manage users and platform content</div>
+            <div className="admin-subtitle">
+              Manage users and platform content
+            </div>
           </div>
         </div>
       </header>
@@ -197,7 +238,9 @@ const AdminPanelPage = () => {
           <a
             key={tab.path}
             href={`#${tab.path}`}
-            className={`tab-item ${activeAdminTab === tab.path ? "active" : ""}`}
+            className={`tab-item ${
+              activeAdminTab === tab.path ? "active" : ""
+            }`}
             onClick={(e) => {
               e.preventDefault();
               setActiveAdminTab(tab.path);
@@ -252,62 +295,84 @@ const AdminPanelPage = () => {
                       <div className="card-label">Support Requests</div>
                     </div>
                     <div className="card-value">N/A</div>
-                    <div className="card-sub-sub">Pending responses (no API yet)</div>
+                    <div className="card-sub-sub">
+                      Pending responses (no API yet)
+                    </div>
                   </div>
                 </div>
                 <div className="section-box" style={{ marginTop: "20px" }}>
                   <div className="section-title">Platform Analytics</div>
                   <div className="dashboard-grid analytics-section">
                     <div className="analytics-card">
-
                       <div className="analytics-title">
                         <UserOutlined /> New Users
                       </div>
-                      <div className="analytics-value">{dashboardStats?.newUsersThisMonth ?? "N/A"}</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.newUsersThisMonth ?? "N/A"}
+                      </div>
                       <div className="analytics-sub">This month</div>
                     </div>
                     <div className="analytics-card">
-
                       <div className="analytics-title">
-                        <CheckCircleOutlined style={{ color: "#52c41a" }} /> Smoke-Free Rate
+                        <CheckCircleOutlined style={{ color: "#52c41a" }} />{" "}
+                        Smoke-Free Rate
                       </div>
-                      <div className="analytics-value">{dashboardStats?.overallSmokeFreeRate ?? "N/A"}%</div>
-                      <div className="analytics-sub">+{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from last month</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.overallSmokeFreeRate ?? "N/A"}%
+                      </div>
+                      <div className="analytics-sub">
+                        +{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from
+                        last month
+                      </div>
                     </div>
                     <div className="analytics-card">
-
                       <div className="analytics-title">
-                        <AreaChartOutlined style={{ color: "#9254de" }} /> Avg. Days Quit
+                        <AreaChartOutlined style={{ color: "#9254de" }} /> Avg.
+                        Days Quit
                       </div>
-                      <div className="analytics-value">{dashboardStats?.averageDailyUsers ?? "N/A"}</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.averageDailyUsers ?? "N/A"}
+                      </div>
                       <div className="analytics-sub">Per successful user</div>
                     </div>
                   </div>
                 </div>
                 <div className="section-box">
-                  <div className="section-title">User Progress Distribution</div>
+                  <div className="section-title">
+                    User Progress Distribution
+                  </div>
                   <div className="progress-row">
                     <div className="progress-label">First Week (1–7 days)</div>
                     <div className="progress-bar-container">
                       <div className="progress-bar-track">
                         <div
                           className="bar-red"
-                          style={{ width: `${dashboardStats?.firstWeekPercent ?? 0}%` }}
+                          style={{
+                            width: `${dashboardStats?.firstWeekPercent ?? 0}%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.firstWeekPercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.firstWeekPercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                   <div className="progress-row">
-                    <div className="progress-label">First Month (8–30 days)</div>
+                    <div className="progress-label">
+                      First Month (8–30 days)
+                    </div>
                     <div className="progress-bar-container">
                       <div className="progress-bar-track">
                         <div
                           className="bar-orange"
-                          style={{ width: `${dashboardStats?.firstMonthPercent ?? 0}%` }}
+                          style={{
+                            width: `${dashboardStats?.firstMonthPercent ?? 0}%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.firstMonthPercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.firstMonthPercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                   <div className="progress-row">
@@ -316,10 +381,16 @@ const AdminPanelPage = () => {
                       <div className="progress-bar-track">
                         <div
                           className="bar-green"
-                          style={{ width: `${dashboardStats?.threeMonthsOrMorePercent ?? 0}%` }}
+                          style={{
+                            width: `${
+                              dashboardStats?.threeMonthsOrMorePercent ?? 0
+                            }%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.threeMonthsOrMorePercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.threeMonthsOrMorePercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -351,10 +422,22 @@ const AdminPanelPage = () => {
                 <div className="user-header">
                   <div>
                     <div className="user-title">User Management</div>
-                    <div className="user-sub">Manage all users and their progress</div>
+                    <div className="user-sub">
+                      Manage all users and their progress
+                    </div>
+                  </div>
+                  {/* Ô tìm kiếm người dùng theo tên hoặc email */}
+                  <div className="user-search">
+                    <Input
+                      placeholder="Search by name or email"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      prefix={<SearchOutlined />}
+                    />
                   </div>
                 </div>
-                {users.map((user, index) => (
+                {/* Hiển thị danh sách người dùng đã lọc theo từ khóa tìm kiếm thay vì danh sách gốc */}
+                {filteredUsers.map((user, index) => (
                   <div className="user-row" key={index}>
                     <div className="user-left">
                       <div className="avatar">
@@ -388,15 +471,24 @@ const AdminPanelPage = () => {
                         </div>
                       </div>
                     </div>
-                
+
                     <div className="user-action-wrapper">
-                      <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
+                      <MoreOutlined
+                        className="admin-action"
+                        onClick={() => toggleMenu(index)}
+                      />
                       {openMenu === index && (
                         <div className="user-dropdown">
-                          <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
+                          <div
+                            className="dropdown-item delete-option"
+                            onClick={() => handleDeleteUser(user)}
+                          >
                             <DeleteOutlined /> Delete User
                           </div>
-                          <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
+                          <div
+                            className="dropdown-item"
+                            onClick={() => handleUserProfile(user)}
+                          >
                             <UserOutlined /> User Profile
                           </div>
                         </div>
@@ -412,18 +504,20 @@ const AdminPanelPage = () => {
           <div>
             <div className="section-box">
               <div className="section-title">
-                <FileTextOutlined style={{ color: "#000" }} /> Admin Community Management
+                <FileTextOutlined style={{ color: "#000" }} /> Admin Community
+                Management
               </div>
-              <div className="section-sub">View and manage community blog posts</div>
+              <div className="section-sub">
+                View and manage community blog posts
+              </div>
               <CommunityBlogPage />
             </div>
           </div>
         )}
       </div>
 
-
       <Modal
-        title={ "User Profile"}
+        title={"User Profile"}
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
@@ -445,7 +539,6 @@ const AdminPanelPage = () => {
               <div style={{ fontWeight: "bold", marginTop: 8 }}>
                 {selectedUser?.name || "N/A"}
               </div>
-
             </div>
 
             {/* Thông báo nếu chưa có profile */}
@@ -455,25 +548,36 @@ const AdminPanelPage = () => {
               </p>
             )}
 
-
             {/* Bảng Descriptions */}
             <Descriptions bordered column={1} size="middle">
-              <Descriptions.Item label="Phone">{userProfile?.phone || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Birthdate">{userProfile?.birthdate || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Gender">{userProfile?.gender || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Smoking Age">{userProfile?.smokingAge ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Years Smoked">{userProfile?.yearsSmoked ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Occupation">{userProfile?.occupation || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Health Status">{userProfile?.healthStatus || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Bio">{userProfile?.bio || "No bio provided."}</Descriptions.Item>
+              <Descriptions.Item label="Phone">
+                {userProfile?.phone || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Birthdate">
+                {userProfile?.birthdate || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Gender">
+                {userProfile?.gender || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Smoking Age">
+                {userProfile?.smokingAge ?? "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Years Smoked">
+                {userProfile?.yearsSmoked ?? "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Occupation">
+                {userProfile?.occupation || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Health Status">
+                {userProfile?.healthStatus || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Bio">
+                {userProfile?.bio || "No bio provided."}
+              </Descriptions.Item>
             </Descriptions>
           </div>
         )}
-
-
       </Modal>
-
-
     </div>
   ); // Added the missing closing parenthesis here
 };
