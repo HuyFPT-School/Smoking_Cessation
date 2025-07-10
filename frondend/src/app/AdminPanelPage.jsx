@@ -163,8 +163,8 @@ const AdminPanelPage = () => {
 
 
   return (
-
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
+    <div data-admin-page="true" style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
       <header className="admin-header">
         <div className="admin-header-top">
           <div className="admin-logo">
@@ -176,8 +176,8 @@ const AdminPanelPage = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  width="20"
-                  height="20"
+                  width="32"
+                  height="32"
                 >
                   <path
                     strokeLinecap="round"
@@ -231,26 +231,26 @@ const AdminPanelPage = () => {
               <>
                 <div className="dashboard-grid">
                   <div className="dashboard-card-admin">
-                    <div className="card-icon">
-                      <UserOutlined />
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                      <UserOutlined style={{ marginRight: '8px' }} />
+                      <div className="card-label">Total Users</div>
                     </div>
-                    <div className="card-label">Total Users</div>
                     <div className="card-value">{dashboardStats?.totalUsers ?? "N/A"}</div>
                     <div className="card-sub">{dashboardStats?.growthRate ?? "N/A"}% from last month</div>
                   </div>
                   <div className="dashboard-card-admin">
-                    <div className="card-icon">
-                      <RiseOutlined />
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                      <RiseOutlined style={{ marginRight: '8px' }} />
+                      <div className="card-label">Success Rate</div>
                     </div>
-                    <div className="card-label">Success Rate</div>
                     <div className="card-value">{dashboardStats?.successRate ?? "N/A"}%</div>
                     <div className="card-sub">Users who quit successfully</div>
                   </div>
                   <div className="dashboard-card-admin">
-                    <div className="card-icon">
-                      <MessageOutlined />
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                      <MessageOutlined style={{ marginRight: '8px' }} />
+                      <div className="card-label">Support Requests</div>
                     </div>
-                    <div className="card-label">Support Requests</div>
                     <div className="card-value">N/A</div>
                     <div className="card-sub-sub">Pending responses (no API yet)</div>
                   </div>
