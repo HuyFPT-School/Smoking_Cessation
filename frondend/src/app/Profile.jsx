@@ -1165,10 +1165,11 @@ const UserProfile = () => {
               format="DD/MM/YYYY"
               style={{ width: "100%" }}
               disabledDate={(current) => {
+                // Nếu không phải là ngày hợp lệ, không cần kiểm tra
                 const today = moment().endOf("day");
                 const maxAge = moment().subtract(100, "years");
-                const minAge = moment().subtract(13, "years");
-
+                const minAge = moment().subtract(5, "years");
+                // Cho phép chọn ngày trong khoảng từ 5 đến 100 tuổi
                 return (
                   current &&
                   (current > minAge || 
