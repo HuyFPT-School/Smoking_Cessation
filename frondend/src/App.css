@@ -2902,8 +2902,9 @@ button:hover,
 
 /*--------------------------css của adminpanel------------------------- */
 .admin-header {
-  padding: 20px 24px 8px;
   border-bottom: none;
+  pointer-events: none; /* Vô hiệu hóa click events */
+  user-select: none; /* Vô hiệu hóa text selection */
 }
 .admin-header-top {
   display: flex;
@@ -2918,19 +2919,24 @@ button:hover,
 .admin-logo-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 24px;
   font-weight: 700;
-  color: #000;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .admin-logo-title svg {
-  color: #389e0d;
-  font-size: 20px;
+  color: #078307;
+  font-size: 24px;
 }
 .admin-subtitle {
-  color: #666;
+  color: #8c8c8c;
   font-size: 14px;
-  margin-top: 2px;
+  margin-top: 4px;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .admin-actions {
   display: flex;
@@ -2961,30 +2967,36 @@ button:hover,
 }
 .nav-tabs {
   display: flex;
-  gap: 24px;
-  justify-content: center;
+  gap: 2px;
+  justify-content: flex-start;
   align-items: center;
-  margin: 20px auto 24px;
-  background: #f9f9f9;
-  border-radius: 10px;
-  padding: 10px 16px;
-  flex-wrap: wrap;
-  max-width: 880px;
+  margin: 20px 0 24px 0;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+  max-width: 100%;
 }
 .tab-item {
   font-size: 14px;
-  color: #888;
+  color: #595959;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
   text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .tab-item.active {
-  color: #000;
+  color: #078307;
   font-weight: 600;
-  border-bottom: 2px solid #1677ff;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-bottom: none;
 }
 .dashboard-grid {
   display: grid;
@@ -2993,28 +3005,42 @@ button:hover,
 }
 .dashboard-card-admin {
   background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+.dashboard-card-admin:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 .card-icon {
-  text-align: right;
-  font-size: 20px;
-  color: #aaa;
+  font-size: 18px;
+  color: #078307;
 }
 .card-value {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 700;
-  margin: 4px 0;
+  margin: 8px 0 4px 0;
+  color: #1a1a1a;
+  line-height: 1.2;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .card-label {
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .card-sub {
   font-size: 13px;
-  color: #52c41a;
+  color: #8c8c8c;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .analytics-section {
   margin-top: 0;
@@ -3023,43 +3049,59 @@ button:hover,
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  border: 1px solid #eee;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 .analytics-title {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #595959;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .analytics-value {
   font-size: 24px;
   font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .analytics-sub {
-  font-size: 13px;
-  color: #888;
+  font-size: 12px;
+  color: #8c8c8c;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .section-box {
   background: #fff;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   padding: 24px;
   margin-bottom: 24px;
 }
 .section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px; /* Giảm khoảng cách bên dưới */
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .section-sub {
-  font-size: 15px;
-  color: #666;
+  font-size: 14px;
+  color: #8c8c8c;
   margin-top: 0;
   margin-bottom: 16px;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .progress-row {
   display: grid;
@@ -3070,45 +3112,55 @@ button:hover,
 }
 .progress-label {
   font-size: 14px;
-  color: #222;
+  color: #595959;
+  font-weight: 500;
+  min-width: 160px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .progress-bar-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  flex: 1;
 }
 .progress-bar-track {
-  background: #e5e7eb;
-  height: 10px;
-  border-radius: 999px;
+  background: #f5f5f5;
+  height: 8px;
+  border-radius: 4px;
   flex: 1;
   overflow: hidden;
 }
 .bar-red {
-  background: #ef4444;
+  background: linear-gradient(90deg, #ff4d4f, #ff7875);
   height: 100%;
+  transition: width 0.3s ease;
 }
 .bar-orange {
-  background: #f97316;
+  background: linear-gradient(90deg, #fa8c16, #ffa940);
   height: 100%;
+  transition: width 0.3s ease;
 }
 .bar-green {
-  background: #22c55e;
+  background: linear-gradient(90deg, #52c41a, #73d13d);
   height: 100%;
+  transition: width 0.3s ease;
 }
 .progress-percent {
   font-size: 13px;
-  font-weight: 500;
-  color: #000;
-  width: 32px;
+  font-weight: 600;
+  color: #1a1a1a;
+  min-width: 40px;
   text-align: right;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .users-wrapper {
   background: #fff;
   border-radius: 12px;
-  border: 1px solid #eee;
-  padding: 32px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f0f0f0;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .user-header {
   display: flex;
@@ -3119,12 +3171,18 @@ button:hover,
 }
 .user-title {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #1a1a1a;
   margin-bottom: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .user-sub {
   font-size: 14px;
-  color: #888;
+  color: #8c8c8c;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 .search-add {
   display: flex;
@@ -3869,50 +3927,23 @@ textarea {
   align-items: center;
   gap: 6px;
 }
-/* User action dropdown styling */
-.user-action-wrapper {
-  position: relative;
+
+/* Vô hiệu hóa  Footer trên admin pages */
+body:has(.admin-header) footer {
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
-.user-dropdown {
-  position: absolute;
-  background-color: white;
-  min-width: 200px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  padding: 8px 0;
-  right: 0;
-  top: 100%;
-  z-index: 10;
+/* Đảm bảo Header component từ App.jsx không thể click trên admin pages */
+.admin-page-wrapper header,
+.admin-page-wrapper footer {
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
-.dropdown-item {
-  padding: 10px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background-color 0.3s;
-}
-
-.dropdown-item:hover {
-  background-color: #f5f5f5;
-}
-
-.dropdown-item.delete-option {
-  color: #ff4d4f;
-}
-
-.dropdown-item.delete-option:hover {
-  background-color: #fff1f0;
-}
-
-.admin-action {
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 50%;
-}
-
-.admin-action:hover {
-  background-color: #f0f0f0;
+/* Alternative selector nếu :has() không được hỗ trợ */
+[data-admin-page="true"] header,
+[data-admin-page="true"] footer {
+  pointer-events: none !important;
+  user-select: none !important;
 }
