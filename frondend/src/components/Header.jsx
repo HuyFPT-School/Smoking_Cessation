@@ -129,7 +129,7 @@ const Header = () => {
           <IconButton
             disableRipple
             component={RouterLink}
-            to="/"
+            to={isAdminRole ? (user?.role === "SUPER_ADMIN" ? "/superadmin" : "/admin") : "/"}
             sx={{ mr: 1 }}
           >
             <svg
@@ -156,7 +156,7 @@ const Header = () => {
           >
             <MuiLink
               component={RouterLink} // Sử dụng RouterLink để điều hướng nội bộ
-              to="/"
+              to={isAdminRole ? (user?.role === "SUPER_ADMIN" ? "/superadmin" : "/admin") : "/"}
               underline="none"
               color="inherit"
               sx={{ textDecoration: "none" }}
