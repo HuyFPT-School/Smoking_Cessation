@@ -10,8 +10,16 @@ import {
   Typography, 
   Paper, 
   Snackbar, 
-  Alert, 
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
@@ -19,7 +27,9 @@ import { AuthContext } from "../context/AuthContext";
 import { auth } from "../firebase";
 import {
   createUserWithEmailAndPassword, 
-  updateProfile, 
+  updateProfile,
+  sendEmailVerification,
+  reload,
 } from "firebase/auth";
 import axios from "axios";
 
@@ -29,9 +39,16 @@ const Register = () => {
   const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState(""); 
   const [agreeTerms, setAgreeTerms] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false); 
 
   // State để theo dõi trạng thái loading (đang xử lý) - ngăn user bấm nhiều lần
   const [isLoading, setIsLoading] = useState(false);
+
+  // State cho email verification
+  const [showVerificationDialog, setShowVerificationDialog] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [checkingVerification, setCheckingVerification] = useState(false);
+  const [tempUser, setTempUser] = useState(null);
 
   // Các state để quản lý thông báo (snackbar)
   const [open, setOpen] = useState(false); 
@@ -46,6 +63,58 @@ const Register = () => {
     setSnackbarMsg(message); 
     setSnackbarType(type); 
     setOpen(true); 
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  // Hàm gửi email xác nhận
+  const sendVerificationEmail = async (user) => {
+    try {
+      await sendEmailVerification(user);
+      setVerificationSent(true);
+      showSnackbar("Verification email has been sent! Please check your inbox.", "success");
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      showSnackbar("Unable to send verification email. Please try again.", "error");
+    }
+  };
+
+  // Hàm kiểm tra trạng thái xác nhận email
+  const checkEmailVerification = async () => {
+    if (!tempUser) return;
+    
+    setCheckingVerification(true);
+    try {
+      await reload(tempUser);
+      if (tempUser.emailVerified) {
+        showSnackbar("Email has been verified successfully!", "success");
+        setShowVerificationDialog(false);
+        
+        // Tiếp tục với quá trình đăng ký
+        const idToken = await tempUser.getIdToken(true);
+        await fetchUserFromBackend(idToken);
+      } else {
+        showSnackbar("Email has not been verified yet. Please check your inbox.", "warning");
+      }
+    } catch (error) {
+      console.error("Error checking verification:", error);
+      showSnackbar("Error occurred while checking email verification.", "error");
+    } finally {
+      setCheckingVerification(false);
+    }
+  };
+
+  // Hàm gửi lại email xác nhận
+  const resendVerificationEmail = async () => {
+    if (tempUser) {
+      await sendVerificationEmail(tempUser);
+    }
   };
 
   const fetchUserFromBackend = async (idToken) => {
@@ -90,6 +159,7 @@ const Register = () => {
 
     if (!agreeTerms) {
       showSnackbar("⚠️ You must agree to the terms and policies.", "warning");
+      setIsLoading(false);
       return; 
     }
 
@@ -104,15 +174,16 @@ const Register = () => {
         displayName: Username, 
       });
 
-      //  Đợi Firebase cập nhật profile hoàn tất
-      await new Promise((resolve) => setTimeout(resolve, 500)); //  Lấy token mới sau khi update profile (đảm bảo name đúng)
-      const idToken = await result.user.getIdToken(true);
-      await fetchUserFromBackend(idToken);
+      // Lưu user tạm thời và gửi email xác nhận
+      setTempUser(result.user);
+      await sendVerificationEmail(result.user);
+      setShowVerificationDialog(true);
+
     } catch (err) {
       console.error("Registration error:", err);
       if (err.code === "auth/email-already-in-use") {
         showSnackbar(
-          " Email already exists. Please use another email.",
+          "Email already exists. Please use another email.",
           "error"
         );
       } else if (err.code === "auth/weak-password") {
@@ -161,13 +232,27 @@ const Register = () => {
           <TextField
             fullWidth
             label="Password"
-            type="password" 
+            type={showPassword ? "text" : "password"}
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             helperText="Password must be more than 6 characters" 
             required
             error={password.length > 0 && password.length < 6}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <FormControlLabel
             control={
@@ -214,7 +299,7 @@ const Register = () => {
               "&:hover": { bgcolor: "#15803d" }, 
             }}
           >
-            {isLoading ? "Logging in..." : "Register"}{" "}
+            {isLoading ? "Registering..." : "Register"}{" "}
           </Button>
         </form>
 
@@ -231,6 +316,103 @@ const Register = () => {
           </MuiLink>
         </Typography>
       </Paper>
+
+      {/* Dialog xác nhận email */}
+      <Dialog 
+        open={showVerificationDialog} 
+        onClose={() => {}} // Không cho phép đóng bằng cách click ra ngoài
+        maxWidth="sm"
+        fullWidth
+        className="email-verification-dialog"
+        PaperProps={{
+          className: "email-verification-content"
+        }}
+      >
+        <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
+          <Typography variant="h6" fontWeight="bold" color="primary">
+            Email Verification
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", pt: 1 }}>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            We have sent a verification email to:
+          </Typography>
+          <Typography 
+            variant="body1" 
+            fontWeight="bold" 
+            className="verification-email-text"
+            sx={{ mb: 2 }}
+          >
+            {email}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Please check your inbox and click on the verification link, 
+            then click the "Check Verification" button below.
+          </Typography>
+          
+          {verificationSent && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              Verification email has been sent successfully!
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, flexDirection: "column", gap: 1 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={checkEmailVerification}
+            disabled={checkingVerification}
+            className="verification-button"
+            sx={{
+              bgcolor: "#16A34A",
+              "&:hover": { bgcolor: "#15803d" },
+            }}
+          >
+            {checkingVerification ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1, color: "white" }} />
+                Checking...
+              </>
+            ) : (
+              "Check Verification"
+            )}
+          </Button>
+          
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={resendVerificationEmail}
+            disabled={checkingVerification}
+            sx={{
+              borderColor: "#16A34A",
+              color: "#16A34A",
+              "&:hover": { 
+                borderColor: "#15803d",
+                bgcolor: "rgba(22, 163, 74, 0.04)"
+              },
+            }}
+          >
+            Resend verification email
+          </Button>
+          
+          <Button
+            fullWidth
+            variant="text"
+            onClick={() => {
+              setShowVerificationDialog(false);
+              // Xóa user tạm thời nếu hủy
+              if (tempUser) {
+                tempUser.delete().catch(console.error);
+                setTempUser(null);
+              }
+              setVerificationSent(false);
+            }}
+            sx={{ color: "text.secondary", mt: 1 }}
+          >
+            Cancel registration
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={open} 

@@ -8,7 +8,10 @@ import {
   Typography,
   Snackbar,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
@@ -28,6 +31,7 @@ const Login = () => {
   // State quản lý form đăng nhập
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // State quản lý thông báo
   const [open, setOpen] = useState(false);
@@ -45,6 +49,14 @@ const Login = () => {
     setSnackbarMsg(message);
     setSnackbarType(type);
     setOpen(true);
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
   // Lấy thông tin user từ backend sau khi đăng nhập thành công
   const fetchUserFromBackend = async (idToken) => {
@@ -157,11 +169,25 @@ const Login = () => {
           <TextField
             fullWidth
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <Button
