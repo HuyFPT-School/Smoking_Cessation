@@ -4033,3 +4033,112 @@ body:has(.admin-header) footer {
 .admin-action:hover {
   background-color: #f0f0f0;
 }
+/* ...existing code... */
+
+.admin-action:hover {
+  background-color: #f0f0f0;
+}
+
+/* Email Verification Dialog Styles */
+.email-verification-dialog .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.email-verification-dialog .ant-modal-header {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-bottom: none;
+  padding: 20px 24px 16px;
+}
+
+.email-verification-dialog .ant-modal-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.email-verification-content {
+  padding: 0;
+}
+
+.email-verification-dialog .ant-modal-body {
+  padding: 24px;
+  text-align: center;
+}
+
+.verification-email-text {
+  background: #f0f9ff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #bae6fd;
+  display: inline-block;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.verification-button {
+  transition: all 0.3s ease;
+}
+
+.verification-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.verification-button:active {
+  transform: translateY(0);
+}
+
+/* Email verification specific alerts */
+.email-verification-dialog .ant-alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.email-verification-dialog .ant-alert-info {
+  background: #e6f4ff;
+  border-left: 4px solid #1677ff;
+}
+
+/* Dialog actions styling */
+.email-verification-dialog .ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+/* Responsive design for email verification */
+@media (max-width: 576px) {
+  .email-verification-dialog .ant-modal-content {
+    margin: 16px;
+  }
+  
+  .verification-email-text {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .email-verification-dialog .ant-modal-body {
+    padding: 16px;
+  }
+}
+
+/* Animation for verification success */
+.verification-success {
+  animation: verificationPulse 0.6s ease-in-out;
+}
+
+@keyframes verificationPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Loading spinner in verification button */
+.verification-button .ant-spin {
+  color: white;
+}
+
+.verification-button .ant-spin-dot-item {
+  background-color: white;
+}
