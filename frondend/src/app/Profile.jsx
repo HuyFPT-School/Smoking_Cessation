@@ -14,6 +14,7 @@ import {
   Row,
   Col,
   Statistic,
+  message,
 } from "antd";
 import { Snackbar, Alert } from "@mui/material";
 import {
@@ -34,7 +35,6 @@ import moment from "moment";
 import "../App.css";
 import { useParams } from "react-router-dom";
 
-
 const { Title, Text } = Typography;
 const { Option } = Select;
 
@@ -52,18 +52,19 @@ const UserProfile = () => {
   // Dùng để disable nút hoặc hiện loading khi đang liên kết
   const [linkingGoogle, setLinkingGoogle] = useState(false);
 
-  const [snackbar, setSnackbar] = useState({
-    open: false, 
-    message: "", 
-    severity: "info", 
-  });
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({
-      open: true, 
-      message, 
-      severity, 
+      open: true,
+      message,
+      severity,
     });
   };
 
@@ -97,7 +98,6 @@ const UserProfile = () => {
 
   const localUserId = userObj ? userObj.id : null;
   const userId = paramUserId || localUserId;
-
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -134,28 +134,28 @@ const UserProfile = () => {
 
           //  gán giá trị mặc định cho form
           form.setFieldsValue({
-            name: profileData.name, 
-            phone: profileData.phone, 
-            birthdate: profileData.birthdate 
+            name: profileData.name,
+            phone: profileData.phone,
+            birthdate: profileData.birthdate
               ? moment(profileData.birthdate, "DD/MM/YYYY")
-              : null, 
-            gender: profileData.gender, 
-            bio: profileData.bio, 
-            smokingAge: profileData.smokingAge, 
-            yearsSmoked: profileData.yearsSmoked, 
-            occupation: profileData.occupation, 
-            healthStatus: profileData.healthStatus, 
+              : null,
+            gender: profileData.gender,
+            bio: profileData.bio,
+            smokingAge: profileData.smokingAge,
+            yearsSmoked: profileData.yearsSmoked,
+            occupation: profileData.occupation,
+            healthStatus: profileData.healthStatus,
           });
         }
       } catch (error) {
         if (error.response?.status === 404) {
-          console.log("No profile found, user can create one"); 
+          console.log("No profile found, user can create one");
         } else {
-          console.error("Error fetching profile data:", error); 
-          showSnackbar("Failed to load profile data", "error"); 
+          console.error("Error fetching profile data:", error);
+          showSnackbar("Failed to load profile data", "error");
         }
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -185,8 +185,76 @@ const UserProfile = () => {
       }
     };
 
-    fetchLeaderboardData(); 
+    fetchLeaderboardData();
   }, [userId]);
+
+  const handleAvatarUpload = async ({ file }) => {
+    // 1. Kiểm tra file trước khi tải lên
+    const isImage = file.type.startsWith("image/");
+    if (!isImage) {
+      message.error("You can only upload image files (JPG, PNG, GIF)!");
+      return;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image must be less than 2MB!");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "avatar_unsigned");
+
+    try {
+      // 2. Tải ảnh lên Cloudinary
+      const cloudinaryResponse = await axios.post(
+        "https://api.cloudinary.com/v1_1/dt6uoyt1t/image/upload",
+        formData
+      );
+      const newAvatarUrl = cloudinaryResponse.data.secure_url;
+
+      if (!auth.currentUser) {
+        showSnackbar("User is not logged in, cannot update.", "error");
+        setUploadingAvatar(false);
+        return;
+      }
+      const idToken = await auth.currentUser.getIdToken(true);
+
+      // 4. Cập nhật URL avatar mới vào backend VỚI HEADER XÁC THỰC
+      const backendResponse = await axios.post(
+        `http://localhost:8080/api/user/avatar`,
+        { avatarUrl: newAvatarUrl }, // Body của request
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+
+      if (backendResponse.status === 200) {
+        // 5. Cập nhật state và localStorage để UI thay đổi ngay lập tức
+        const updatedAvatarUrl = backendResponse.data.avatarUrl;
+        const updatedUser = { ...user, avatarUrl: updatedAvatarUrl };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        if (userData) {
+          setUserData((prevData) => ({
+            ...prevData,
+            user: { ...prevData.user, avatarUrl: updatedAvatarUrl },
+          }));
+        }
+
+        showSnackbar("Profile picture updated successfully!", "success");
+      }
+    } catch (error) {
+      console.error("Error loading avatar:", error);
+      showSnackbar("Profile picture update failed. Please try again.", "error");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -197,27 +265,27 @@ const UserProfile = () => {
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false); 
+    setIsModalVisible(false);
     if (userData) {
       form.setFieldsValue({
-        name: userData.name, 
-        phone: userData.phone, 
-        birthdate: userData.birthdate 
+        name: userData.name,
+        phone: userData.phone,
+        birthdate: userData.birthdate
           ? moment(userData.birthdate, "DD/MM/YYYY")
           : null,
-        gender: userData.gender, 
-        bio: userData.bio, 
-        smokingAge: userData.smokingAge, 
-        yearsSmoked: userData.yearsSmoked, 
+        gender: userData.gender,
+        bio: userData.bio,
+        smokingAge: userData.smokingAge,
+        yearsSmoked: userData.yearsSmoked,
         occupation: userData.occupation,
-        healthStatus: userData.healthStatus, 
+        healthStatus: userData.healthStatus,
       });
     }
   };
   const handleFinish = async (values) => {
     if (!userId) {
-      showSnackbar("User ID not found", "error"); 
-      return; 
+      showSnackbar("User ID not found", "error");
+      return;
     }
 
     setLoading(true); // chặn người dùng gửi data khi đang load data
@@ -229,7 +297,7 @@ const UserProfile = () => {
 
       const profileData = {
         ...values, // giữ lại những trường cũ mà ng dùng đã nhập trong form
-        userId: parseInt(userId) || userId, // thêm userid 
+        userId: parseInt(userId) || userId, // thêm userid
       };
 
       const response = await axios.post(
@@ -246,17 +314,17 @@ const UserProfile = () => {
             ...user, //sao chép toàn bộ thuộc tính từ object user vào object mới
             name: values.name, // Ghi đè trường name nếu có tên mới (values.name)
           };
-          setUser(updatedUser); 
+          setUser(updatedUser);
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
-        setIsModalVisible(false); 
-        showSnackbar("Profile updated successfully!", "success"); 
+        setIsModalVisible(false);
+        showSnackbar("Profile updated successfully!", "success");
       }
     } catch (error) {
-      console.error("Error saving profile:", error); 
-      showSnackbar("Failed to save profile. Please try again.", "error"); 
+      console.error("Error saving profile:", error);
+      showSnackbar("Failed to save profile. Please try again.", "error");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -264,14 +332,14 @@ const UserProfile = () => {
     //auth.currentUser là thông tin người dùng hiện tại đã đăng nhập
     //Kiểm tra xem đã có ai đăng nhập chưa.
     if (!auth.currentUser) {
-      showSnackbar("Please log in first", "error"); 
+      showSnackbar("Please log in first", "error");
       return;
     }
 
     setLinkingGoogle(true); //Hiển thị trạng thái linking.
     try {
-      const provider = new GoogleAuthProvider(); 
-      const result = await linkWithPopup(auth.currentUser, provider); 
+      const provider = new GoogleAuthProvider();
+      const result = await linkWithPopup(auth.currentUser, provider);
 
       const idToken = await result.user.getIdToken(true);
 
@@ -280,14 +348,14 @@ const UserProfile = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${idToken}`, 
+            Authorization: `Bearer ${idToken}`,
           },
         }
       );
 
       if (response.status === 200) {
         const updatedUser = response.data.user || response.data;
-        setUser(updatedUser); 
+        setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
         showSnackbar(
           "🎉 Google account linked successfully! You can now login with Google or Email/Password.",
@@ -295,9 +363,9 @@ const UserProfile = () => {
         );
       }
     } catch (error) {
-      console.error("Error linking Google account:", error); 
+      console.error("Error linking Google account:", error);
       if (error.code === "auth/popup-closed-by-user") {
-        showSnackbar("Google linking cancelled.", "info"); 
+        showSnackbar("Google linking cancelled.", "info");
       } else if (error.code === "auth/credential-already-in-use") {
         showSnackbar(
           "This Google account is already linked to another user.",
@@ -373,7 +441,7 @@ const UserProfile = () => {
               return moment([year, month - 1, day]).format("DD/MM/YYYY"); // Dùng moment.js để tạo đối tượng ngày, rồi format theo kiểu dd/mm/yyyy
             }
           } catch (e) {
-            console.error("Failed to parse date array string:", e); 
+            console.error("Failed to parse date array string:", e);
           }
         }
 
@@ -405,21 +473,21 @@ const UserProfile = () => {
       // Kiểm tra xem dateValue có phải là mảng ít nhất 3 phần tử không (tức [year, month, day]).
       if (Array.isArray(dateValue) && dateValue.length >= 3) {
         const year = dateValue[0];
-        const month = dateValue[1]; 
+        const month = dateValue[1];
         const day = dateValue[2];
-        return moment([year, month - 1, day]).format("DD/MM/YYYY"); 
+        return moment([year, month - 1, day]).format("DD/MM/YYYY");
       }
 
-      console.error("Invalid date format for createAt:", dateValue); 
-      return "N/A"; 
+      console.error("Invalid date format for createAt:", dateValue);
+      return "N/A";
     } catch (error) {
-      console.error("Error formatting date:", error); 
-      return "N/A"; 
+      console.error("Error formatting date:", error);
+      return "N/A";
     }
   };
   // ngày bắt đầu trở thành thành viên
   const getMemberSinceDate = () => {
-    console.log("Finding member since date"); 
+    console.log("Finding member since date");
 
     const dateFields = [
       "createAt",
@@ -435,7 +503,7 @@ const UserProfile = () => {
     if (userObj) {
       for (const field of dateFields) {
         if (userObj[field]) {
-          console.log(`Using date from userObj.${field}`); 
+          console.log(`Using date from userObj.${field}`);
           return formatMemberSinceDate(userObj[field]); // Gọi hàm formatMemberSinceDate(...) để định dạng ngày theo ý muốn
         }
       }
@@ -446,7 +514,7 @@ const UserProfile = () => {
       for (const field of dateFields) {
         if (userData[field]) {
           //Nếu userData có một trong các trường đang duyệt->sử dụng
-          console.log(`Using date from userData.${field}`); 
+          console.log(`Using date from userData.${field}`);
           //Gọi hàm formatMemberSinceDate(...) để định dạng ngày (ví dụ chuyển từ "2023-04-15T10:00:00Z" thành "15/04/2023").
           return formatMemberSinceDate(userData[field]);
         }
@@ -476,16 +544,16 @@ const UserProfile = () => {
       return formatMemberSinceDate(date);
     }
 
-    console.log("No date found, using default date"); 
+    console.log("No date found, using default date");
 
-    return "N/A"; 
+    return "N/A";
   };
   //tổng hợp các thống kê chính (summary) của người dùng trong ứng dụng theo dõi việc bỏ thuốc
   const summaryStats = {
-    smokeFreeDays: leaderboardData?.consecutiveSmokFreeDays || 0, 
-    achievementPoints: leaderboardData?.totalPoints || 0, 
-    memberSince: getMemberSinceDate(), 
-    rank: leaderboardData?.rank || "-", 
+    smokeFreeDays: leaderboardData?.consecutiveSmokFreeDays || 0,
+    achievementPoints: leaderboardData?.totalPoints || 0,
+    memberSince: getMemberSinceDate(),
+    rank: leaderboardData?.rank || "-",
   };
 
   if (loading && !userData) {
@@ -581,15 +649,26 @@ const UserProfile = () => {
             left: "24px",
           }}
         >
-          <Avatar
-            size={100}
-            src={user?.avatarUrl}
-            icon={!user?.avatarUrl && <CameraOutlined />}
-            style={{
-              border: "4px solid white",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            }}
-          />
+          <Upload
+            name="avatar"
+            showUploadList={false}
+            customRequest={handleAvatarUpload} // Gọi hàm upload tùy chỉnh của chúng ta
+            accept="image/*" // Chỉ chấp nhận file ảnh
+            disabled={uploadingAvatar} // Vô hiệu hóa khi đang tải
+          >
+            <Spin spinning={uploadingAvatar} tip="Đang tải lên...">
+              <Avatar
+                size={100}
+                src={user?.avatarUrl} // Lấy avatar từ user context để cập nhật ngay
+                icon={!user?.avatarUrl && <CameraOutlined />}
+                style={{
+                  border: "4px solid white",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  cursor: "pointer", // Thêm con trỏ để người dùng biết có thể click
+                }}
+              />
+            </Spin>
+          </Upload>
         </div>
         <div
           className="text-content"
@@ -616,7 +695,7 @@ const UserProfile = () => {
               lineHeight: "1.5",
             }}
           >
-            {userData 
+            {userData
               ? `${userData.birthdate ? `Born on ${userData.birthdate}` : ""} ${
                   userData.gender ? `• ${userData.gender}` : ""
                 } ${
@@ -1172,9 +1251,7 @@ const UserProfile = () => {
                 // Cho phép chọn ngày trong khoảng từ 5 đến 100 tuổi
                 return (
                   current &&
-                  (current > minAge || 
-                    current < maxAge || 
-                    current > today) 
+                  (current > minAge || current < maxAge || current > today)
                 );
               }}
             />
