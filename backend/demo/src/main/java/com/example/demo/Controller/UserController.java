@@ -97,4 +97,45 @@ public class UserController {
         }
     }
 
+    /**
+     * Cập nhật URL ảnh đại diện cho người dùng đã được xác thực.
+     * Endpoint này được bảo vệ bởi Spring Security (thông qua FirebaseTokenFilter).
+     *
+     * authentication Đối tượng chứa thông tin người dùng đã đăng nhập.
+     * payload        Body của request, chứa "avatarUrl".
+     * ResponseEntity chứa thông báo thành công và URL mới.
+     */
+    @PostMapping("/avatar")
+    public ResponseEntity<?> updateUserAvatar(Authentication authentication, @RequestBody Map<String, String> payload) {
+        // 1. Lấy người dùng đã xác thực từ context của Spring Security
+        User currentUser = (User) authentication.getPrincipal();
+
+        // 2. Lấy URL mới từ body của request
+        String newAvatarUrl = payload.get("avatarUrl");
+        if (newAvatarUrl == null || newAvatarUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Avatar URL is required."));
+        }
+
+        try {
+            // 3. Tìm lại người dùng trong DB để đảm bảo dữ liệu là mới nhất
+            User userToUpdate = userRepo.findById(currentUser.getId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + currentUser.getId()));
+            
+            // 4. Cập nhật URL và lưu vào DB
+            userToUpdate.setAvatarUrl(newAvatarUrl);
+            userRepo.save(userToUpdate);
+
+            // 5. Trả về thông báo thành công
+            return ResponseEntity.ok(Map.of(
+                "message", "Avatar updated successfully",
+                "avatarUrl", newAvatarUrl
+            ));
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error updating avatar: " + e.getMessage()));
+        }
+    }
+
 }
