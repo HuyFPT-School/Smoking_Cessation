@@ -28,7 +28,7 @@ public class AdminRemoteService {
     @Autowired private PostRepo postRepo;
 
     // =====================================================================================
-    // ✅ 1. SUPER_ADMIN promote USER → ADMIN
+    //  1. SUPER_ADMIN promote USER → ADMIN
     // =====================================================================================
     public boolean promoteToAdmin(String userIdStr, String currentAdminIdStr) {
         Integer userId = parse(userIdStr);
@@ -47,7 +47,7 @@ public class AdminRemoteService {
     }
 
     // =====================================================================================
-    // ✅ 2. SUPER_ADMIN demote ADMIN → USER
+    //  2. SUPER_ADMIN demote ADMIN → USER
     // =====================================================================================
     public boolean demoteAdminToUser(String adminIdStr, String currentAdminIdStr) {
         Integer adminId = parse(adminIdStr);
@@ -67,7 +67,7 @@ public class AdminRemoteService {
     }
 
     // =====================================================================================
-    // ✅ 3. ADMIN hoặc SUPER_ADMIN xóa USER
+    //  3. ADMIN hoặc SUPER_ADMIN xóa USER
     // =====================================================================================
     @Transactional
     public boolean deleteUserByAdmin(String targetUserId, String currentAdminId) {
@@ -87,15 +87,15 @@ public class AdminRemoteService {
         Role currentRole = current.getRole();
         Role targetRole = target.getRole();
 
-        // ❌ Không cho xóa SUPER_ADMIN
+        //  Không cho xóa SUPER_ADMIN
         if (targetRole == Role.SUPER_ADMIN) return false;
 
-        // ✅ SUPER_ADMIN được xóa mọi user (trừ chính mình)
+        //  SUPER_ADMIN được xóa mọi user (trừ chính mình)
         if (currentRole == Role.SUPER_ADMIN) {
             return deleteUserAndFirebase(target, targetId);
         }
 
-        // ✅ ADMIN chỉ được xóa người dùng thường (USER)
+        //  ADMIN chỉ được xóa người dùng thường (USER)
         if (currentRole == Role.ADMIN && targetRole == Role.USER) {
             return deleteUserAndFirebase(target, targetId);
         }
@@ -104,7 +104,7 @@ public class AdminRemoteService {
     }
 
     // =====================================================================================
-    // ✅ XÓA HOÀN TOÀN USER: FIREBASE + DATABASE
+    //  XÓA HOÀN TOÀN USER: FIREBASE + DATABASE
     // =====================================================================================
     private boolean deleteUserAndFirebase(User target, int targetId) {
         System.out.println("🔍 Attempting to delete user:");
@@ -153,7 +153,7 @@ public class AdminRemoteService {
     }
 
     // =====================================================================================
-    // ✅ Hàm tiện ích: Parse chuỗi sang số nguyên, dùng để validate ID
+    //  Hàm tiện ích: Parse chuỗi sang số nguyên, dùng để validate ID
     // =====================================================================================
     private Integer parse(String str) {
         try {

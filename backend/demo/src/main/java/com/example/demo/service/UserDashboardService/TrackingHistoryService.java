@@ -53,7 +53,7 @@ public class TrackingHistoryService {
         // Lấy tất cả tracking từ ngày bỏ thuốc đến hôm nay
         List<Tracking> trackings = trackingRepo.findByUserIdAndDateBetween(userId, quitDate, today);
 
-        // ✅ Đếm số lượt hút thuốc theo ngày
+        //  Đếm số lượt hút thuốc theo ngày
         Map<LocalDate, Long> cigaretteCounts = trackings.stream()
                 .filter(t -> "smoking".equalsIgnoreCase(t.getType()))
                 .filter(t -> t.getDate() != null)
@@ -62,7 +62,7 @@ public class TrackingHistoryService {
                         Collectors.counting()
                 ));
 
-        // ✅ Tính trung bình satisfaction của cravings mỗi ngày
+        //  Tính trung bình satisfaction của cravings mỗi ngày
         Map<LocalDate, Double> averageCravingSatisfaction = trackings.stream()
                 .filter(t -> !"smoking".equalsIgnoreCase(t.getType()))
                 .filter(t -> t.getDate() != null && t.getSatisfaction() >= 1 && t.getSatisfaction() <= 10)
@@ -71,7 +71,7 @@ public class TrackingHistoryService {
                         Collectors.averagingDouble(Tracking::getSatisfaction)
                 ));
 
-        // ✅ Đếm số lượt cravings mỗi ngày
+        //  Đếm số lượt cravings mỗi ngày
         Map<LocalDate, Long> cravingCounts = trackings.stream()
                 .filter(t -> !"smoking".equalsIgnoreCase(t.getType()))
                 .filter(t -> t.getDate() != null)
@@ -80,7 +80,7 @@ public class TrackingHistoryService {
                         Collectors.counting()
                 ));
 
-        // ✅ Tạo danh sách lịch sử theo từng ngày, từ ngày bỏ thuốc đến hôm nay
+        // Tạo danh sách lịch sử theo từng ngày, từ ngày bỏ thuốc đến hôm nay
         List<Map<String, Object>> history = new ArrayList<>();
         long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(quitDate, today);
 

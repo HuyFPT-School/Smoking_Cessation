@@ -17,7 +17,7 @@ public class UserProgressDistributionService {
     private PlanRepo planRepo;
 
     /**
-     * ✅ Trả về phần trăm người dùng đạt từng mốc tiến trình:
+     *  Trả về phần trăm người dùng đạt từng mốc tiến trình:
      * - Trong tuần đầu
      * - Trong tháng đầu
      * - Cai được từ 3 tháng trở lên
@@ -46,7 +46,7 @@ public class UserProgressDistributionService {
 
             total++; // User hợp lệ
 
-            // ✅ Phân loại theo mốc thời gian
+            //  Phân loại theo mốc thời gian
             if (days <= 7) {
                 firstWeek++; // Trong tuần đầu
             } else if (days <= 30) {
@@ -56,7 +56,7 @@ public class UserProgressDistributionService {
             }
         }
 
-        // ✅ Tính phần trăm cho từng nhóm, làm tròn 1 chữ số thập phân
+        //  Tính phần trăm cho từng nhóm, làm tròn 1 chữ số thập phân
         double weekPercent = total == 0 ? 0 : Math.round((double) firstWeek / total * 1000) / 10.0;
         double monthPercent = total == 0 ? 0 : Math.round((double) firstMonth / total * 1000) / 10.0;
         double threeMonthPercent = total == 0 ? 0 : Math.round((double) threeMonthsOrMore / total * 1000) / 10.0;
@@ -65,8 +65,8 @@ public class UserProgressDistributionService {
     }
 
     /**
-     * ✅ Inner class dạng record để gom kết quả phân bố thành một object
-     * 📦 Dùng làm DTO trả về cho Dashboard
+     * Inner class dạng record để gom kết quả phân bố thành một object
+     *  Dùng làm DTO trả về cho Dashboard
      */
     public record ProgressDistribution(
             double firstWeekPercent,
