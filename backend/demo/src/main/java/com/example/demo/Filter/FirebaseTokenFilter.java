@@ -81,20 +81,22 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 } else {
                     // Có cần cập nhật thông tin người dùng không?
                     boolean needUpdate = false;
-                    
-                    // Nếu ảnh từ Firebase khác ảnh trong hồ sơ → cập nhật
-                    // Nếu ảnh từ Firebase không có và ảnh trong hồ sơ cũng không có → dùng ảnh mặc định từ tên người dùng
-                    if (picture != null && !picture.isBlank() && !picture.equals(user.getAvatarUrl())) {
-                        user.setAvatarUrl(picture);
-                        needUpdate = true;
-                    } else if ((picture == null || picture.isBlank()) && 
-                              (user.getAvatarUrl() == null || user.getAvatarUrl().isBlank())) {
-                        // Dùng user.getName() thay vì name từ token
-                        String diceBearAvatar = "https://api.dicebear.com/7.x/initials/svg?seed=" + user.getName();
-                        user.setAvatarUrl(diceBearAvatar);
-                        needUpdate = true;
+                    // Nếu user đã đổi avatar sang Cloudinary thì KHÔNG ghi đè nữa
+                    boolean isCloudinaryAvatar = user.getAvatarUrl() != null && user.getAvatarUrl().contains("res.cloudinary.com");
+                    boolean isDefaultAvatar = user.getAvatarUrl() == null || user.getAvatarUrl().contains("dicebear") || user.getAvatarUrl().isBlank();
+
+                    if (!isCloudinaryAvatar) {
+                        if (picture != null && !picture.isBlank() && !picture.equals(user.getAvatarUrl())) {
+                            user.setAvatarUrl(picture);
+                            needUpdate = true;
+                        } else if ((picture == null || picture.isBlank()) && isDefaultAvatar) {
+                            // Dùng user.getName() thay vì name từ token
+                            String diceBearAvatar = "https://api.dicebear.com/7.x/initials/svg?seed=" + user.getName();
+                            user.setAvatarUrl(diceBearAvatar);
+                            needUpdate = true;
+                        }
                     }
-                    
+
                     if (needUpdate) {
                         try {
                             userRepo.save(user);
