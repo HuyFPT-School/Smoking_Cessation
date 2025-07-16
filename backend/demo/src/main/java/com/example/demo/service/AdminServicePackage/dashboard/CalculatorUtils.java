@@ -17,7 +17,7 @@ public class CalculatorUtils {
     private TrackingRepo trackingRepo;
 
     // =====================================================================================
-    // ✅ 1. Tính tổng số ngày không hút thuốc kể từ ngày cai (quitDate) đến hôm nay
+    //  1. Tính tổng số ngày không hút thuốc kể từ ngày cai (quitDate) đến hôm nay
     //     - Trừ ra số ngày có Tracking loại "smoking"
     //     - Chỉ tính từ ngày quitDate đến LocalDate.now()
     // =====================================================================================
@@ -47,7 +47,7 @@ public class CalculatorUtils {
     }
 
     // =====================================================================================
-    // ✅ 2. Tính số ngày không hút thuốc trong một khoảng thời gian cụ thể
+    //  2. Tính số ngày không hút thuốc trong một khoảng thời gian cụ thể
     //     - Ví dụ: tháng trước, 7 ngày gần đây, v.v.
     // =====================================================================================
     public long calculateSmokeFreeDaysInRange(Plan plan, LocalDate start, LocalDate end) {
@@ -77,7 +77,7 @@ public class CalculatorUtils {
     }
 
     // =====================================================================================
-    // ✅ 3. Tính tổng số ngày từ quitDate đến end, bị giới hạn bởi start
+    //  3. Tính tổng số ngày từ quitDate đến end, bị giới hạn bởi start
     //     - Dùng cho thống kê tổng số ngày của plan
     // =====================================================================================
     public long calculateTotalDaysInRange(LocalDate quitDate, LocalDate start, LocalDate end) {
@@ -90,7 +90,7 @@ public class CalculatorUtils {
     }
 
     // =====================================================================================
-    // ✅ 4. Chuyển milestone ("3 days", "2 weeks", ...) → số ngày
+    //  4. Chuyển milestone ("3 days", "2 weeks", ...) → số ngày
     //     - Dùng để kiểm tra đã đạt mốc thưởng chưa
     // =====================================================================================
     public long getDaysFromMilestone(String milestone) {
@@ -113,7 +113,7 @@ public class CalculatorUtils {
     }
 
     // =====================================================================================
-    // ✅ 5. Chuyển chuỗi ngày (String) sang LocalDate an toàn
+    //  5. Chuyển chuỗi ngày (String) sang LocalDate an toàn
     // =====================================================================================
     private LocalDate parseDateSafe(String dateStr) {
         try {

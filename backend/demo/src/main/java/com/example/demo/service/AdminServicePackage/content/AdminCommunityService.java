@@ -23,35 +23,35 @@ public class AdminCommunityService {
     private final UserRepo userRepo;
 
     // ==============================
-    // 📌 Hàm kiểm tra quyền hạn
+    //  Hàm kiểm tra quyền hạn
     // ==============================
 
     /**
-     * ✅ Kiểm tra user có phải là ADMIN hoặc SUPER_ADMIN không
+     *  Kiểm tra user có phải là ADMIN hoặc SUPER_ADMIN không
      */
     private boolean isAdminOrSuperAdmin(User user) {
         return user.getRole() == Role.ADMIN || user.getRole() == Role.SUPER_ADMIN;
     }
 
     // ==============================
-    // 📌 Hàm xóa bài viết bất kỳ
+    //  Hàm xóa bài viết bất kỳ
     // ==============================
 
     /**
-     * ✅ Cho phép ADMIN hoặc SUPER_ADMIN xóa bài viết bất kỳ
-     * 👉 URL: DELETE /api/admin/posts/delete/{postId}?adminId=...
+     *  Cho phép ADMIN hoặc SUPER_ADMIN xóa bài viết bất kỳ
+     *  URL: DELETE /api/admin/posts/delete/{postId}?adminId=...
      */
     @Transactional
     public ResponseEntity<?> deletePostByAdmin(Integer postId, Integer adminId) {
 
-        // 🔐 Kiểm tra xem người thực hiện có phải admin không
+        //  Kiểm tra xem người thực hiện có phải admin không
         Optional<User> adminOpt = userRepo.findById(adminId);
         if (adminOpt.isEmpty() || !isAdminOrSuperAdmin(adminOpt.get())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access denied: You are not an admin"));
         }
 
-        // 🔎 Tìm bài viết theo ID
+        //  Tìm bài viết theo ID
         Optional<Post> postOpt = postRepo.findById(postId);
         if (postOpt.isEmpty()) {
             return ResponseEntity.badRequest()
@@ -60,7 +60,7 @@ public class AdminCommunityService {
 
         Post post = postOpt.get();
 
-        // ✅ Xóa dữ liệu liên quan trước để tránh lỗi khóa ngoại:
+        //  Xóa dữ liệu liên quan trước để tránh lỗi khóa ngoại:
         postLikeRepo.deleteByPostId(postId);     // Xóa like
         commentRepo.deleteByPostId(postId);      // Xóa comment
         postRepo.delete(post);                   // Cuối cùng xóa post
@@ -69,24 +69,24 @@ public class AdminCommunityService {
     }
 
     // ==============================
-    // 📌 Hàm xóa bình luận bất kỳ
+    //  Hàm xóa bình luận bất kỳ
     // ==============================
 
     /**
-     * ✅ Cho phép ADMIN hoặc SUPER_ADMIN xóa bình luận bất kỳ
-     * 👉 URL: DELETE /api/admin/comments/delete/{commentId}?adminId=...
+     *  Cho phép ADMIN hoặc SUPER_ADMIN xóa bình luận bất kỳ
+     *  URL: DELETE /api/admin/comments/delete/{commentId}?adminId=...
      */
     @Transactional
     public ResponseEntity<?> deleteCommentByAdmin(Integer commentId, Integer adminId) {
 
-        // 🔐 Kiểm tra quyền
+        //  Kiểm tra quyền
         Optional<User> adminOpt = userRepo.findById(adminId);
         if (adminOpt.isEmpty() || !isAdminOrSuperAdmin(adminOpt.get())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Access denied: You are not an admin"));
         }
 
-        // 🔎 Tìm comment
+        //  Tìm comment
         Optional<Comment> commentOpt = commentRepo.findById(commentId);
         if (commentOpt.isEmpty()) {
             return ResponseEntity.badRequest()
@@ -96,9 +96,9 @@ public class AdminCommunityService {
         Comment comment = commentOpt.get();
         Post post = comment.getPost();  // Lấy bài viết gốc để cập nhật số lượng comment
 
-        commentRepo.delete(comment);    // ✅ Xóa bình luận
+        commentRepo.delete(comment);    //  Xóa bình luận
 
-        // ✅ Cập nhật lại số lượng comment cho bài viết (giảm đi 1, nhưng không < 0)
+        //  Cập nhật lại số lượng comment cho bài viết (giảm đi 1, nhưng không < 0)
         post.setCommentsCount(Math.max(0, post.getCommentsCount() - 1));
         postRepo.save(post);  // Lưu thay đổi
 

@@ -20,7 +20,7 @@ public class GeminiAICoachService {
     // Như chìa khóa để mở cửa nhà Google AI - cần có để được phép sử dụng dịch vụ AI
     @Value("${google.ai.api.key}")
     private String apiKey;
-    @Value("${google.ai.model:gemini-1.5-flash}")  // ✅ Using free Flash model for unlimited usage
+    @Value("${google.ai.model:gemini-1.5-flash}")  //  Using free Flash model for unlimited usage
     private String model;
 
     // Để lưu/lấy tin nhắn từ database

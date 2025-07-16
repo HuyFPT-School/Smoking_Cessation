@@ -34,8 +34,8 @@ public class AdminController {
 
     // ==================== DASHBOARD ====================
 
-    // ✅ Lấy dữ liệu tổng quan dashboard (số user, admin, v.v...)
-    // 📌 Dùng chung cho cả ADMIN và SUPER_ADMIN
+    //  Lấy dữ liệu tổng quan dashboard (số user, admin, v.v...)
+    //  Dùng chung cho cả ADMIN và SUPER_ADMIN
     @GetMapping("/dashboard")
     public AdminDTO getDashboardData() {
         return dashboardService.getTotalUserStats();
@@ -43,21 +43,21 @@ public class AdminController {
 
     // ==================== QUẢN LÝ USER ====================
 
-    // ✅ Trả về danh sách user thường (trong phần users của trang admin)
-    // 📌 Cả ADMIN và SUPER_ADMIN đều xem được
+    //  Trả về danh sách user thường (trong phần users của trang admin)
+    //  Cả ADMIN và SUPER_ADMIN đều xem được
     @GetMapping("/users")
     public List<AdminUserDTO> getUsersForAdmin(@RequestParam int currentAdminId) {
         return adminUserService.getAllUsersVisibleToAdmin(currentAdminId);
     }
 
-    // ✅ Trả về danh sách các admin hiện tại (chỉ SUPER_ADMIN xem)
+    //  Trả về danh sách các admin hiện tại (chỉ SUPER_ADMIN xem)
     @GetMapping("/admins")
     public List<AdminUserDTO> getAllAdmins(@RequestParam int currentAdminId) {
         return adminUserService.getAllAdmins(currentAdminId);
     }
 
-    // ✅ Lấy chi tiết profile
-    // 📌 Dùng cho modal xem chi tiết hồ sơ trong giao diện admin
+    //  Lấy chi tiết profile
+    //  Dùng cho modal xem chi tiết hồ sơ trong giao diện admin
     @GetMapping("/user/{id}")
     public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Integer id) {
         UserProfileDTO dto = adminUserService.getUserProfileByUserId(id);
@@ -67,8 +67,8 @@ public class AdminController {
         return ResponseEntity.ok(dto);
     }
 
-    // ✅ Xóa 1 user thường
-    // 📌 Chỉ ADMIN hoặc SUPER_ADMIN mới được thực hiện
+    //  Xóa 1 user thường
+    //  Chỉ ADMIN hoặc SUPER_ADMIN mới được thực hiện
     @DeleteMapping("/delete-user/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable String userId,
                                         @RequestParam String currentAdminId) {
@@ -80,8 +80,8 @@ public class AdminController {
 
     // ==================== QUẢN LÝ PHÂN QUYỀN ====================
 
-    // ✅ Nâng quyền user thường thành admin
-    // 📌 Chỉ SUPER_ADMIN mới được phép thực hiện hành động này
+    //  Nâng quyền user thường thành admin
+    //  Chỉ SUPER_ADMIN mới được phép thực hiện hành động này
     @PutMapping("/promote/{userId}")
     public ResponseEntity<?> promoteUserToAdmin(@PathVariable String userId,
                                                 @RequestParam String currentAdminId) {
@@ -91,8 +91,8 @@ public class AdminController {
                 : ResponseEntity.badRequest().body("Permission denied or invalid target");
     }
 
-    // ✅ Giáng cấp admin thành user thường
-    // 📌 Chỉ SUPER_ADMIN mới được phép thực hiện hành động này
+    //  Giáng cấp admin thành user thường
+    //  Chỉ SUPER_ADMIN mới được phép thực hiện hành động này
     @PutMapping("/demote/{adminId}")
     public ResponseEntity<?> demoteAdmin(@PathVariable String adminId,
                                          @RequestParam String currentAdminId) {
@@ -105,9 +105,9 @@ public class AdminController {
     // ==================== QUẢN LÝ COMMUNITY (BLOG, COMMENT) ====================
 
     /**
-     * ✅ Xóa bài viết bất kỳ
-     * 📌 Chỉ ADMIN hoặc SUPER_ADMIN có quyền
-     * 🔗 Endpoint ví dụ: DELETE /api/admin/posts/delete/45?adminId=2
+     *  Xóa bài viết bất kỳ
+     *  Chỉ ADMIN hoặc SUPER_ADMIN có quyền
+     *  Endpoint ví dụ: DELETE /api/admin/posts/delete/45?adminId=2
      */
     @DeleteMapping("/posts/delete/{postId}")
     public ResponseEntity<?> deletePostByAdmin(@PathVariable Integer postId,
@@ -116,9 +116,9 @@ public class AdminController {
     }
 
     /**
-     * ✅ Xóa bình luận bất kỳ
-     * 📌 Chỉ ADMIN hoặc SUPER_ADMIN có quyền
-     * 🔗 Endpoint ví dụ: DELETE /api/admin/comments/delete/12?adminId=2
+     *  Xóa bình luận bất kỳ
+     *  Chỉ ADMIN hoặc SUPER_ADMIN có quyền
+     *  Endpoint ví dụ: DELETE /api/admin/comments/delete/12?adminId=2
      */
     @DeleteMapping("/comments/delete/{commentId}")
     public ResponseEntity<?> deleteCommentByAdmin(@PathVariable Integer commentId,

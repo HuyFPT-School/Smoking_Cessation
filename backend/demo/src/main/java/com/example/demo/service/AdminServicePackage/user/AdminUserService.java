@@ -25,11 +25,11 @@ public class AdminUserService {
     @Autowired private CalculatorUtils calculatorUtils;
 
     // ============================================================================
-    // 📌 1. LẤY DANH SÁCH USER CHO ADMIN VÀ SUPER_ADMIN
+    //  1. LẤY DANH SÁCH USER CHO ADMIN VÀ SUPER_ADMIN
     // ============================================================================
 
     /**
-     * ✅ Cả ADMIN và SUPER_ADMIN đều được xem danh sách người dùng thường (USER)
+     *  Cả ADMIN và SUPER_ADMIN đều được xem danh sách người dùng thường (USER)
      */
     public List<AdminUserDTO> getAllUsersVisibleToAdmin(int currentAdminId) {
 
@@ -57,11 +57,11 @@ public class AdminUserService {
     }
 
     // ============================================================================
-    // 📌 2. LẤY DANH SÁCH ADMIN (chỉ dành cho SUPER_ADMIN)
+    //  2. LẤY DANH SÁCH ADMIN (chỉ dành cho SUPER_ADMIN)
     // ============================================================================
 
     /**
-     * ✅ Chỉ SUPER_ADMIN được xem danh sách ADMIN (loại bỏ SUPER_ADMIN khác)
+     *  Chỉ SUPER_ADMIN được xem danh sách ADMIN (loại bỏ SUPER_ADMIN khác)
      */
     public List<AdminUserDTO> getAllAdmins(int currentAdminId) {
         User current = userRepo.findById(currentAdminId)
@@ -81,11 +81,11 @@ public class AdminUserService {
     }
 
     // ============================================================================
-    // 📌 3. XEM CHI TIẾT THÔNG TIN CÁ NHÂN CỦA USER (trong modal)
+    //  3. XEM CHI TIẾT THÔNG TIN CÁ NHÂN CỦA USER (trong modal)
     // ============================================================================
 
     /**
-     * ✅ Trả về thông tin chi tiết hồ sơ cá nhân của người dùng (userId)
+     *  Trả về thông tin chi tiết hồ sơ cá nhân của người dùng (userId)
      * → Gồm cả profile và user (id, name,…)
      */
     public UserProfileDTO getUserProfileByUserId(Integer userId) {
@@ -114,11 +114,11 @@ public class AdminUserService {
     }
 
     // ============================================================================
-    // 📌 4. HÀM DÙNG CHUNG ĐỂ CONVERT USER → AdminUserDTO
+    //  4. HÀM DÙNG CHUNG ĐỂ CONVERT USER → AdminUserDTO
     // ============================================================================
 
     /**
-     * ✅ Chuyển entity User sang DTO AdminUserDTO để hiển thị lên bảng quản lý
+     *  Chuyển entity User sang DTO AdminUserDTO để hiển thị lên bảng quản lý
      * → Gồm: id, tên, email, avatar, phone, role, và số ngày không hút thuốc
      */
     private AdminUserDTO convertToDTO(User user) {

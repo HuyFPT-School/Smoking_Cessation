@@ -23,12 +23,12 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     // ========================================
-    // 📌 API: LẤY DỮ LIỆU DASHBOARD CHÍNH
+    //  API: LẤY DỮ LIỆU DASHBOARD CHÍNH
     // ========================================
 
     /**
-     * ✅ Trả về dữ liệu dashboard hiện tại của một user
-     * 📌 Dùng để hiển thị thông tin như: ngày không hút, số điếu tránh được, milestone tiếp theo...
+     *  Trả về dữ liệu dashboard hiện tại của một user
+     *  Dùng để hiển thị thông tin như: ngày không hút, số điếu tránh được, milestone tiếp theo...
      */
     @GetMapping("/{userId}")
     public ResponseEntity<DashboardDTO> getDashboard(@PathVariable Integer userId) {
@@ -36,12 +36,12 @@ public class DashboardController {
     }
 
     // ========================================
-    // 📌 API: LỊCH SỬ TRACKING
+    //  API: LỊCH SỬ TRACKING
     // ========================================
 
     /**
-     * ✅ Trả về danh sách lịch sử tracking (theo ngày) của user
-     * 📌 Dùng cho biểu đồ, thống kê theo ngày trên giao diện dashboard
+     *  Trả về danh sách lịch sử tracking (theo ngày) của user
+     *  Dùng cho biểu đồ, thống kê theo ngày trên giao diện dashboard
      */
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<Map<String, Object>>> getTrackingHistory(@PathVariable Integer userId) {
@@ -49,12 +49,12 @@ public class DashboardController {
     }
 
     // ========================================
-    // 📌 XỬ LÝ SỰ KIỆN REALTIME TỪ WEBSOCKET HOẶC HÀNH VI KHÁC
+    //  XỬ LÝ SỰ KIỆN REALTIME TỪ WEBSOCKET HOẶC HÀNH VI KHÁC
     // ========================================
 
     /**
-     * ✅ Lắng nghe sự kiện DataUpdatedEvent (phát ra khi có dữ liệu mới như tracking hoặc kế hoạch)
-     * 📌 Khi sự kiện được gửi (ví dụ qua WebSocket hoặc Service khác), hàm này sẽ chạy bất đồng bộ
+     *  Lắng nghe sự kiện DataUpdatedEvent (phát ra khi có dữ liệu mới như tracking hoặc kế hoạch)
+     *  Khi sự kiện được gửi (ví dụ qua WebSocket hoặc Service khác), hàm này sẽ chạy bất đồng bộ
      */
     @EventListener
     @Async

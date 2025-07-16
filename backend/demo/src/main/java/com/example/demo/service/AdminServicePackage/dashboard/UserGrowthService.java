@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 
-// ✅ Service dùng cho Admin Dashboard — thống kê tăng trưởng số lượng người dùng thường (Role.USER)
+//  Service dùng cho Admin Dashboard — thống kê tăng trưởng số lượng người dùng thường (Role.USER)
 @Service  // Spring sẽ quản lý bean này để tự inject vào các nơi cần dùng
 public class UserGrowthService {
 
@@ -18,23 +18,23 @@ public class UserGrowthService {
     private UserRepo userRepo;
 
     // ===========================================
-    // 📌 1. ĐẾM TỔNG SỐ USER
+    //  1. ĐẾM TỔNG SỐ USER
     // ===========================================
 
     /**
-     * ✅ Trả về tổng số người dùng có role là USER (bỏ qua ADMIN, SUPER_ADMIN)
+     *  Trả về tổng số người dùng có role là USER (bỏ qua ADMIN, SUPER_ADMIN)
      */
     public long countTotalUsers() {
         return userRepo.countByRole(Role.USER);
     }
 
     // ===========================================
-    // 📌 2. TÍNH TỶ LỆ TĂNG TRƯỞNG
+    //  2. TÍNH TỶ LỆ TĂNG TRƯỞNG
     // ===========================================
 
     /**
-     * ✅ Tính % tăng trưởng người dùng trong tháng này so với tháng trước
-     * 📌 Công thức: ((thisMonth - lastMonth) / lastMonth) * 100
+     * Tính % tăng trưởng người dùng trong tháng này so với tháng trước
+     *  Công thức: ((thisMonth - lastMonth) / lastMonth) * 100
      */
     public double calculateGrowthRate() {
         LocalDate today = LocalDate.now();  // Ngày hiện tại
@@ -52,7 +52,7 @@ public class UserGrowthService {
         long usersThisMonth = userRepo.countByRoleAndCreateAtBetween(Role.USER, startCurrent, endCurrent);
         long usersLastMonth = userRepo.countByRoleAndCreateAtBetween(Role.USER, startLast, endLast);
 
-        // ✅ Tính tỷ lệ tăng trưởng
+        //  Tính tỷ lệ tăng trưởng
         if (usersLastMonth > 0) {
             return (double)(usersThisMonth - usersLastMonth) / usersLastMonth * 100;
         } else {
@@ -62,7 +62,7 @@ public class UserGrowthService {
     }
 
     // ===========================================
-    // 📌 3. LẤY SỐ USER MỚI TRONG THÁNG NÀY
+    //  3. LẤY SỐ USER MỚI TRONG THÁNG NÀY
     // ===========================================
 
     /**

@@ -20,9 +20,9 @@ public class SuccessRateService {
     private CalculatorUtils calculatorUtils;
 
     /**
-     * ✅ Tính tỷ lệ % người dùng đã hoàn thành toàn bộ các mốc phần thưởng (milestone) trong kế hoạch bỏ thuốc
-     * 📌 Thành công được định nghĩa là: số ngày không hút ≥ milestone cao nhất trong RewardItem của Plan
-     * 📤 Kết quả trả về là phần trăm, làm tròn đến 1 chữ số thập phân
+     *  Tính tỷ lệ % người dùng đã hoàn thành toàn bộ các mốc phần thưởng (milestone) trong kế hoạch bỏ thuốc
+     *  Thành công được định nghĩa là: số ngày không hút ≥ milestone cao nhất trong RewardItem của Plan
+     *  Kết quả trả về là phần trăm, làm tròn đến 1 chữ số thập phân
      */
     public double calculateSuccessRate() {
 
@@ -41,12 +41,12 @@ public class SuccessRateService {
 
             usersWithRewards++;
 
-            // ✅ Tìm mốc thời gian dài nhất trong phần thưởng (ví dụ: "3 months" → 90 ngày)
+            //  Tìm mốc thời gian dài nhất trong phần thưởng (ví dụ: "3 months" → 90 ngày)
             long maxRequiredDays = rewards.stream()
                     .mapToLong(r -> calculatorUtils.getDaysFromMilestone(r.getMilestone()))
                     .max().orElse(0);  // Nếu không có thì mặc định là 0
 
-            // ✅ Tính số ngày người dùng đã không hút thuốc thực tế
+            //  Tính số ngày người dùng đã không hút thuốc thực tế
             long actualDays = calculatorUtils.calculateDaysSmokeFree(plan);
             if (actualDays >= maxRequiredDays) {
                 usersCompletedAll++;
@@ -59,9 +59,9 @@ public class SuccessRateService {
 
 
     /**
-     * ✅ Tính tỉ lệ % số ngày không hút thuốc tổng thể của toàn bộ người dùng
-     * 📌 Công thức: (Tổng số ngày không hút thuốc) / (Tổng số ngày kể từ ngày bắt đầu plan) * 100
-     * 📤 Trả về số phần trăm, làm tròn đến 1 chữ số thập phân
+     *  Tính tỉ lệ % số ngày không hút thuốc tổng thể của toàn bộ người dùng
+     *  Công thức: (Tổng số ngày không hút thuốc) / (Tổng số ngày kể từ ngày bắt đầu plan) * 100
+     *  Trả về số phần trăm, làm tròn đến 1 chữ số thập phân
      */
     public double calculateOverallSmokeFreeRate() {
 
@@ -78,10 +78,10 @@ public class SuccessRateService {
             // Bỏ qua nếu kế hoạch không có ngày bỏ thuốc, hoặc bỏ thuốc ở tương lai
             if (quitDate == null || quitDate.isAfter(LocalDate.now())) continue;
 
-            // ✅ Cộng số ngày không hút thuốc (dựa vào tracking của user)
+            //  Cộng số ngày không hút thuốc (dựa vào tracking của user)
             totalSmokeFreeDays += calculatorUtils.calculateDaysSmokeFree(plan);
 
-            // ✅ Cộng số ngày từ ngày bỏ thuốc đến hôm nay (tổng thời gian user có cơ hội để bỏ thuốc)
+            //  Cộng số ngày từ ngày bỏ thuốc đến hôm nay (tổng thời gian user có cơ hội để bỏ thuốc)
             totalPlanDays += calculatorUtils.calculateTotalDaysInRange(
                     quitDate,
                     quitDate,
@@ -95,9 +95,9 @@ public class SuccessRateService {
 
 
     /**
-     * ✅ Tính phần trăm số ngày người dùng không hút thuốc trong tháng trước
-     * 📌 Cách tính: (Tổng số ngày không hút thuốc trong tháng trước) / (Tổng số ngày kể từ quitDate đến hôm nay của tất cả kế hoạch) * 100
-     * 📤 Kết quả làm tròn đến 1 chữ số thập phân (%)
+     *  Tính phần trăm số ngày người dùng không hút thuốc trong tháng trước
+     *  Cách tính: (Tổng số ngày không hút thuốc trong tháng trước) / (Tổng số ngày kể từ quitDate đến hôm nay của tất cả kế hoạch) * 100
+     *  Kết quả làm tròn đến 1 chữ số thập phân (%)
      */
     public double calculateLastMonthSmokeFreeRate() {
 
@@ -119,14 +119,14 @@ public class SuccessRateService {
             // Nếu chưa có ngày quit hoặc ngày quit ở tương lai thì bỏ qua
             if (quitDate == null || quitDate.isAfter(today)) continue;
 
-            // ✅ Tính tổng số ngày không hút thuốc trong khoảng tháng trước (tùy theo tracking của từng user)
+            //  Tính tổng số ngày không hút thuốc trong khoảng tháng trước (tùy theo tracking của từng user)
             totalSmokeFreeDaysLastMonth += calculatorUtils.calculateSmokeFreeDaysInRange(
                     plan,
                     startOfLastMonth,
                     endOfLastMonth
             );
 
-            // ✅ Tính tổng số ngày từ ngày bỏ thuốc đến hôm nay
+            //  Tính tổng số ngày từ ngày bỏ thuốc đến hôm nay
             totalAllPlanDays += calculatorUtils.calculateTotalDaysInRange(
                     quitDate,
                     quitDate,
@@ -140,9 +140,9 @@ public class SuccessRateService {
 
 
     /**
-     * ✅ Tính số ngày cai thuốc trung bình của những người dùng đã hoàn thành toàn bộ các mốc phần thưởng (milestone)
-     * 📌 Chỉ tính cho những người mà số ngày không hút thuốc ≥ milestone cao nhất trong kế hoạch (Plan)
-     * 🔢 Trả về số ngày trung bình (đã làm tròn 1 chữ số thập phân)
+     *  Tính số ngày cai thuốc trung bình của những người dùng đã hoàn thành toàn bộ các mốc phần thưởng (milestone)
+     *  Chỉ tính cho những người mà số ngày không hút thuốc ≥ milestone cao nhất trong kế hoạch (Plan)
+     *  Trả về số ngày trung bình (đã làm tròn 1 chữ số thập phân)
      */
     public double calculateAvgDaysQuitPerSuccessfulUser() {
 
@@ -159,12 +159,12 @@ public class SuccessRateService {
             // Bỏ qua nếu kế hoạch không có mốc phần thưởng
             if (rewards == null || rewards.isEmpty()) continue;
 
-            // ✅ Tìm milestone cao nhất mà user cần đạt trong kế hoạch này
+            //  Tìm milestone cao nhất mà user cần đạt trong kế hoạch này
             long maxRequiredDays = rewards.stream()
                     .mapToLong(r -> calculatorUtils.getDaysFromMilestone(r.getMilestone()))  // Chuyển milestone (string) thành số ngày
                     .max().orElse(0);
 
-            // ✅ Tính số ngày thực tế mà user đã không hút thuốc
+            //  Tính số ngày thực tế mà user đã không hút thuốc
             long daysSmokeFree = calculatorUtils.calculateDaysSmokeFree(plan);
 
             // Nếu user đã vượt qua mốc cao nhất → tính vào nhóm "thành công"
