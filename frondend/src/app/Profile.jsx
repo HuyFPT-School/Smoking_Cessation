@@ -656,7 +656,7 @@ const UserProfile = () => {
             accept="image/*" // Chỉ chấp nhận file ảnh
             disabled={uploadingAvatar} // Vô hiệu hóa khi đang tải
           >
-            <Spin spinning={uploadingAvatar} tip="Đang tải lên...">
+            <Spin spinning={uploadingAvatar} tip="Uploading...">
               <Avatar
                 size={100}
                 src={user?.avatarUrl} // Lấy avatar từ user context để cập nhật ngay
