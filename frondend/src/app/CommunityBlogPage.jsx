@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Input, Button, Card, Avatar, Tag, message, Popconfirm } from "antd";
+import {
+  Input,
+  Button,
+  Card,
+  Avatar,
+  Tag,
+  message,
+  Popconfirm,
+  Modal,
+} from "antd";
 import {
   MessageOutlined,
   LikeOutlined,
   DeleteOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import "../App.css";
@@ -76,6 +86,8 @@ const DiscussionItem = ({
   onAddComment,
   onDeletePost,
   onDeleteComment,
+  createdAt,
+  onEditPost,
 }) => {
   const currentUserId = getCurrentUserId();
   const userObj = getCurrentUser();
@@ -89,6 +101,23 @@ const DiscussionItem = ({
     currentUserId &&
     author &&
     (author.id === currentUserId || author.username === currentUserId);
+
+  // Kiểm tra quyền sửa bài: chỉ tác giả, chưa có comment và trong 15 phút đầu
+  const canEditPost = (() => {
+    if (!isPostAuthor) return false;
+    if (comments > 0) return false;
+    if (!createdAt) return false;
+    const now = new Date();
+    const created = new Date(createdAt);
+    const diffMinutes = Math.floor((now - created) / (1000 * 60));
+    return diffMinutes <= 15;
+  })();
+
+  // State cho modal edit
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
+  const [editContent, setEditContent] = useState(content);
+  const [editLoading, setEditLoading] = useState(false);
 
   /**
    * Hàm xử lý khi user click nút like
@@ -149,6 +178,19 @@ const DiscussionItem = ({
       );
     }
   };
+  const handleEditPost = async () => {
+    setEditLoading(true);
+    try {
+      await onEditPost(id, editTitle, editContent);
+      setEditModalVisible(false);
+      message.success("Post updated successfully!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Failed to update post");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   return (
     <Card className="discussion-item-card" bodyStyle={{ padding: 20 }}>
       <div className="discussion-item-header">
@@ -162,18 +204,35 @@ const DiscussionItem = ({
             <div className="discussion-item-time">{time}</div>
           </div>
         </div>
-        {(isPostAuthor || isAdminOrSuperAdmin()) && (
-          <Popconfirm
-            title="Delete this post?"
-            description="Are you sure you want to delete this post? This action cannot be undone."
-            onConfirm={handleDeletePost}
-            okText="Yes, Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button type="text" icon={<DeleteOutlined />} size="small" danger />
-          </Popconfirm>
-        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          {(isPostAuthor || isAdminOrSuperAdmin()) && (
+            <Popconfirm
+              title="Delete this post?"
+              description="Are you sure you want to delete this post? This action cannot be undone."
+              onConfirm={handleDeletePost}
+              okText="Yes, Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+            >
+              <Button
+                type="text"
+                icon={<DeleteOutlined />}
+                size="small"
+                danger
+              />
+            </Popconfirm>
+          )}
+          {canEditPost && (
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => setEditModalVisible(true)}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
       </div>
       <div className="discussion-item-title">{title}</div>
       <div className="discussion-item-content">{content}</div>
@@ -268,6 +327,28 @@ const DiscussionItem = ({
           )}
         </div>
       )}
+      <Modal
+        title="Edit Post"
+        open={editModalVisible}
+        onOk={handleEditPost}
+        onCancel={() => setEditModalVisible(false)}
+        confirmLoading={editLoading}
+        okText="Save"
+        cancelText="Cancel"
+      >
+        <Input
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          placeholder="Edit title"
+          style={{ marginBottom: 12 }}
+        />
+        <TextArea
+          value={editContent}
+          onChange={(e) => setEditContent(e.target.value)}
+          rows={4}
+          placeholder="Edit content"
+        />
+      </Modal>
     </Card>
   );
 };
@@ -381,6 +462,7 @@ const DiscussionsAndGroups = ({
   onAddComment,
   onDeletePost,
   onDeleteComment,
+  onEditPost,
   onLoadMore,
   hasMorePosts,
   loadingMore,
@@ -396,6 +478,8 @@ const DiscussionsAndGroups = ({
               onAddComment={onAddComment}
               onDeletePost={onDeletePost}
               onDeleteComment={onDeleteComment}
+              createdAt={item.createdAt}
+              onEditPost={onEditPost}
             />
           </div>
         ))}
@@ -457,6 +541,7 @@ const CommunityBlogPage = () => {
           likes: post.likesCount,
           comments: post.commentsCount,
           time: formatTimeAgo(new Date(post.createdAt)),
+          createdAt: post.createdAt,
           likedByCurrentUser: post.likedByCurrentUser || false,
           commentsList: post.comments.map((comment) => ({
             id: comment.id,
@@ -678,6 +763,29 @@ const CommunityBlogPage = () => {
     }
   };
 
+  // Sửa bài đăng
+  const handleEditPost = async (postId, newTitle, newContent) => {
+    const userId = getCurrentUserId();
+    if (!userId) {
+      message.error("Please log in to edit posts");
+      return;
+    }
+    try {
+      const response = await axios.put(`${API_BASE_URL}/posts/${postId}`, {
+        title: newTitle,
+        content: newContent,
+        userId: userId,
+      });
+      if (response.status === 200) {
+        await fetchPosts(0, false);
+        return Promise.resolve();
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || "Failed to update post");
+      throw error;
+    }
+  };
+
   console.log("👤 User:", getCurrentUser());
   console.log("🛡️ Role check:", isAdminOrSuperAdmin());
 
@@ -692,6 +800,7 @@ const CommunityBlogPage = () => {
           onAddComment={handleAddComment}
           onDeletePost={handleDeletePost}
           onDeleteComment={handleDeleteComment}
+          onEditPost={handleEditPost}
           onLoadMore={handleLoadMore}
           hasMorePosts={hasMorePosts}
           loadingMore={loadingMore}
