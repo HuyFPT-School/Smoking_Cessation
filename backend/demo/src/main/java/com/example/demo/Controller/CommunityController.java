@@ -561,4 +561,82 @@ public class CommunityController {
         }
     }
     
+    /**
+     * API cập nhật bài đăng
+     * Cho phép tác giả cập nhật tiêu đề và nội dung của bài đăng.
+     * Điều kiện:
+     * 1. Người dùng phải là tác giả của bài đăng.
+     * 2. Bài đăng phải chưa có bình luận nào.
+     * 3. Bài đăng phải được tạo trong vòng 15 phút.
+     * postId      - ID của bài đăng cần cập nhật
+     * requestBody - Chứa userId, title và content mới
+     * return Bài đăng đã được cập nhật hoặc thông báo lỗi
+     * URL: PUT /api/community/posts/{postId}
+     * Body: {
+     * "userId": 456,
+     * "title": "Tiêu đề mới",
+     * "content": "Nội dung mới..."
+     * }
+     */
+    @PutMapping("/posts/{postId}")
+    @Transactional
+    public ResponseEntity<?> updatePost(@PathVariable Integer postId, @RequestBody Map<String, Object> requestBody) {
+        try {
+            Integer userId = (Integer) requestBody.get("userId");
+            String title = (String) requestBody.get("title");
+            String content = (String) requestBody.get("content");
+
+            // Validate dữ liệu đầu vào
+            if (userId == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "User ID is required"));
+            }
+            if (title == null || title.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Title cannot be empty"));
+            }
+            if (content == null || content.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Content cannot be empty"));
+            }
+
+            // Kiểm tra bài đăng có tồn tại không
+            Optional<Post> postOpt = postRepo.findById(postId);
+            if (postOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Post not found"));
+            }
+
+            Post post = postOpt.get();
+
+            // 1. Kiểm tra quyền: chỉ tác giả mới được sửa
+            if (!Objects.equals(post.getUser().getId(), userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You can only edit your own posts"));
+            }
+
+            // 2. Kiểm tra xem đã có bình luận chưa
+            if (post.getCommentsCount() > 0) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Cannot edit a post that already has comments."));
+            }
+
+            // 3. Kiểm tra thời gian tạo bài đăng (trong vòng 15 phút)
+            LocalDateTime fifteenMinutesAgo = LocalDateTime.now().minusMinutes(15);
+            if (post.getCreatedAt().isBefore(fifteenMinutesAgo)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You can only edit posts within 15 minutes of creation."));
+            }
+
+            // Cập nhật bài đăng
+            post.setTitle(title.trim());
+            post.setContent(content.trim());
+            post.setUpdatedAt(LocalDateTime.now()); // Cập nhật thời gian chỉnh sửa
+            Post updatedPost = postRepo.save(post);
+
+            // Trả về DTO của bài đăng đã cập nhật
+            PostDTO postDTO = convertToPostDTO(updatedPost, userId);
+            return ResponseEntity.ok(postDTO);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error updating post: " + e.getMessage()));
+        }
+    }
 }
