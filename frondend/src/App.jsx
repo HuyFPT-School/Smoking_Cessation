@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom"; 
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -9,10 +9,10 @@ import Tracking from "./app/Tracking";
 import DashboardPage from "./app/DashboardPage";
 import HomePage from "./app/HomePage";
 import Plan from "./app/Plan";
-import CommunityBlogPage from "./app/CommunityBlogPage";
+import CommunityBlogPage from "./app/CommunityBlogPage"; 
 import LeaderboardPage from "./app/LeaderboardPage";
 import Profile from "./app/Profile";
-import CoachChat from "./app/CoachChat";
+import CoachChat from "./app/CoachChat"; 
 import AdminPanelPage from "./app/AdminPanelPage";
 import SuperAdminPanelPage from "./app/SuperAdminPanelPage";
 import Contact from "./components/Contact";
