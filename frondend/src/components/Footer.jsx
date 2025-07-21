@@ -110,7 +110,7 @@ function Footer() {
           <Space direction="vertical">
             {/* Links đến trang contact và careers (hiện đang là placeholder) */}
             <Link
-              href="#"
+              href="/contact"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -122,7 +122,7 @@ function Footer() {
               Contact
             </Link>
             <Link
-              href="#"
+              href="/careers"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -142,7 +142,7 @@ function Footer() {
           <Space direction="vertical">
             {/* Links đến các trang điều khoản pháp lý (hiện đang là placeholder) */}
             <Link
-              href="#"
+              href="/privacy-policy"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -154,7 +154,7 @@ function Footer() {
               Privacy Policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-service"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -166,7 +166,7 @@ function Footer() {
               Terms of Service
             </Link>
             <Link
-              href="#"
+              href="/cookie-policy"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
