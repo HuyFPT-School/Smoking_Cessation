@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom"; 
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -9,12 +9,17 @@ import Tracking from "./app/Tracking";
 import DashboardPage from "./app/DashboardPage";
 import HomePage from "./app/HomePage";
 import Plan from "./app/Plan";
-import CommunityBlogPage from "./app/CommunityBlogPage"; 
+import CommunityBlogPage from "./app/CommunityBlogPage";
 import LeaderboardPage from "./app/LeaderboardPage";
 import Profile from "./app/Profile";
-import CoachChat from "./app/CoachChat"; 
+import CoachChat from "./app/CoachChat";
 import AdminPanelPage from "./app/AdminPanelPage";
 import SuperAdminPanelPage from "./app/SuperAdminPanelPage";
+import Contact from "./components/Contact";
+import Careers from "./components/Careers";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsOfService from "./components/TermsOfService";
+import CookiePolicy from "./components/CookiePolicy";
 
 function AppContent() {
   const location = useLocation();
@@ -41,6 +46,11 @@ function AppContent() {
         <Route path="/superadmin" element={<SuperAdminPanelPage />} />
         <Route path="/superadmin/user-profile/:userId" element={<Profile />} />
         <Route path="/admin/user-profile/:userId" element={<Profile />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
       </Routes>
       {!isAdminPage && <Footer />}
     </>
