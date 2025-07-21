@@ -109,8 +109,9 @@ function Footer() {
           <Title level={5}>Company</Title>
           <Space direction="vertical">
             {/* Links đến trang contact và careers (hiện đang là placeholder) */}
-            <Link
-              href="/contact"
+            <MuiLink
+              component={RouterLink}
+              to="/contact"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -120,9 +121,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Contact
-            </Link>
-            <Link
-              href="/careers"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/careers"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -132,7 +134,7 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Careers
-            </Link>
+            </MuiLink>
           </Space>
         </Col>
 
@@ -141,8 +143,9 @@ function Footer() {
           <Title level={5}>Legal</Title>
           <Space direction="vertical">
             {/* Links đến các trang điều khoản pháp lý (hiện đang là placeholder) */}
-            <Link
-              href="/privacy-policy"
+            <MuiLink
+              component={RouterLink}
+              to="/privacy-policy"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -152,9 +155,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Privacy Policy
-            </Link>
-            <Link
-              href="/terms-of-service"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/terms-of-service"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -164,9 +168,10 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Terms of Service
-            </Link>
-            <Link
-              href="/cookie-policy"
+            </MuiLink>
+            <MuiLink
+              component={RouterLink}
+              to="/cookie-policy"
               style={{
                 color: "#71717A",
                 textDecoration: "none",
@@ -176,7 +181,7 @@ function Footer() {
               onMouseOut={(e) => (e.currentTarget.style.color = "#71717A")}
             >
               Cookie Policy
-            </Link>
+            </MuiLink>
           </Space>
         </Col>
       </Row>
