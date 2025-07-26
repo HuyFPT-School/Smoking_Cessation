@@ -1060,7 +1060,7 @@ const Plan = () => {
                 Methods of quitting smoking:
               </Text>{" "}
               <br />
-              {quitMethod || "Chưa chọn"}
+              {quitMethod || "Not selected yet"}
             </Typography.Paragraph>
             <Typography.Paragraph
               style={{ fontSize: "16px", marginBottom: "12px" }}
