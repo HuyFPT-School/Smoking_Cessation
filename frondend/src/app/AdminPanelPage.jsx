@@ -544,7 +544,7 @@ const AdminPanelPage = () => {
             {/* Thông báo nếu chưa có profile */}
             {!userProfile && (
               <p style={{ marginTop: 12, color: "#888", textAlign: "center" }}>
-                User này chưa điền thông tin hồ sơ.
+                This user has not filled out the profile information.
               </p>
             )}
 

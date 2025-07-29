@@ -35,13 +35,10 @@ const triggerLabels = {
 };
 
 const Tracking = () => {
-  // Khởi tạo state lưu ngày được chọn (mặc định là ngày hiện tại)
   const [selectedDate, setSelectedDate] = useState(moment());
 
-  // Khởi tạo state lưu tháng hiện tại đang hiển thị trong lịch (mặc định là tháng hiện tại)
   const [currentMonth, setCurrentMonth] = useState(moment());
 
-  // Khởi tạo state lưu giờ hiện tại (theo định dạng hh:mm A, ví dụ: 08:30 AM)
   const [time, setTime] = useState(moment().format("hh:mm A"));
 
   const [location, setLocation] = useState("E.g., Balcony, Coffee shop");
@@ -57,9 +54,7 @@ const Tracking = () => {
   const userId = userObj ? userObj.id : null;
 
   useEffect(() => {
-    // Hàm bất đồng bộ để gọi dữ liệu tracking từ backend
     const fetchTrackingData = async () => {
-      // Nếu chưa có userId thì không thực hiện gì cả
       if (!userId) return;
 
       try {
@@ -67,9 +62,8 @@ const Tracking = () => {
           `http://localhost:8080/api/tracking/user/${userId}`
         );
 
-        // Nếu phản hồi thành công (status code = 200)
         if (response.status === 200) {
-          setIncidents(response.data); // Dữ liệu là một array các incident
+          setIncidents(response.data); 
         } else {
           setIncidents([]);
         }
@@ -79,32 +73,27 @@ const Tracking = () => {
       }
     };
 
-    // Gọi hàm fetchTrackingData khi component mount hoặc userId thay đổi
     fetchTrackingData();
-  }, [userId]); // useEffect sẽ chạy lại mỗi khi userId thay đổi
+  }, [userId]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Ngăn trình duyệt reload lại trang khi submit form
 
-    // Kiểm tra xem userId có tồn tại không
     if (!userId) {
       console.error("User ID not found in localStorage");
       return;
     }
 
-    // Tạo đối tượng mới chứa thông tin sự kiện (incident) từ dữ liệu người dùng nhập
     const newIncident = {
-      date: selectedDate.format("YYYY-MM-DD"), // Format ngày thành chuỗi YYYY-MM-DD
-      time, // Giờ đã chọn (định dạng: hh:mm AM/PM)
-      location, // Địa điểm nhập vào
-      trigger, // Nguyên nhân gây hành vi (stress, habit,...)
+      date: selectedDate.format("YYYY-MM-DD"), 
+      time, 
+      location, 
+      trigger, 
       satisfaction:
         activityType === "smoking" ? satisfaction : cravingIntensity,
-      // Nếu loại hành vi là "smoking" thì lưu mức độ hài lòng (satisfaction)
-      // Nếu là loại khác thì lưu mức độ thèm muốn (cravingIntensity)
-      type: activityType, // Loại hoạt động (smoking, vaping,...)
-      notes, // Ghi chú người dùng nhập
-      userId: userId, // ID người dùng lấy từ localStorage
+      type: activityType, 
+      notes, 
+      userId: userId, 
     };
 
     try {
@@ -113,7 +102,6 @@ const Tracking = () => {
         newIncident 
       );
 
-      // Nếu response trả về thành công (status code 200 hoặc 201)
       if (response.status === 200 || response.status === 201) {
         setIncidents([...incidents, newIncident]);
 
@@ -296,13 +284,11 @@ const Tracking = () => {
   };
 
   const renderChart = () => {
-    const chartData = getChartDataFromIncidents(); // Lấy dữ liệu biểu đồ từ danh sách các sự kiện (incidents)
-    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0); // Tính tổng số lần hút thuốc trong dữ liệu biểu đồ
+    const chartData = getChartDataFromIncidents(); 
+    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0); 
     // Hiển thị khoảng tuần
     const weekStart = selectedDate.clone().startOf("week").format("DD/MM");
-    // Lấy ngày bắt đầu của tuần từ ngày được chọn và định dạng là "DD/MM"
     const weekEnd = selectedDate.clone().endOf("week").format("DD/MM/YYYY");
-    // Lấy ngày kết thúc của tuần từ ngày được chọn và định dạng là "DD/MM/YYYY"
 
     return (
       <div className="chart-container">
@@ -324,9 +310,7 @@ const Tracking = () => {
         ) : (
           <div className="chart-bars">
             {chartData.map((data, index) => {
-              const heightPx = data.smoking * 20; // tính chều cao cột dựa trên số lần hút thuốc
-              // Highlight cột nếu là ngày đang chọn
-              //isSelected có giá trị true nếu ngày đang chọn (selectedDate) trùng với ngày của data.date
+              const heightPx = data.smoking * 20; 
               const isSelected =
                 selectedDate.format("YYYY-MM-DD") === data.date;
               return (
@@ -334,19 +318,18 @@ const Tracking = () => {
                   <div
                     className="bar smoking"
                     style={{
-                      height: `${heightPx}px`, //Gán chiều cao của cột dựa trên giá trị heightPx đã tính trước đó (số lần hút thuốc * 20px)
-                      minHeight: data.smoking > 0 ? "20px" : "2px", // nếu có hút thuốc thì height tối thiểu là 20px, ko có : 2px
-                      background: isSelected ? "#1890ff" : undefined, //if cột đang đc chọn thì màu xanh, ko thì màu css
+                      height: `${heightPx}px`, 
+                      minHeight: data.smoking > 0 ? "20px" : "2px", 
+                      background: isSelected ? "#1890ff" : undefined, 
                       border: isSelected ? "0px solid #0050b3" : undefined,
                     }}
                   />
                   <span className="bar-label">{data.day}</span>{" "}
-                  {/* hiển thị ngày trong tuần*/}
                   <span
                     className="bar-value"
                     style={{ fontSize: "12px", color: "#666" }}
                   >
-                    {data.smoking} {/* hiển thị số lần hút thuốc*/}
+                    {data.smoking} 
                   </span>
                 </div>
               );
@@ -354,7 +337,6 @@ const Tracking = () => {
           </div>
         )}
         <div style={{ marginTop: "10px", fontSize: "12px", color: "#666" }}>
-          {/* Hiển thị tổng số sự kiện (hút thuốc hoặc thèm thuốc) trong tuần */}
           Total {activityType} incidents this week: {totalIncidents}
         </div>
       </div>
@@ -382,7 +364,6 @@ const Tracking = () => {
   const filteredIncidents = getWeekIncidents();
 
   const countTriggers = () => {
-    //triggerCount chứa các loại nguyên nhân phổ biến, giá trị ban đầu = 0
     const triggerCount = {
       stress: 0,
       social: 0,
@@ -426,22 +407,21 @@ const Tracking = () => {
             <h3>Select Date</h3>
             <p>Choose a date to record activity or view data</p>
             {renderCalendar()}
-            {/*hiển thị giao diện chọn ngày*/}
           </div>
           <div className="record-section">
             <h3>Record Activity</h3>
             <p>Log a smoking incident</p>
             <form onSubmit={handleSubmit} className="tracking-form">
               <Radio.Group
-                value={activityType} // Giá trị hiện tại của lựa chọn (được lưu trong state activityType)
-                onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn một lựa chọn mới, cập nhật activityType
+                value={activityType} 
+                onChange={(e) => setActivityType(e.target.value)} 
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
                 {/*tạo 2 sự lựa chọn để ngdungf chọn */}
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
-              {activityType === "smoking" ? ( // nếu activityType đang là "smoking" thì hiện giao diện cho smoking
+              {activityType === "smoking" ? ( 
                 <>
                   <div className="form-group">
                     <label>Time</label>
@@ -558,13 +538,11 @@ const Tracking = () => {
                 />
               </div>
               <Button
-                //Gửi thông tin đã nhập vào biểu mẫu (thời gian, địa điểm, trigger, ghi chú...)
-                // để ghi lại một hành vi hút thuốc hoặc cơn thèm thuốc.
                 style={{ backgroundColor: "#16A34A", color: "#fff" }}
                 htmlType="submit"
                 className="submit-button"
               >
-                {activityType === "smoking" // hiển thị đúng loại sự kiện (hút thuốc, thèm thuốc)
+                {activityType === "smoking" 
                   ? "RECORD SMOKING INCIDENT"
                   : "RECORD CRAVING INCIDENT"}
               </Button>
@@ -580,8 +558,8 @@ const Tracking = () => {
           <TabPane tab="Chart" key="chart">
             <div className="chart-header" style={{ marginBottom: "10px" }}>
               <Radio.Group
-                value={activityType} //Gắn giá trị hiện tại (state) để hiển thị lựa chọn đang chọn.
-                onChange={(e) => setActivityType(e.target.value)} //Khi người dùng chọn mục khác → cập nhật lại activityType.
+                value={activityType} 
+                onChange={(e) => setActivityType(e.target.value)} 
                 className="activity-type"
                 style={{ marginBottom: "10px" }}
               >
@@ -589,7 +567,6 @@ const Tracking = () => {
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
             </div>
-            {/* Gọi hàm renderChart để hiển thị biểu đồ tùy theo lựa chọn (smoking hoặc craving).*/}
             {renderChart()}
           </TabPane>
           <TabPane tab="Log" key="log">
@@ -608,18 +585,15 @@ const Tracking = () => {
                   className="activity-type"
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
-                  {/*hiển thị 2 lựa chọn*/}
                   <Radio.Button value="craving">Craving Incidents</Radio.Button>
                 </Radio.Group>
                 <span style={{ fontSize: "14px", color: "#666" }}>
                   Week: {selectedDate.clone().startOf("week").format("DD/MM")} -{" "}
-                  {/*lấy ngày bắt đầu tuần*/}
                   {selectedDate.clone().endOf("week").format("DD/MM/YYYY")}
-                  {/*lấy ngày bắt đầu tuần*/}
                 </span>
               </div>
             </div>
-            {filteredIncidents.length === 0 ? ( //Kiểm tra xem danh sách sự kiện đã lọc trong tuần hiện tại có rỗng không.
+            {filteredIncidents.length === 0 ? ( 
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -627,7 +601,6 @@ const Tracking = () => {
                 <p>Start recording your activities to see the log data.</p>
               </div>
             ) : (
-              // Nếu có dữ liệu, hiển thị bảng ghi chép chi tiết các sự kiện
               <table className="log-table">
                 <thead>
                   <tr>
@@ -636,7 +609,6 @@ const Tracking = () => {
                     <th>Location</th>
                     <th>Trigger</th>
                     <th>
-                      {/*// Tùy theo loại hoạt động, tiêu đề sẽ là 'Satisfaction' (nếu hút thuốc) hoặc 'Intensity' (nếu thèm thuốc)*/}
                       {activityType === "smoking"
                         ? "Satisfaction"
                         : "Intensity"}
@@ -693,7 +665,7 @@ const Tracking = () => {
                 {/*cuối tuần*/}
               </span>
             </div>
-            {incidents.length === 0 ? ( //Kiểm tra nếu không có dữ liệu sự kiện nào
+            {incidents.length === 0 ? ( 
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -722,12 +694,11 @@ const Tracking = () => {
                                     )) *
                                   100
                                 : 0
-                            }%`, // Tính chiều dài thanh theo phần trăm
+                            }%`, 
                             backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
                           }}
                         >
                           <span className="trigger-value">{trigger.value}</span>
-                          {/* Số lượng trigger hiển thị trên thanh */}
                         </div>
                       </div>
                     )
