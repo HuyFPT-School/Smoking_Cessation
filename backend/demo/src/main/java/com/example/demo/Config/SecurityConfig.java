@@ -58,7 +58,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Cho phép tất cả các đường dẫn
-                        .allowedOrigins("http://localhost:3000") // Chỉ cho phép từ frontend này
+                        .allowedOrigins("https://smoking-cessation-kef557xo0-nhathuys-projects-e7dabf31.vercel.app") // Chỉ cho phép từ frontend này
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
                         .allowedHeaders("*") // Cho phép tất cả các header
                         .allowCredentials(true); // Cho phép gửi cookie, thông tin xác thực
