@@ -120,7 +120,7 @@ const Register = () => {
   const fetchUserFromBackend = async (idToken) => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/user/me", 
+        "https://smoking-cessation-f7anbngta4b9gnap.eastasia-01.azurewebsites.net/api/user/me", 
         { name: Username }, 
         {
           headers: {
