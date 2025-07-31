@@ -23,7 +23,10 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
-
+      
+      - name: List files for debug
+        run: ls -lR
+      
       - name: Build with Maven
         run: cd backend/demo && mvn clean install -DskipTests
 
