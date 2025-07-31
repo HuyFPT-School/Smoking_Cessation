@@ -28,48 +28,46 @@ public class FirebaseConfig {
     @PostConstruct // Annotation giúp tự động chạy hàm này sau khi bean được tạo
     public void initializeFirebase() {
         try {
-            // Kiểm tra nếu Firebase chưa được khởi tạo thì mới tiến hành khởi tạo
             if (FirebaseApp.getApps().isEmpty()) {
                 System.out.println("🔄 Initializing Firebase Admin SDK...");
 
-                // Đọc file serviceAccountKey.json từ thư mục resources (classpath)
-                // Sử dụng try-with-resources để tự động đóng InputStream sau khi dùng xong
-                try (InputStream serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream()) {
-                    // Tạo đối tượng cấu hình Firebase với thông tin xác thực và projectId
-                    FirebaseOptions options = FirebaseOptions.builder()
-                            .setCredentials(GoogleCredentials.fromStream(serviceAccount)) // Đọc credentials từ file
-                            .setProjectId("my-project-caaa7") // ID của project Firebase
-                            .build();
-
-                    // Khởi tạo FirebaseApp với cấu hình trên
-                    FirebaseApp.initializeApp(options);
-                    System.out.println("✅ Firebase Admin SDK initialized successfully");
-
-                    // Kiểm tra kết nối với Firebase bằng cách lấy danh sách user (giới hạn 1 user)
-                    try {
-                        Thread.sleep(1000); // Chờ 1 giây để đảm bảo khởi tạo hoàn tất
-                        com.google.firebase.auth.FirebaseAuth.getInstance().listUsers(null, 1); // Lấy 1 user để test
-                        System.out.println("✅ Firebase connection test passed");
-                    } catch (Exception e) {
-                        System.err.println("❌ Firebase connection test failed: " + e.getMessage());
-                        // Nếu lỗi liên quan đến chữ ký JWT, gợi ý đồng bộ thời gian hệ thống
-                        if (e.getMessage().contains("Invalid JWT Signature")) {
-                            System.err.println("💡 Hint: Try running 'w32tm /resync' as Administrator");
-                        }
-                    }
+                InputStream serviceAccount = null;
+                String serviceAccountJson = System.getenv("FIREBASE_SERVICE_ACCOUNT");
+                if (serviceAccountJson != null && !serviceAccountJson.isEmpty()) {
+                    System.out.println("ℹ️ Using service account from environment variable FIREBASE_SERVICE_ACCOUNT");
+                    serviceAccount = new java.io.ByteArrayInputStream(serviceAccountJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                } else {
+                    System.out.println("ℹ️ Using service account from classpath resource serviceAccountKey.json");
+                    serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
                 }
 
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .setProjectId("my-project-caaa7")
+                        .build();
+
+                FirebaseApp.initializeApp(options);
+                System.out.println("✅ Firebase Admin SDK initialized successfully");
+
+                // Kiểm tra kết nối với Firebase bằng cách lấy danh sách user (giới hạn 1 user)
+                try {
+                    Thread.sleep(1000);
+                    com.google.firebase.auth.FirebaseAuth.getInstance().listUsers(null, 1);
+                    System.out.println("✅ Firebase connection test passed");
+                } catch (Exception e) {
+                    System.err.println("❌ Firebase connection test failed: " + e.getMessage());
+                    if (e.getMessage() != null && e.getMessage().contains("Invalid JWT Signature")) {
+                        System.err.println("💡 Hint: Try running 'w32tm /resync' as Administrator");
+                    }
+                }
             } else {
-                // Nếu đã khởi tạo rồi thì chỉ log ra thông báo
                 System.out.println("✅ Firebase Admin SDK already initialized");
             }
         } catch (IOException e) {
-            // Xử lý lỗi khi không đọc được file serviceAccountKey.json
             System.err.println("❌ Firebase initialization failed: " + e.getMessage());
-            System.err.println("❌ Make sure serviceAccountKey.json exists and is valid");
+            System.err.println("❌ Make sure serviceAccountKey.json exists and is valid, or the FIREBASE_SERVICE_ACCOUNT env variable is set");
             e.printStackTrace();
         } catch (Exception e) {
-            // Xử lý các lỗi bất ngờ khác
             System.err.println("❌ Unexpected Firebase initialization error: " + e.getMessage());
             e.printStackTrace();
         }
