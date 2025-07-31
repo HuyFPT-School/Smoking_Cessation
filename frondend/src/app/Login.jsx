@@ -62,7 +62,7 @@ const Login = () => {
   const fetchUserFromBackend = async (idToken) => {
     try {
       // Gọi API lấy thông tin user
-      const res = await axios.get("https://smoking-cessation-f7anbngta4b9gnap.eastasia-01.azurewebsites.net/api/user/me", {
+      const res = await axios.get("https://smoking-cessation.azurewebsites.net/api/user/me", {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
