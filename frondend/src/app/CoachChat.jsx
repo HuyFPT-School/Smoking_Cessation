@@ -156,7 +156,8 @@ const CoachChat = () => {
         error.response?.status >= 400 &&
         error.response?.status < 500
       ) {
-        fallbackMessage = "An error occurred. Please try asking in a different way! 🤔";
+        fallbackMessage =
+          "An error occurred. Please try asking in a different way! 🤔";
       } else if (!error.response) {
         fallbackMessage =
           "Unable to connect to the server. Please check your network connection! 🔄";
@@ -211,40 +212,56 @@ const CoachChat = () => {
             padding: "20px 30px",
             display: "flex",
             alignItems: "center",
-            gap: "15px",
+            justifyContent: "space-between",
           }}
         >
-          <Avatar
-            size={50}
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              border: "2px solid rgba(255,255,255,0.3)",
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 25 20"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <Avatar
+              size={50}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                border: "2px solid rgba(255,255,255,0.3)",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
             >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
-          </Avatar>
-          <div>
-            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "600" }}>
-              AI Coach Sarah
-            </h1>
-            <p style={{ margin: 0, opacity: 0.9, fontSize: "14px" }}>
-              Smoking Cessation Specialist • Online • Always ready to help
-            </p>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 25 20"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+              </svg>
+            </Avatar>
+            <div>
+              <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "600" }}>
+                AI Coach Sarah
+              </h1>
+              <p style={{ margin: 0, opacity: 0.9, fontSize: "14px" }}>
+                Smoking Cessation Specialist
+              </p>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <Button
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "white",
+                borderRadius: "20px",
+                fontSize: "14px",
+              }}
+              onClick={() => (window.location.href = "/direct-chat")}
+            >
+              💬 Chat with Human
+            </Button>
           </div>
         </div>{" "}
         {/* Chat Messages Area */}
@@ -508,9 +525,7 @@ const CoachChat = () => {
               🚭 Start quitting
             </button>
             <button
-              onClick={() =>
-                setInput("I'm having trouble quitting smoking")
-              }
+              onClick={() => setInput("I'm having trouble quitting smoking")}
               style={{
                 background: "rgba(102, 126, 234, 0.1)",
                 border: "1px solid rgba(102, 126, 234, 0.3)",
