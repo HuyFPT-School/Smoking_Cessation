@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 export const directChatAPI = {
   // Get user's chat rooms
@@ -45,6 +46,15 @@ export const directChatAPI = {
       {
         params: { roomId, userId },
       }
+    );
+    return response.data;
+  },
+
+  // Send message via REST API
+  sendMessage: async (message) => {
+    const response = await axios.post(
+      `${API_BASE_URL}/direct-chat/messages/send`,
+      message
     );
     return response.data;
   },

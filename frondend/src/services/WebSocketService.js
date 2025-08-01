@@ -6,6 +6,8 @@ class WebSocketService {
     this.client = null;
     this.connected = false;
     this.subscriptions = new Map();
+    this.baseApiUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
   }
 
   getWebSocketUrl() {
@@ -150,16 +152,40 @@ class WebSocketService {
     }
   }
 
-  sendMessage(message) {
-    if (!this.connected) {
-      console.error("WebSocket not connected");
-      return;
-    }
+  // Gửi tin nhắn - fallback sang REST API nếu WebSocket không khả dụng
+  async sendMessage(message) {
+    if (this.connected) {
+      // Sử dụng WebSocket nếu có kết nối
+      this.client.publish({
+        destination: "/app/chat.sendMessage",
+        body: JSON.stringify(message),
+      });
+      return Promise.resolve();
+    } else {
+      // Fallback sang REST API
+      console.log("WebSocket not connected, using REST API to send message");
+      try {
+        const response = await fetch(
+          `${this.baseApiUrl}/api/direct-chat/messages/send`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          }
+        );
 
-    this.client.publish({
-      destination: "/app/chat.sendMessage",
-      body: JSON.stringify(message),
-    });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error("Failed to send message via REST API:", error);
+        throw error;
+      }
+    }
   }
 
   joinRoom(roomId) {
