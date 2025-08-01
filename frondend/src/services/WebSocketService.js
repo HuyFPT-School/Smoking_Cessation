@@ -13,7 +13,7 @@ class WebSocketService {
     // Kiểm tra nếu đang ở production (HTTPS)
     if (window.location.protocol === "https:") {
       // Sử dụng WSS cho HTTPS - thay đổi URL này thành backend HTTPS của bạn
-      return import.meta.env.VITE_WS_URL || "wss://your-backend-domain.com/ws";
+      return import.meta.env.VITE_WS_URL || "http://localhost:8080/ws";
     } else {
       // Sử dụng HTTP cho development
       return "http://localhost:8080/ws";
