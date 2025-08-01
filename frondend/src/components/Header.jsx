@@ -42,6 +42,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isAdminRole = ["ADMIN", "SUPER_ADMIN"].includes(user?.role);
+  const isCoachRole = user?.role === "COACH";
 
   const handleMenuOpen = (event) => {
     // Điều này giúp tránh việc menu tự động đóng ngay khi mở do sự kiện click
@@ -75,6 +76,13 @@ const Header = () => {
     { label: "Tracking", path: "/tracking", protected: true },
     { label: "Leaderboard", path: "/leaderboard", protected: false },
     { label: "Blog", path: "/blog", protected: false },
+  ];
+
+  // Mảng menu cho Coach
+  const coachNavLinks = [
+    { label: "Coach Dashboard", path: "/coach-dashboard", protected: true },
+    { label: "Leaderboard", path: "/leaderboard", protected: true },
+    { label: "Blog", path: "/blog", protected: true },
   ];
 
   // Hàm xử lý click vào navigation link
@@ -129,7 +137,15 @@ const Header = () => {
           <IconButton
             disableRipple
             component={RouterLink}
-            to={isAdminRole ? (user?.role === "SUPER_ADMIN" ? "/superadmin" : "/admin") : "/"}
+            to={
+              isAdminRole
+                ? user?.role === "SUPER_ADMIN"
+                  ? "/superadmin"
+                  : "/admin"
+                : isCoachRole
+                ? "/coach-dashboard"
+                : "/"
+            }
             sx={{ mr: 1 }}
           >
             <svg
@@ -156,7 +172,15 @@ const Header = () => {
           >
             <MuiLink
               component={RouterLink} // Sử dụng RouterLink để điều hướng nội bộ
-              to={isAdminRole ? (user?.role === "SUPER_ADMIN" ? "/superadmin" : "/admin") : "/"}
+              to={
+                isAdminRole
+                  ? user?.role === "SUPER_ADMIN"
+                    ? "/superadmin"
+                    : "/admin"
+                  : isCoachRole
+                  ? "/coach-dashboard"
+                  : "/"
+              }
               underline="none"
               color="inherit"
               sx={{ textDecoration: "none" }}
@@ -165,7 +189,7 @@ const Header = () => {
             </MuiLink>
           </Typography>
         </Box>
-        {!isAdminRole && !isMobile && (
+        {!isAdminRole && !isCoachRole && !isMobile && (
           <Box
             sx={{
               display: "flex",
@@ -175,6 +199,32 @@ const Header = () => {
             {navLinks.map((item) => (
               <MuiLink
                 key={item.label} // Key là bắt buộc khi render danh sách trong React
+                component={RouterLink}
+                to={item.path}
+                underline="none"
+                color="text.primary"
+                onClick={(event) => handleNavClick(event, item)}
+                sx={{
+                  fontWeight: "bold",
+                  transition: "0.2s",
+                  "&:hover": { color: "#16A34A" },
+                }}
+              >
+                {item.label}
+              </MuiLink>
+            ))}
+          </Box>
+        )}
+        {isCoachRole && !isMobile && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+            }}
+          >
+            {coachNavLinks.map((item) => (
+              <MuiLink
+                key={item.label}
                 component={RouterLink}
                 to={item.path}
                 underline="none"
@@ -263,6 +313,16 @@ const Header = () => {
                 >
                   Profile
                 </MenuItem>
+                {user.role === "COACH" && (
+                  <MenuItem
+                    onClick={() => {
+                      navigate("/coach-dashboard");
+                      handleMenuClose();
+                    }}
+                  >
+                    Coach Dashboard
+                  </MenuItem>
+                )}
                 {user.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => {
@@ -338,7 +398,37 @@ const Header = () => {
             {user &&
               user.role !== "ADMIN" &&
               user.role !== "SUPER_ADMIN" &&
+              user.role !== "COACH" &&
               navLinks.map((item) => (
+                <ListItem
+                  button
+                  key={item.label}
+                  component={RouterLink}
+                  to={item.path}
+                  onClick={(event) => handleNavClick(event, item)}
+                  sx={{
+                    py: 1.5,
+                    "&:hover": {
+                      bgcolor: "rgba(22, 163, 74, 0.1)",
+                      "& .MuiListItemText-primary": {
+                        color: "#16A34A",
+                      },
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={item.label}
+                    sx={{
+                      "& .MuiListItemText-primary": { fontWeight: "bold" },
+                    }}
+                  />
+                </ListItem>
+              ))}
+
+            {/* Menu cho Coach trên mobile */}
+            {user &&
+              user.role === "COACH" &&
+              coachNavLinks.map((item) => (
                 <ListItem
                   button
                   key={item.label}

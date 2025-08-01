@@ -59,7 +59,7 @@ const Tracking = () => {
 
       try {
         const response = await axios.get(
-          `https://smoking-cessation-f7anbngta4b9gnap.eastasia-01.azurewebsites.net/api/tracking/user/${userId}`
+          `http://localhost:8080/api/tracking/user/${userId}`
         );
 
         if (response.status === 200) {
@@ -98,7 +98,7 @@ const Tracking = () => {
 
     try {
       const response = await axios.post(
-        "https://smoking-cessation-f7anbngta4b9gnap.eastasia-01.azurewebsites.net/api/tracking", 
+        "http://localhost:8080/api/tracking", 
         newIncident 
       );
 
