@@ -196,7 +196,22 @@ const DirectChat = () => {
     setIsLoading(true);
 
     try {
-      WebSocketService.sendMessage(messageData);
+      // Gửi tin nhắn (WebSocket hoặc REST API)
+      await WebSocketService.sendMessage(messageData);
+
+      // Reload messages để cập nhật UI
+      setTimeout(async () => {
+        if (activeRoom?.roomId) {
+          try {
+            const roomMessages = await directChatAPI.getRoomMessages(
+              activeRoom.roomId
+            );
+            setMessages(roomMessages);
+          } catch (error) {
+            console.error("Error reloading messages:", error);
+          }
+        }
+      }, 100);
     } catch (error) {
       console.error("Error sending message:", error);
       message.error("Failed to send message");
