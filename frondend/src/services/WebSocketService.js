@@ -8,14 +8,47 @@ class WebSocketService {
     this.subscriptions = new Map();
   }
 
+  getWebSocketUrl() {
+    // Kiểm tra môi trường
+    if (
+      typeof window !== "undefined" &&
+      window.location.protocol === "https:"
+    ) {
+      // Production HTTPS - cần WSS
+      const wsUrl = import.meta.env.VITE_WS_URL;
+      if (!wsUrl) {
+        console.warn("No WSS URL configured for HTTPS environment");
+        return null; // Disable WebSocket nếu không có URL secure
+      }
+      return wsUrl;
+    } else {
+      // Development HTTP
+      return "http://localhost:8080/ws";
+    }
+  }
+
   connect(onConnected, onError) {
     if (this.connected) {
       return Promise.resolve();
     }
 
+    const wsUrl = this.getWebSocketUrl();
+
+    // Nếu không có URL (HTTPS mà không có WSS), disable WebSocket
+    if (!wsUrl) {
+      console.warn("WebSocket disabled: No secure URL available for HTTPS");
+      const error = new Error(
+        "WebSocket not available on HTTPS without secure backend"
+      );
+      if (onError) onError(error);
+      return Promise.reject(error);
+    }
+
+    console.log("Connecting to WebSocket:", wsUrl);
+
     return new Promise((resolve, reject) => {
       this.client = new Client({
-        webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+        webSocketFactory: () => new SockJS(wsUrl),
         debug: (str) => {
           console.log("STOMP: " + str);
         },

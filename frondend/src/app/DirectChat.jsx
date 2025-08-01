@@ -82,7 +82,14 @@ const DirectChat = () => {
         },
         (error) => {
           console.error("WebSocket connection failed:", error);
-          message.error("Failed to connect to chat service");
+          // Chỉ hiển thị error nếu không phải lỗi HTTPS WebSocket disable
+          if (!error.message.includes("WebSocket not available")) {
+            message.error("Failed to connect to chat service");
+          } else {
+            console.warn(
+              "WebSocket disabled on HTTPS - chat will work without real-time updates"
+            );
+          }
           setIsConnecting(false);
         }
       );
