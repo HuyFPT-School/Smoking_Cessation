@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Avatar, Input, Button, Spin } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const { TextArea } = Input;
 
@@ -12,6 +13,7 @@ const CoachChat = () => {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const messagesEndRef = useRef(null);
   const textAreaRef = useRef(null);
+  const navigate = useNavigate();
 
   // Temporary user ID - in real app, get from authentication context
   const userStr = localStorage.getItem("user");
@@ -258,7 +260,7 @@ const CoachChat = () => {
                 borderRadius: "20px",
                 fontSize: "14px",
               }}
-              onClick={() => (window.location.href = "/direct-chat")}
+              onClick={() => (navigate("/direct-chat"))}
             >
               💬 Chat with Human
             </Button>
