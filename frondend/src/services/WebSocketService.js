@@ -6,27 +6,6 @@ class WebSocketService {
     this.client = null;
     this.connected = false;
     this.subscriptions = new Map();
-    this.baseApiUrl =
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-  }
-
-  getWebSocketUrl() {
-    // Kiểm tra môi trường
-    if (
-      typeof window !== "undefined" &&
-      window.location.protocol === "https:"
-    ) {
-      // Production HTTPS - cần WSS
-      const wsUrl = import.meta.env.VITE_WS_URL;
-      if (!wsUrl) {
-        console.warn("No WSS URL configured for HTTPS environment");
-        return null; // Disable WebSocket nếu không có URL secure
-      }
-      return wsUrl;
-    } else {
-      // Development HTTP
-      return "http://localhost:8080/ws";
-    }
   }
 
   connect(onConnected, onError) {
@@ -34,23 +13,9 @@ class WebSocketService {
       return Promise.resolve();
     }
 
-    const wsUrl = this.getWebSocketUrl();
-
-    // Nếu không có URL (HTTPS mà không có WSS), disable WebSocket
-    if (!wsUrl) {
-      console.warn("WebSocket disabled: No secure URL available for HTTPS");
-      const error = new Error(
-        "WebSocket not available on HTTPS without secure backend"
-      );
-      if (onError) onError(error);
-      return Promise.reject(error);
-    }
-
-    console.log("Connecting to WebSocket:", wsUrl);
-
     return new Promise((resolve, reject) => {
       this.client = new Client({
-        webSocketFactory: () => new SockJS(wsUrl),
+        webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
         debug: (str) => {
           console.log("STOMP: " + str);
         },
@@ -152,40 +117,16 @@ class WebSocketService {
     }
   }
 
-  // Gửi tin nhắn - fallback sang REST API nếu WebSocket không khả dụng
-  async sendMessage(message) {
-    if (this.connected) {
-      // Sử dụng WebSocket nếu có kết nối
-      this.client.publish({
-        destination: "/app/chat.sendMessage",
-        body: JSON.stringify(message),
-      });
-      return Promise.resolve();
-    } else {
-      // Fallback sang REST API
-      console.log("WebSocket not connected, using REST API to send message");
-      try {
-        const response = await fetch(
-          `${this.baseApiUrl}/api/direct-chat/messages/send`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(message),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        console.error("Failed to send message via REST API:", error);
-        throw error;
-      }
+  sendMessage(message) {
+    if (!this.connected) {
+      console.error("WebSocket not connected");
+      return;
     }
+
+    this.client.publish({
+      destination: "/app/chat.sendMessage",
+      body: JSON.stringify(message),
+    });
   }
 
   joinRoom(roomId) {
