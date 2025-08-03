@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
-import axios from "axios"; 
+import axios from "axios";
 
 import {
   Row,
@@ -15,7 +15,7 @@ import {
   Form,
   Radio,
 } from "antd";
-import { Line } from "react-chartjs-2"; 
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -25,7 +25,7 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js"; 
+} from "chart.js";
 import "../index.css";
 import { Select } from "antd";
 import {
@@ -59,7 +59,7 @@ ChartJS.register(
 
 // Component chính để tạo kế hoạch cai thuốc lá
 const Plan = () => {
-  const [currentStep, setCurrentStep] = useState(1); 
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [quitMethod, setQuitMethod] = useState("");
   const [cigarettesPerDay, setCigarettesPerDay] = useState(20);
@@ -73,7 +73,9 @@ const Plan = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [showCompleteNotification, setShowCompleteNotification] =
     useState(false);
-
+  const [showDeleteNotification, setShowDeleteNotification] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [existingPlan, setExistingPlan] = useState(null);
 
   const handleDeleteReward = (indexToDelete) => {
     // nhận vào 1 index của phần thưởng bạn muốn xóa
@@ -100,11 +102,12 @@ const Plan = () => {
       if (!userId) return;
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/plans/user/${userId}` 
+          `http://localhost:8080/api/plans/user/${userId}`
         );
         if (response.status === 200 && response.data) {
           const plan = response.data;
-          setSelectedDate(new Date(plan.quitDate)); 
+          setExistingPlan(plan); // Lưu thông tin kế hoạch hiện có
+          setSelectedDate(new Date(plan.quitDate));
           setQuitMethod(plan.quitMethod);
           setCigarettesPerDay(plan.cigarettesPerDay);
           setTriggers(plan.triggers || []);
@@ -113,7 +116,7 @@ const Plan = () => {
           setAdditionalNotes(plan.additionalNotes || "");
           setRewards(plan.rewards || []);
 
-          setCurrentStep(5); 
+          setCurrentStep(5);
         }
       } catch (error) {
         console.error("Error fetching plan data:", error);
@@ -122,7 +125,6 @@ const Plan = () => {
 
     fetchPlanData();
   }, [userId]);
-
 
   for (let i = 0; i < 35; i++) {
     // tại mỗi ô lặp tạo 1 date đại diện cho từng ô ngày
@@ -162,16 +164,16 @@ const Plan = () => {
   ];
 
   const half = Math.ceil(smokingTriggers.length / 2);
-  const leftColumnTriggers = smokingTriggers.slice(0, half); 
-  const rightColumnTriggers = smokingTriggers.slice(half); 
+  const leftColumnTriggers = smokingTriggers.slice(0, half);
+  const rightColumnTriggers = smokingTriggers.slice(half);
 
   // Hàm xử lý khi chọn hoặc bỏ chọn yếu tố kích hoạt
   const handleTriggerChange = (trigger) => {
     // hàm nhận vào trigger
     if (triggers.includes(trigger)) {
-      setTriggers(triggers.filter((t) => t !== trigger)); 
+      setTriggers(triggers.filter((t) => t !== trigger));
     } else {
-      setTriggers([...triggers, trigger]); 
+      setTriggers([...triggers, trigger]);
     }
   };
 
@@ -190,15 +192,15 @@ const Plan = () => {
   ];
 
   const halfCoping = Math.ceil(copingStrategiesList.length / 2);
-  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping); 
-  const rightCopingStrategies = copingStrategiesList.slice(halfCoping); 
+  const leftCopingStrategies = copingStrategiesList.slice(0, halfCoping);
+  const rightCopingStrategies = copingStrategiesList.slice(halfCoping);
 
   // Hàm xử lý khi chọn hoặc bỏ chọn chiến lược đối phó
   const handleCopingStrategyChange = (strategy) => {
     if (copingStrategies.includes(strategy)) {
-      setCopingStrategies(copingStrategies.filter((s) => s !== strategy)); 
+      setCopingStrategies(copingStrategies.filter((s) => s !== strategy));
     } else {
-      setCopingStrategies([...copingStrategies, strategy]); 
+      setCopingStrategies([...copingStrategies, strategy]);
     }
   };
 
@@ -243,12 +245,12 @@ const Plan = () => {
       .validateFields() // check xem các ô nhập có hợp lệ ko, Trả về Promise chứa values nếu hợp lệ
       .then((values) => {
         setRewards([
-          ...rewards, 
+          ...rewards,
           { milestone: values.milestone, reward: values.reward },
         ]);
-        setIsModalVisible(false); 
-        form.resetFields(); 
-        setShowNotification(true); 
+        setIsModalVisible(false);
+        form.resetFields();
+        setShowNotification(true);
         setTimeout(() => setShowNotification(false), 3000); // Ẩn thông báo sau 3 giây
       })
       .catch((info) => {
@@ -257,8 +259,50 @@ const Plan = () => {
   };
 
   const handleModalCancel = () => {
-    setIsModalVisible(false); 
+    setIsModalVisible(false);
     form.resetFields(); // xóa dữ liệu trong form
+  };
+
+  const handleDeletePlan = async () => {
+    if (!userId) {
+      console.error("User ID not found in localStorage");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:8080/api/plans/user/${userId}`
+      );
+
+      if (response.status === 200) {
+        // Reset tất cả state về giá trị mặc định
+        setExistingPlan(null);
+        setSelectedDate(new Date());
+        setQuitMethod("");
+        setCigarettesPerDay(20);
+        setTriggers([]);
+        setCopingStrategies([]);
+        setSupportNetwork([]);
+        setAdditionalNotes("");
+        setRewards([]);
+        setCurrentStep(1); // Quay về bước đầu
+
+        setShowDeleteNotification(true);
+        setTimeout(() => setShowDeleteNotification(false), 3000);
+        console.log("Plan deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting plan:", error);
+    }
+    setIsDeleteModalVisible(false);
+  };
+
+  const showDeleteModal = () => {
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleDeleteModalCancel = () => {
+    setIsDeleteModalVisible(false);
   };
 
   const handleComplete = async () => {
@@ -266,9 +310,16 @@ const Plan = () => {
       console.error("User ID not found in localStorage");
       return;
     }
+
+    // Kiểm tra nếu đã có kế hoạch thì không cho tạo mới
+    if (existingPlan) {
+      console.log("Plan already exists. Cannot create new plan.");
+      return;
+    }
+
     const planData = {
       userId,
-      quitDate: selectedDate.toISOString().split("T")[0], 
+      quitDate: selectedDate.toISOString().split("T")[0],
       quitMethod,
       cigarettesPerDay,
       triggers,
@@ -279,44 +330,31 @@ const Plan = () => {
     };
 
     try {
-      let existingPlan = null; 
-      try {
-        const checkResponse = await axios.get(
-          `http://localhost:8080/api/plans/user/${userId}`
-        );
-        if (checkResponse.status === 200 && checkResponse.data) {
-          existingPlan = checkResponse.data; // if phản hồi 200 và có data thì gán kế hoạch hiện có cho existingPlan
-        }
-      } catch (error) {
-        if (error.response && error.response.status !== 404) {
-          console.error("Error checking for existing plan:", error);
-        }
-      }
+      // Chỉ tạo mới kế hoạch (POST)
+      const response = await axios.post(
+        "http://localhost:8080/api/plans",
+        planData
+      );
 
-      let response;
-      if (existingPlan && existingPlan.id) {
-        // Nếu có kế hoạch, cập nhật (PUT)
-        response = await axios.put(
-          `http://localhost:8080/api/plans/${existingPlan.id}`, 
-          planData
-        );
+      if (response.status === 201) {
+        setExistingPlan(response.data); // Lưu kế hoạch vừa tạo
+        setShowCompleteNotification(true);
+        setTimeout(() => setShowCompleteNotification(false), 3000);
+        console.log("Plan created successfully:", response.data);
+      } else if (response.status === 409) {
+        // Conflict - user đã có kế hoạch
+        console.log("User already has a plan");
+        setExistingPlan(response.data);
       } else {
-        // Nếu không có, tạo mới (POST)
-        response = await axios.post(
-          "http://localhost:8080/api/plans",
-          planData
-        );
-      }
-
-      if (response.status === 200 || response.status === 201) {
-        setShowCompleteNotification(true); 
-        setTimeout(() => setShowCompleteNotification(false), 3000); // Ẩn sau 3 giây
-        console.log("Plan saved successfully:", response.data);
-      } else {
-        console.error("Failed to save plan:", response.status, response.data);
+        console.error("Failed to create plan:", response.status, response.data);
       }
     } catch (error) {
-      console.error("Error saving plan:", error);
+      if (error.response && error.response.status === 409) {
+        console.log("User already has a plan");
+        setExistingPlan(error.response.data);
+      } else {
+        console.error("Error creating plan:", error);
+      }
     }
   };
   // Tính dữ liệu cho biểu đồ dựa trên phương pháp cai thuốc
@@ -491,7 +529,9 @@ const Plan = () => {
     >
       <Text className="plan-plan-title">Create a Quit Plan</Text>
       <Text className="plan-plan-subtitle">
-        Create a personalized quit plan to increase your chances of success
+        {existingPlan
+          ? "Review your existing quit plan. You can delete it to create a new one."
+          : "Create a personalized quit plan to increase your chances of success"}
       </Text>
       <div className="plan-progress-bar">
         <div
@@ -538,7 +578,7 @@ const Plan = () => {
           <span>Review & Complete</span>
         </div>
       </div>
-      {currentStep === 1 && (
+      {currentStep === 1 && !existingPlan && (
         <div className="plan-step-container">
           <Text strong className="plan-step-title">
             Set quit goals
@@ -626,7 +666,7 @@ const Plan = () => {
               type="primary"
               className="plan-nav-button"
               style={{ backgroundColor: "black", borderColor: "#16A34A" }}
-              onClick={() => setCurrentStep(2)} 
+              onClick={() => setCurrentStep(2)}
             >
               Next
             </Button>
@@ -634,7 +674,7 @@ const Plan = () => {
         </div>
       )}
       {/* Bước 2: Thói quen hút thuốc hiện tại */}
-      {currentStep === 2 && (
+      {currentStep === 2 && !existingPlan && (
         <div className="plan-step-container">
           <Text strong className="plan-step-title">
             Current smoking habits
@@ -648,7 +688,7 @@ const Plan = () => {
             <InputNumber
               min={0}
               value={cigarettesPerDay}
-              onChange={(value) => setCigarettesPerDay(value)} 
+              onChange={(value) => setCigarettesPerDay(value)}
               className="plan-custom-input"
             />
           </div>
@@ -657,21 +697,16 @@ const Plan = () => {
             <Text className="plan-form-label">Smoking triggers</Text>
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                {leftColumnTriggers.map(
-                  (
-                    trigger,
-                    index 
-                  ) => (
-                    <div key={index} className="plan-option-wrapper">
-                      <Checkbox
-                        checked={triggers.includes(trigger)} 
-                        onChange={() => handleTriggerChange(trigger)} 
-                      >
-                        {trigger}
-                      </Checkbox>
-                    </div>
-                  )
-                )}
+                {leftColumnTriggers.map((trigger, index) => (
+                  <div key={index} className="plan-option-wrapper">
+                    <Checkbox
+                      checked={triggers.includes(trigger)}
+                      onChange={() => handleTriggerChange(trigger)}
+                    >
+                      {trigger}
+                    </Checkbox>
+                  </div>
+                ))}
               </Col>
               <Col span={12}>
                 {rightColumnTriggers.map(
@@ -681,8 +716,8 @@ const Plan = () => {
                   ) => (
                     <div key={index} className="plan-option-wrapper">
                       <Checkbox
-                        checked={triggers.includes(trigger)} 
-                        onChange={() => handleTriggerChange(trigger)} 
+                        checked={triggers.includes(trigger)}
+                        onChange={() => handleTriggerChange(trigger)}
                       >
                         {trigger}
                       </Checkbox>
@@ -720,7 +755,7 @@ const Plan = () => {
         </div>
       )}
       {/* Bước 3: Chiến lược đối phó */}
-      {currentStep === 3 && (
+      {currentStep === 3 && !existingPlan && (
         <div className="plan-step-container">
           <Text strong className="plan-step-title">
             Strategies to cope with cravings
@@ -735,21 +770,16 @@ const Plan = () => {
             </Text>
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                {leftCopingStrategies.map(
-                  (
-                    strategy,
-                    index 
-                  ) => (
-                    <div key={index} className="plan-option-wrapper">
-                      <Checkbox
-                        checked={copingStrategies.includes(strategy)}
-                        onChange={() => handleCopingStrategyChange(strategy)}
-                      >
-                        {strategy}
-                      </Checkbox>
-                    </div>
-                  )
-                )}
+                {leftCopingStrategies.map((strategy, index) => (
+                  <div key={index} className="plan-option-wrapper">
+                    <Checkbox
+                      checked={copingStrategies.includes(strategy)}
+                      onChange={() => handleCopingStrategyChange(strategy)}
+                    >
+                      {strategy}
+                    </Checkbox>
+                  </div>
+                ))}
               </Col>
               <Col span={12}>
                 {rightCopingStrategies.map((strategy, index) => (
@@ -773,8 +803,8 @@ const Plan = () => {
                 {leftSupportNetwork.map((support, index) => (
                   <div key={index} className="plan-option-wrapper">
                     <Checkbox
-                      checked={supportNetwork.includes(support)} 
-                      onChange={() => handleSupportNetworkChange(support)} 
+                      checked={supportNetwork.includes(support)}
+                      onChange={() => handleSupportNetworkChange(support)}
                     >
                       {support}
                     </Checkbox>
@@ -785,10 +815,10 @@ const Plan = () => {
                 {rightSupportNetwork.map((support, index) => (
                   <div key={index} className="plan-option-wrapper">
                     <Checkbox
-                      checked={supportNetwork.includes(support)} 
-                      onChange={() => handleSupportNetworkChange(support)} 
+                      checked={supportNetwork.includes(support)}
+                      onChange={() => handleSupportNetworkChange(support)}
                     >
-                      {support} 
+                      {support}
                     </Checkbox>
                   </div>
                 ))}
@@ -823,7 +853,7 @@ const Plan = () => {
         </div>
       )}
       {/* // Bước 4: Thiết lập phần thưởng */}
-      {currentStep === 4 && (
+      {currentStep === 4 && !existingPlan && (
         <div className="plan-step-container">
           <Text strong className="plan-step-title">
             Set up rewards
@@ -1012,6 +1042,35 @@ const Plan = () => {
           </div>
         </div>
       )}
+
+      {/* Thông báo khi đã có kế hoạch */}
+      {existingPlan && currentStep < 5 && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "40px 20px",
+            backgroundColor: "#fff7e6",
+            border: "1px solid #ffd591",
+            borderRadius: "8px",
+            margin: "20px 0",
+          }}
+        >
+          <h3 style={{ color: "#d48806", marginBottom: "16px" }}>
+            You already have a quit plan!
+          </h3>
+          <p style={{ color: "#ad6800", marginBottom: "20px" }}>
+            To create a new plan, you need to delete your existing one first.
+          </p>
+          <Button
+            type="primary"
+            onClick={() => setCurrentStep(5)}
+            style={{ backgroundColor: "#1890ff", borderColor: "#1890ff" }}
+          >
+            View Current Plan
+          </Button>
+        </div>
+      )}
+
       {/* // Bước 5: Xem lại và Hoàn thành */}
       {currentStep === 5 && (
         <div className="plan-container" style={{ padding: "20px" }}>
@@ -1260,14 +1319,32 @@ const Plan = () => {
             >
               Back
             </Button>
-            <Button
-              type="primary"
-              className="plan-nav-button"
-              onClick={handleComplete}
-              style={{ backgroundColor: "black", borderColor: "#16A34A" }}
-            >
-              Complete
-            </Button>
+            {existingPlan ? (
+              // Nếu đã có kế hoạch, chỉ hiển thị nút Delete
+              <Button
+                type="primary"
+                danger
+                className="plan-nav-button"
+                onClick={showDeleteModal}
+                style={{
+                  backgroundColor: "#dc2626",
+                  borderColor: "#dc2626",
+                  padding: "0 20px",
+                }}
+              >
+                Delete Plan
+              </Button>
+            ) : (
+              // Nếu chưa có kế hoạch, hiển thị nút Complete
+              <Button
+                type="primary"
+                className="plan-nav-button"
+                onClick={handleComplete}
+                style={{ backgroundColor: "black", borderColor: "#16A34A" }}
+              >
+                Complete
+              </Button>
+            )}
           </div>
           {showCompleteNotification && (
             <div
@@ -1285,6 +1362,51 @@ const Plan = () => {
               ✓ Quit plan saved successfully!
             </div>
           )}
+          {showDeleteNotification && (
+            <div
+              style={{
+                backgroundColor: "#fff2f0",
+                border: "1px solid #ffccc7",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                marginTop: "10px",
+                color: "#ff4d4f",
+                fontSize: "14px",
+                textAlign: "center",
+              }}
+            >
+              ✓ Plan and tracking data deleted successfully!
+            </div>
+          )}
+
+          {/* Modal xác nhận xóa */}
+          <Modal
+            title="Confirm Delete Plan"
+            visible={isDeleteModalVisible}
+            onOk={handleDeletePlan}
+            onCancel={handleDeleteModalCancel}
+            okText="Delete"
+            cancelText="Cancel"
+            okType="danger"
+            centered
+          >
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <WarningOutlined
+                style={{
+                  fontSize: "48px",
+                  color: "#ff4d4f",
+                  marginBottom: "16px",
+                }}
+              />
+              <p style={{ fontSize: "16px", marginBottom: "8px" }}>
+                Are you sure you want to delete your quit plan?
+              </p>
+              <p style={{ fontSize: "14px", color: "#666" }}>
+                This action will also delete all your tracking data and cannot
+                be undone.
+              </p>
+            </div>
+          </Modal>
         </div>
       )}
       <div className="plan-advice-section">
