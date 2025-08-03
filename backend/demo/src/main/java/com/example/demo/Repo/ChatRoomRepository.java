@@ -3,6 +3,7 @@ package com.example.demo.Repo;
 import com.example.demo.entity.ChatRoom;
 import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,4 +24,9 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.coach.id = :coachId AND cr.isActive = true ORDER BY cr.updatedAt DESC")
     List<ChatRoom> findActiveRoomsForCoach(@Param("coachId") Integer coachId);
+    
+    // Delete all chat rooms where user is member or coach
+    @Modifying
+    @Query("DELETE FROM ChatRoom cr WHERE cr.member.id = :userId OR cr.coach.id = :userId")
+    void deleteByUserId(@Param("userId") Integer userId);
 }

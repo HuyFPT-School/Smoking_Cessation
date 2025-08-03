@@ -2,6 +2,7 @@ package com.example.demo.Repo;
 
 import com.example.demo.entity.DirectChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,9 @@ public interface DirectChatMessageRepository extends JpaRepository<DirectChatMes
     
     @Query("SELECT dcm FROM DirectChatMessage dcm WHERE dcm.roomId = :roomId ORDER BY dcm.timestamp DESC LIMIT 1")
     DirectChatMessage findLastMessageInRoom(@Param("roomId") String roomId);
+    
+    // Delete all messages where user is sender or receiver
+    @Modifying
+    @Query("DELETE FROM DirectChatMessage dcm WHERE dcm.sender.id = :userId OR dcm.receiver.id = :userId")
+    void deleteByUserId(@Param("userId") Integer userId);
 }

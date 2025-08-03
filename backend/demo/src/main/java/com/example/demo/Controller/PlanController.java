@@ -4,13 +4,16 @@ import com.example.demo.DTO.PlanDTO;
 import com.example.demo.DTO.RewardItemDTO;
 import com.example.demo.entity.Plan;
 import com.example.demo.entity.RewardItem;
+import com.example.demo.entity.User;
 import com.example.demo.Repo.PlanRepo;
-// import com.example.demo.Repo.UserRepo; // Assuming UserRepo exists for validation if needed
+import com.example.demo.Repo.TrackingRepo;
+import com.example.demo.Repo.UserRepo;
 import com.example.demo.utils.DataUpdatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,6 +29,12 @@ public class PlanController {
     //tương tác với cơ sở dữ liệu.
     @Autowired
     private PlanRepo planRepo;
+
+    @Autowired
+    private TrackingRepo trackingRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     //  ApplicationEventPublisher - Để thông báo cập nhật dữ liệu
     //  
@@ -187,140 +196,56 @@ public class PlanController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));  // Nếu không: 404
     }
 
-    //  === API CẬP NHẬT KẾ HOẠCH THEO PLAN ID ===
+    //  === API XÓA KẾ HOẠCH CAI THUỐC THEO USER ID ===
     //   
-    //   Endpoint này cho phép cập nhật kế hoạch dựa trên ID của kế hoạch.
+    //   Endpoint này cho phép xóa kế hoạch cai thuốc của một người dùng cụ thể.
+    //   Khi xóa kế hoạch, sẽ đồng thời xóa tất cả tracking records của user đó.
     //   
-    //   Chú ý: Endpoint này ít được sử dụng trong thực tế vì:
-    //   - Client thường chỉ biết userId, không biết planId
-    //   - Plan.jsx sử dụng endpoint /user/{userId} thay vì endpoint này
-    //   - Được giữ lại để tương thích với các client khác (nếu có)
-    //   
-    //   Quy tắc bảo mật:
-    //   - Không cho phép thay đổi userId (chủ sở hữu kế hoạch)
-    //   - Nếu userId trong DTO khác với userId của kế hoạch hiện tại -> lỗi 400
+    //   Lý do xóa tracking:
+    //   - Tracking gắn liền với kế hoạch cai thuốc
+    //   - Khi không có kế hoạch, tracking không còn ý nghĩa
+    //   - Tránh dữ liệu rác trong database
     //   
     //   Luồng xử lý:
-    //   1. Tìm kế hoạch hiện tại theo planId
-    //   2. Kiểm tra kế hoạch có tồn tại không
-    //   3. Validate userId không được thay đổi
-    //   4. Cập nhật kế hoạch với dữ liệu mới
-    //   5. Gửi thông báo cập nhật dữ liệu
+    //   1. Tìm kế hoạch theo userId
+    //   2. Nếu không có kế hoạch -> trả về 404
+    //   3. Tìm user entity để xóa tracking
+    //   4. Xóa tất cả tracking records của user
+    //   5. Xóa kế hoạch
+    //   6. Gửi thông báo cập nhật dữ liệu
     //   
-    //   planId - ID của kế hoạch cần cập nhật
-    //   planDTO - Dữ liệu mới cho kế hoạch
-    //   return ResponseEntity chứa kế hoạch đã cập nhật hoặc thông báo lỗi
+    //   userId - ID của người dùng
+    //   return ResponseEntity với thông báo xóa thành công hoặc lỗi
     //   
-    //   URL: PUT /api/plans/456
+    //   URL: DELETE /api/plans/user/123
+    //   Response thành công (200): "Plan and tracking data deleted successfully"
+    //   Response lỗi (404): Nếu không tìm thấy kế hoạch
 
-    @PutMapping("/{planId}")
-    public ResponseEntity<PlanDTO> updatePlanById(@PathVariable Long planId, @RequestBody PlanDTO planDTO) {
-        // Tìm kế hoạch hiện tại
-        Optional<Plan> existingPlanOpt = planRepo.findById(planId);
-        if (existingPlanOpt.isEmpty()) {
-            // Kế hoạch không tồn tại
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    @DeleteMapping("/user/{userId}")
+    @Transactional
+    public ResponseEntity<String> deletePlanByUserId(@PathVariable Integer userId) {
+        // Tìm kế hoạch theo userId
+        Optional<Plan> planOpt = planRepo.findByUserId(userId);
+        if (planOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No plan found for user ID: " + userId);
         }
 
-        // Kiểm tra bảo mật: không cho phép thay đổi chủ sở hữu kế hoạch
-        if (!existingPlanOpt.get().getUserId().equals(planDTO.getUserId())) {
-            // Nếu userId trong DTO khác với userId của kế hoạch hiện tại
-            // -> Có thể là người dùng đang cố gắng chiếm đoạt kế hoạch của người khác
-            // -> Trả về lỗi BAD REQUEST
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        // Tìm user entity để xóa tracking
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent()) {
+            // Xóa tất cả tracking records của user
+            trackingRepo.deleteByUser(userOpt.get());
+            System.out.println("✅ Deleted all tracking records for user: " + userId);
         }
-        
-        // Cập nhật kế hoạch
-        Plan planToUpdate = convertToEntity(planDTO, existingPlanOpt.get()); // Merge với kế hoạch hiện tại
-        planToUpdate.setId(planId); // Đảm bảo ID không bị thay đổi
-        Plan updatedPlan = planRepo.save(planToUpdate); // Lưu vào database
+
+        // Xóa kế hoạch
+        planRepo.delete(planOpt.get());
+        System.out.println("✅ Deleted plan for user: " + userId);
 
         // Gửi thông báo cập nhật dữ liệu
-        eventPublisher.publishEvent(new DataUpdatedEvent(this, planDTO.getUserId()));
-
-        // Trả về kế hoạch đã cập nhật
-        return ResponseEntity.ok(convertToDTO(updatedPlan));
-    }
-
-    // === API TẠO HOẶC CẬP NHẬT KẾ HOẠCH THEO USER ID (UPSERT) ===
-    //   
-    //   Đây là endpoint QUAN TRỌNG NHẤT trong PlanController!
-    //   
-    //   Tính năng "Upsert" (Update + Insert):
-    //   - Nếu người dùng chưa có kế hoạch: TẠO MỚI (INSERT)
-    //   - Nếu người dùng đã có kế hoạch: CẬP NHẬT (UPDATE)
-    //   - Người dùng không cần quan tâm có kế hoạch hay chưa
-    //   
-    //   Đây là endpoint được sử dụng bởi Plan.jsx khi người dùng:
-    //   - Lần đầu tạo kế hoạch cai thuốc
-    //   - Chỉnh sửa kế hoạch hiện tại
-    //   - Thêm/sửa phần thưởng
-    //   
-    //   Tính năng bảo mật:
-    //   - Ưu tiên userId từ URL path thay vì từ request body
-    //   - Validate consistency giữa path và body
-    //   - Tự động set userId nếu missing trong body
-    //   
-    //   Luồng xử lý:
-    //   1. Lấy userId từ URL path
-    //   2. Validate và sync userId giữa path và body
-    //   3. Tìm kế hoạch hiện tại của user
-    //   4. Nếu có: cập nhật kế hoạch hiện tại
-    //   5. Nếu không: tạo kế hoạch mới
-    //   6. Lưu vào database và gửi thông báo
-    //   7. Trả về status phù hợp (201 cho tạo mới, 200 cho cập nhật)
-    //   
-    //   userId - ID người dùng từ URL path
-    //   param planDTO - Dữ liệu kế hoạch từ request body
-    //   return ResponseEntity với kế hoạch đã lưu và status code phù hợp
-    //   
-    //   URL: PUT /api/plans/user/123
-    //   Body: { "userId": "123", "quitDate": "2025-07-01", ... }
-    //   
-    //   Response tạo mới (201): { "id": 456, "userId": "123", ... }
-    //   Response cập nhật (200): { "id": 456, "userId": "123", ... }
-
-    @PutMapping("/user/{userId}")
-    public ResponseEntity<PlanDTO> createOrUpdatePlanByUserId(@PathVariable Integer userId, @RequestBody PlanDTO planDTO) {
-        // Xử lý và validate userId
-        if (planDTO.getUserId() == null ) {
-            // Nếu userId không có trong body, lấy từ path
-            planDTO.setUserId(userId);
-        } else if (!userId.equals(planDTO.getUserId())) {
-            // Nếu userId trong path khác với userId trong body
-            // -> Có thể là lỗi từ phía client hoặc cố tình thay đổi
-            // -> Trả về BAD REQUEST để báo lỗi
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
- 
-        // Tìm kế hoạch hiện tại của user
-        Optional<Plan> existingPlanOpt = planRepo.findByUserId(userId);
-        Plan planToSave;
-        boolean isCreating = false;
-
-        if (existingPlanOpt.isPresent()) {
-            // TRƯỜNG HỢP 1: User đã có kế hoạch -> CẬP NHẬT
-            planToSave = convertToEntity(planDTO, existingPlanOpt.get()); // Merge với kế hoạch hiện tại
-            planToSave.setId(existingPlanOpt.get().getId()); // Giữ nguyên ID cũ
-        } else {
-            // TRƯỜNG HỢP 2: User chưa có kế hoạch -> TẠO MỚI
-            planToSave = convertToEntity(planDTO, null); // Tạo kế hoạch hoàn toàn mới
-            isCreating = true;
-        }
-
-        // Lưu kế hoạch vào database
-        Plan savedPlan = planRepo.save(planToSave);
-
-        // Gửi thông báo cập nhật dữ liệu cho các component khác
         eventPublisher.publishEvent(new DataUpdatedEvent(this, userId));
 
-        // Chuyển đổi thành DTO để trả về
-        PlanDTO responseDTO = convertToDTO(savedPlan);
-
-        if (isCreating) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO); // HTTP 201 for create
-        } else {
-            return ResponseEntity.ok(responseDTO); // HTTP 200 for update
-        }
+        return ResponseEntity.ok("Plan and tracking data deleted successfully");
     }
 }

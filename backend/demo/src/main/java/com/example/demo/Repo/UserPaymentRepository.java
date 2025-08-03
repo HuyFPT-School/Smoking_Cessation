@@ -28,4 +28,7 @@ public interface UserPaymentRepository extends JpaRepository<UserPayment, Long> 
     
     // Find payments by status
     List<UserPayment> findByPaymentStatus(String paymentStatus);
+    
+    // Delete all payments by user ID
+    void deleteByUserId(Long userId);
 }

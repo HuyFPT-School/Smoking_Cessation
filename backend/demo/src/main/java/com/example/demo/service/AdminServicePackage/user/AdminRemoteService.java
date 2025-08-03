@@ -26,6 +26,9 @@ public class AdminRemoteService {
     @Autowired private DashboardRepo dashboardRepo;
     @Autowired private ChatMessageRepository chatMessageRepository;
     @Autowired private PostRepo postRepo;
+    @Autowired private UserPaymentRepository userPaymentRepository;
+    @Autowired private DirectChatMessageRepository directChatMessageRepository;
+    @Autowired private ChatRoomRepository chatRoomRepository;
 
     // =====================================================================================
     //  1. SUPER_ADMIN promote USER → ADMIN
@@ -131,10 +134,16 @@ public class AdminRemoteService {
             postLikeRepo.deleteByUser(target);                        // Xóa like
             trackingRepo.deleteByUser(target);                        // Xóa tracking
             dashboardRepo.deleteByUserId(targetId);                   // Xóa dashboard
-            chatMessageRepository.deleteByUserId((long) targetId);    // Xóa chat
-            planRepo.deleteByUserId(targetId);        // Xóa kế hoạch cai thuốc
+            chatMessageRepository.deleteByUserId((long) targetId);    // Xóa chat message (AI)
+            planRepo.deleteByUserId(targetId);                        // Xóa kế hoạch cai thuốc
             userProfileRepo.deleteByUser(target);                     // Xóa hồ sơ
             postRepo.deleteByUser(target);                            // Xóa bài viết
+            
+            // Xóa các bảng liên quan đến payment và direct chat
+            userPaymentRepository.deleteByUserId((long) targetId);    // Xóa payment records
+            directChatMessageRepository.deleteByUserId(targetId);     // Xóa direct chat messages
+            chatRoomRepository.deleteByUserId(targetId);              // Xóa chat rooms
+            
             userRepo.delete(target);                                  // Xóa user chính
 
             System.out.println("✅ Database records deleted successfully");
