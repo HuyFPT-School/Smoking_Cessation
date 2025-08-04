@@ -17,6 +17,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import "../App.css";
+import { getApiUrl } from "../config/apiConfig";
 
 const { TextArea } = Input;
 
@@ -509,7 +510,7 @@ const CommunityBlogPage = () => {
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const API_BASE_URL = "http://localhost:8080/api/community";
+  const API_BASE_URL = getApiUrl("/api/community");
   // Lấy danh sách bài đăng từ API
   const fetchPosts = useCallback(async (page = 0, append = false) => {
     try {
@@ -702,7 +703,7 @@ const CommunityBlogPage = () => {
 
       if (isAdminOrSuperAdmin()) {
         response = await axios.delete(
-          `http://localhost:8080/api/admin/posts/delete/${postId}?adminId=${userId}`
+          getApiUrl(`/api/admin/posts/delete/${postId}?adminId=${userId}`)
         );
       } else {
         response = await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
@@ -734,7 +735,7 @@ const CommunityBlogPage = () => {
 
       if (isAdminOrSuperAdmin()) {
         response = await axios.delete(
-          `http://localhost:8080/api/admin/comments/delete/${commentId}?adminId=${userId}`
+          getApiUrl(`/api/admin/comments/delete/${commentId}?adminId=${userId}`)
         );
       } else {
         response = await axios.delete(`${API_BASE_URL}/comments/${commentId}`, {

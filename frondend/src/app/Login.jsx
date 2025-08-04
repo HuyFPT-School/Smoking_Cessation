@@ -26,6 +26,7 @@ import {
 import { auth, provider } from "../firebase";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { getApiUrl } from "../config/apiConfig";
 
 const Login = () => {
   // State quản lý form đăng nhập
@@ -62,7 +63,7 @@ const Login = () => {
   const fetchUserFromBackend = async (idToken) => {
     try {
       // Gọi API lấy thông tin user
-      const res = await axios.get("http://localhost:8080/api/user/me", {
+      const res = await axios.get(getApiUrl("/api/user/me"), {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },

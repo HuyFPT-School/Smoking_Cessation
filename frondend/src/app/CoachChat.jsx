@@ -3,6 +3,7 @@ import { Avatar, Input, Button, Spin } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getApiUrl } from "../config/apiConfig";
 
 const { TextArea } = Input;
 
@@ -33,7 +34,7 @@ const CoachChat = () => {
     setIsLoadingHistory(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/ai-coach/conversation/${userId}`,
+        getApiUrl(`/api/ai-coach/conversation/${userId}`),
         { timeout: 10000 }
       );
 
@@ -115,7 +116,7 @@ const CoachChat = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/ai-coach/chat",
+        getApiUrl("/api/ai-coach/chat"),
         {
           userId: userId,
           message: userMessage,
@@ -260,7 +261,7 @@ const CoachChat = () => {
                 borderRadius: "20px",
                 fontSize: "14px",
               }}
-              onClick={() => (navigate("/direct-chat"))}
+              onClick={() => navigate("/direct-chat")}
             >
               💬 Chat with Human
             </Button>

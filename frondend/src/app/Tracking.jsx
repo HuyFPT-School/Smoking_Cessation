@@ -1,37 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { Radio, Input, Select, Slider, Button, Tabs } from "antd";
 import moment from "moment";
-import axios from "axios"; 
+import axios from "axios";
 import "antd/dist/reset.css";
 import "../App.css";
+import { getApiUrl } from "../config/apiConfig";
 const { TabPane } = Tabs;
 
 // Khai báo một mảng các lựa chọn (options) để dùng cho select, checkbox, radio,...
 const triggerOptions = [
-  { label: "Stress", value: "stress" }, 
-  { label: "Social", value: "social" }, 
-  { label: "Habit", value: "habit" }, 
-  { label: "Breath time", value: "breathtime" }, 
-  { label: "After meals", value: "aftermeals" }, 
-  { label: "Drinking Coffee", value: "drinkingcoffee" }, 
-  { label: "Drinking Alcohol", value: "drinkingalcohol" }, 
-  { label: "Boredom", value: "boredom" }, 
-  { label: "Social Interaction", value: "socialinteraction" }, 
-  { label: "Other", value: "other" }, 
+  { label: "Stress", value: "stress" },
+  { label: "Social", value: "social" },
+  { label: "Habit", value: "habit" },
+  { label: "Breath time", value: "breathtime" },
+  { label: "After meals", value: "aftermeals" },
+  { label: "Drinking Coffee", value: "drinkingcoffee" },
+  { label: "Drinking Alcohol", value: "drinkingalcohol" },
+  { label: "Boredom", value: "boredom" },
+  { label: "Social Interaction", value: "socialinteraction" },
+  { label: "Other", value: "other" },
 ];
 
 // Ánh xạ các giá trị trigger
 const triggerLabels = {
-  stress: "Stress", 
-  social: "Social", 
-  habit: "Habit", 
-  other: "Other", 
-  breathtime: "Breath time", 
-  aftermeals: "After meals", 
-  drinkingcoffee: "Drinking Coffee", 
-  drinkingalcohol: "Drinking Alcohol", 
-  boredom: "Boredom", 
-  socialinteraction: "Social Interaction", 
+  stress: "Stress",
+  social: "Social",
+  habit: "Habit",
+  other: "Other",
+  breathtime: "Breath time",
+  aftermeals: "After meals",
+  drinkingcoffee: "Drinking Coffee",
+  drinkingalcohol: "Drinking Alcohol",
+  boredom: "Boredom",
+  socialinteraction: "Social Interaction",
 };
 
 const Tracking = () => {
@@ -59,22 +60,22 @@ const Tracking = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/tracking/user/${userId}`
+          getApiUrl(`/api/tracking/user/${userId}`)
         );
 
         if (response.status === 200) {
-          setIncidents(response.data); 
+          setIncidents(response.data);
         } else {
           setIncidents([]);
         }
       } catch (error) {
-        setIncidents([]); 
-        console.error("Error fetching tracking data:", error); 
+        setIncidents([]);
+        console.error("Error fetching tracking data:", error);
       }
     };
 
     fetchTrackingData();
-  }, [userId]); 
+  }, [userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Ngăn trình duyệt reload lại trang khi submit form
@@ -85,21 +86,21 @@ const Tracking = () => {
     }
 
     const newIncident = {
-      date: selectedDate.format("YYYY-MM-DD"), 
-      time, 
-      location, 
-      trigger, 
+      date: selectedDate.format("YYYY-MM-DD"),
+      time,
+      location,
+      trigger,
       satisfaction:
         activityType === "smoking" ? satisfaction : cravingIntensity,
-      type: activityType, 
-      notes, 
-      userId: userId, 
+      type: activityType,
+      notes,
+      userId: userId,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/tracking", 
-        newIncident 
+        getApiUrl("/api/tracking"),
+        newIncident
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -113,7 +114,7 @@ const Tracking = () => {
         setCravingIntensity(5);
         setNotes("");
 
-        console.log("Incident recorded successfully:", response.data); 
+        console.log("Incident recorded successfully:", response.data);
       } else {
         console.error(
           "Failed to record incident:",
@@ -284,8 +285,8 @@ const Tracking = () => {
   };
 
   const renderChart = () => {
-    const chartData = getChartDataFromIncidents(); 
-    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0); 
+    const chartData = getChartDataFromIncidents();
+    const totalIncidents = chartData.reduce((sum, d) => sum + d.smoking, 0);
     // Hiển thị khoảng tuần
     const weekStart = selectedDate.clone().startOf("week").format("DD/MM");
     const weekEnd = selectedDate.clone().endOf("week").format("DD/MM/YYYY");
@@ -310,7 +311,7 @@ const Tracking = () => {
         ) : (
           <div className="chart-bars">
             {chartData.map((data, index) => {
-              const heightPx = data.smoking * 20; 
+              const heightPx = data.smoking * 20;
               const isSelected =
                 selectedDate.format("YYYY-MM-DD") === data.date;
               return (
@@ -318,9 +319,9 @@ const Tracking = () => {
                   <div
                     className="bar smoking"
                     style={{
-                      height: `${heightPx}px`, 
-                      minHeight: data.smoking > 0 ? "20px" : "2px", 
-                      background: isSelected ? "#1890ff" : undefined, 
+                      height: `${heightPx}px`,
+                      minHeight: data.smoking > 0 ? "20px" : "2px",
+                      background: isSelected ? "#1890ff" : undefined,
                       border: isSelected ? "0px solid #0050b3" : undefined,
                     }}
                   />
@@ -329,7 +330,7 @@ const Tracking = () => {
                     className="bar-value"
                     style={{ fontSize: "12px", color: "#666" }}
                   >
-                    {data.smoking} 
+                    {data.smoking}
                   </span>
                 </div>
               );
@@ -413,15 +414,15 @@ const Tracking = () => {
             <p>Log a smoking incident</p>
             <form onSubmit={handleSubmit} className="tracking-form">
               <Radio.Group
-                value={activityType} 
-                onChange={(e) => setActivityType(e.target.value)} 
+                value={activityType}
+                onChange={(e) => setActivityType(e.target.value)}
                 className="activity-type"
               >
                 <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
                 {/*tạo 2 sự lựa chọn để ngdungf chọn */}
                 <Radio.Button value="craving">Craving Incidents</Radio.Button>
               </Radio.Group>
-              {activityType === "smoking" ? ( 
+              {activityType === "smoking" ? (
                 <>
                   <div className="form-group">
                     <label>Time</label>
@@ -436,7 +437,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)} 
+                      onChange={(e) => setLocation(e.target.value)}
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -448,7 +449,7 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)} 
+                      onChange={(value) => setTrigger(value)}
                       options={triggerOptions}
                     />
                   </div>
@@ -460,7 +461,7 @@ const Tracking = () => {
                         border: "0px",
                       }}
                       value={satisfaction}
-                      onChange={(value) => setSatisfaction(value)} 
+                      onChange={(value) => setSatisfaction(value)}
                       min={1}
                       max={10}
                     />
@@ -489,7 +490,7 @@ const Tracking = () => {
                     <label>Location</label>
                     <Input
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)} 
+                      onChange={(e) => setLocation(e.target.value)}
                       placeholder="E.g., Balcony, Coffee shop"
                     />
                   </div>
@@ -501,7 +502,7 @@ const Tracking = () => {
                         borderRadius: "6px",
                       }}
                       value={trigger}
-                      onChange={(value) => setTrigger(value)} 
+                      onChange={(value) => setTrigger(value)}
                       options={triggerOptions}
                     />
                   </div>
@@ -512,8 +513,8 @@ const Tracking = () => {
                         padding: "4px",
                         border: "0px",
                       }}
-                      value={cravingIntensity} 
-                      onChange={(value) => setCravingIntensity(value)} 
+                      value={cravingIntensity}
+                      onChange={(value) => setCravingIntensity(value)}
                       min={1}
                       max={10}
                     />
@@ -531,8 +532,8 @@ const Tracking = () => {
               <div className="form-group">
                 <label>Notes</label>
                 <Input.TextArea
-                  value={notes} 
-                  onChange={(e) => setNotes(e.target.value)} 
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                   placeholder="Emotions, thoughts, effectiveness of coping strategy..."
                   rows={3}
                 />
@@ -542,7 +543,7 @@ const Tracking = () => {
                 htmlType="submit"
                 className="submit-button"
               >
-                {activityType === "smoking" 
+                {activityType === "smoking"
                   ? "RECORD SMOKING INCIDENT"
                   : "RECORD CRAVING INCIDENT"}
               </Button>
@@ -558,8 +559,8 @@ const Tracking = () => {
           <TabPane tab="Chart" key="chart">
             <div className="chart-header" style={{ marginBottom: "10px" }}>
               <Radio.Group
-                value={activityType} 
-                onChange={(e) => setActivityType(e.target.value)} 
+                value={activityType}
+                onChange={(e) => setActivityType(e.target.value)}
                 className="activity-type"
                 style={{ marginBottom: "10px" }}
               >
@@ -580,8 +581,8 @@ const Tracking = () => {
                 }}
               >
                 <Radio.Group
-                  value={activityType} 
-                  onChange={(e) => setActivityType(e.target.value)} 
+                  value={activityType}
+                  onChange={(e) => setActivityType(e.target.value)}
                   className="activity-type"
                 >
                   <Radio.Button value="smoking">Smoking Incidents</Radio.Button>
@@ -593,7 +594,7 @@ const Tracking = () => {
                 </span>
               </div>
             </div>
-            {filteredIncidents.length === 0 ? ( 
+            {filteredIncidents.length === 0 ? (
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -617,22 +618,17 @@ const Tracking = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredIncidents.map(
-                    (
-                      incident,
-                      index 
-                    ) => (
-                      <tr key={index}>
-                        {/*Tạo 1 dòng trong bảng cho mỗi sự kiện (mỗi incident).*/}
-                        <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
-                        <td>{incident.time}</td>
-                        <td>{incident.location || "-"}</td>
-                        <td>{incident.trigger}</td>
-                        <td>{incident.satisfaction}/10</td>
-                        <td>{incident.notes}</td>
-                      </tr>
-                    )
-                  )}
+                  {filteredIncidents.map((incident, index) => (
+                    <tr key={index}>
+                      {/*Tạo 1 dòng trong bảng cho mỗi sự kiện (mỗi incident).*/}
+                      <td>{moment(incident.date).format("DD/MM/YYYY")}</td>
+                      <td>{incident.time}</td>
+                      <td>{incident.location || "-"}</td>
+                      <td>{incident.trigger}</td>
+                      <td>{incident.satisfaction}/10</td>
+                      <td>{incident.notes}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             )}
@@ -648,8 +644,8 @@ const Tracking = () => {
             >
               <div style={{ display: "flex", alignItems: "center" }}>
                 <Radio.Group
-                  value={activityType} 
-                  onChange={(e) => setActivityType(e.target.value)} 
+                  value={activityType}
+                  onChange={(e) => setActivityType(e.target.value)}
                   className="activity-type"
                   style={{ marginRight: "15px" }}
                 >
@@ -665,7 +661,7 @@ const Tracking = () => {
                 {/*cuối tuần*/}
               </span>
             </div>
-            {incidents.length === 0 ? ( 
+            {incidents.length === 0 ? (
               <div
                 style={{ textAlign: "center", padding: "40px", color: "#666" }}
               >
@@ -675,34 +671,29 @@ const Tracking = () => {
             ) : (
               <>
                 <div className="trigger-chart">
-                  {triggersData.map(
-                    (
-                      trigger,
-                      index 
-                    ) => (
-                      <div key={index} className="trigger-bar-group">
-                        <span className="trigger-label">{trigger.label}</span>
-                        <div
-                          className="trigger-bar"
-                          style={{
-                            width: `${
-                              trigger.value > 0
-                                ? (trigger.value /
-                                    Math.max(
-                                      ...triggersData.map((t) => t.value),
-                                      1
-                                    )) *
-                                  100
-                                : 0
-                            }%`, 
-                            backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
-                          }}
-                        >
-                          <span className="trigger-value">{trigger.value}</span>
-                        </div>
+                  {triggersData.map((trigger, index) => (
+                    <div key={index} className="trigger-bar-group">
+                      <span className="trigger-label">{trigger.label}</span>
+                      <div
+                        className="trigger-bar"
+                        style={{
+                          width: `${
+                            trigger.value > 0
+                              ? (trigger.value /
+                                  Math.max(
+                                    ...triggersData.map((t) => t.value),
+                                    1
+                                  )) *
+                                100
+                              : 0
+                          }%`,
+                          backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                        }}
+                      >
+                        <span className="trigger-value">{trigger.value}</span>
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                 </div>
                 <p>
                   Chart shows the most common triggers leading to{" "}

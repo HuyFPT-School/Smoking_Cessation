@@ -23,6 +23,7 @@ import React from "react";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import { getApiUrl } from "../config/apiConfig";
 
 const { Text, Title } = Typography;
 
@@ -48,10 +49,9 @@ const LeaderboardPage = () => {
           params.currentUserId = user.id;
         }
 
-        const response = await axios.get(
-          "http://localhost:8080/api/leaderboard",
-          { params }
-        );
+        const response = await axios.get(getApiUrl("/api/leaderboard"), {
+          params,
+        });
 
         if (response.status === 200) {
           setLeaderboardData(response.data.leaderboard || []);

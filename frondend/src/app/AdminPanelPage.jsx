@@ -5,6 +5,7 @@ import CommunityBlogPage from "./CommunityBlogPage";
 import axios from "axios";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getApiUrl } from "../config/apiConfig";
 import {
   UserOutlined,
   CheckCircleOutlined,
@@ -55,7 +56,7 @@ const AdminPanelPage = () => {
   // Gọi API lấy dashboard
   const fetchAdminDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/admin/dashboard");
+      const res = await axios.get(getApiUrl("/api/admin/dashboard"));
       return res.data;
     } catch (err) {
       throw new Error(
@@ -70,7 +71,7 @@ const AdminPanelPage = () => {
   const fetchUsers = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/admin/users?currentAdminId=${userId}`
+        getApiUrl(`/api/admin/users?currentAdminId=${userId}`)
       );
       return res.data.map((u) => ({
         id: u.id,
@@ -89,7 +90,9 @@ const AdminPanelPage = () => {
   const deleteUserById = async (targetUserId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`
+        getApiUrl(
+          `/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`
+        )
       );
       alert("✅ User deleted successfully");
       fetchUsers().then(setUsers); // load lại danh sách
@@ -168,9 +171,7 @@ const AdminPanelPage = () => {
     setSelectedUser(user);
 
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/admin/user/${user.id}`
-      );
+      const response = await axios.get(getApiUrl(`/api/admin/user/${user.id}`));
       console.log("Fetched data:", response.data); // Xem có đúng dữ liệu không
       setUserProfile(response.data); // CHỈ LẤY PHẦN PROFILE
     } catch (error) {
@@ -203,7 +204,10 @@ const AdminPanelPage = () => {
 
   return (
     // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
-    <div data-admin-page="true" style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div
+      data-admin-page="true"
+      style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}
+    >
       <header className="admin-header">
         <div className="admin-header-top">
           <div className="admin-logo">
@@ -274,24 +278,48 @@ const AdminPanelPage = () => {
               <>
                 <div className="dashboard-grid">
                   <div className="dashboard-card-admin">
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <UserOutlined style={{ marginRight: '8px' }} />
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <UserOutlined style={{ marginRight: "8px" }} />
                       <div className="card-label">Total Users</div>
                     </div>
-                    <div className="card-value">{dashboardStats?.totalUsers ?? "N/A"}</div>
-                    <div className="card-sub">{dashboardStats?.growthRate ?? "N/A"}% from last month</div>
+                    <div className="card-value">
+                      {dashboardStats?.totalUsers ?? "N/A"}
+                    </div>
+                    <div className="card-sub">
+                      {dashboardStats?.growthRate ?? "N/A"}% from last month
+                    </div>
                   </div>
                   <div className="dashboard-card-admin">
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <RiseOutlined style={{ marginRight: '8px' }} />
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <RiseOutlined style={{ marginRight: "8px" }} />
                       <div className="card-label">Success Rate</div>
                     </div>
-                    <div className="card-value">{dashboardStats?.successRate ?? "N/A"}%</div>
+                    <div className="card-value">
+                      {dashboardStats?.successRate ?? "N/A"}%
+                    </div>
                     <div className="card-sub">Users who quit successfully</div>
                   </div>
                   <div className="dashboard-card-admin">
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <MessageOutlined style={{ marginRight: '8px' }} />
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <MessageOutlined style={{ marginRight: "8px" }} />
                       <div className="card-label">Support Requests</div>
                     </div>
                     <div className="card-value">N/A</div>

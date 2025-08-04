@@ -5,6 +5,7 @@ import CommunityBlogPage from "./CommunityBlogPage";
 import axios from "axios";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getApiUrl } from "../config/apiConfig";
 import {
   UserOutlined,
   CheckCircleOutlined,
@@ -60,17 +61,21 @@ const SuperAdminPanelPage = () => {
   // Gọi API lấy dashboard
   const fetchAdminDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/admin/dashboard");
+      const res = await axios.get(getApiUrl("/api/admin/dashboard"));
       return res.data;
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to load dashboard data");
+      throw new Error(
+        err.response?.data?.message || "Failed to load dashboard data"
+      );
     }
   };
 
   // Gọi API lấy danh sách user (tùy theo quyền của người gọi)
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/users?currentAdminId=${userId}`);
+      const res = await axios.get(
+        `http://localhost:8080/api/admin/users?currentAdminId=${userId}`
+      );
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -79,14 +84,18 @@ const SuperAdminPanelPage = () => {
         avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to load user list");
+      throw new Error(
+        err.response?.data?.message || "Failed to load user list"
+      );
     }
   }, [userId]);
 
   // Gọi API lấy danh sách admin (tùy theo quyền của người gọi)
   const fetchAdmins = useCallback(async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/admins?currentAdminId=${userId}`);
+      const res = await axios.get(
+        `http://localhost:8080/api/admin/admins?currentAdminId=${userId}`
+      );
       return res.data.map((u) => ({
         id: u.id,
         name: u.name,
@@ -95,7 +104,9 @@ const SuperAdminPanelPage = () => {
         avatarUrl: u.avatarUrl,
       }));
     } catch (err) {
-      throw new Error(err.response?.data?.message || "Failed to load admin list");
+      throw new Error(
+        err.response?.data?.message || "Failed to load admin list"
+      );
     }
   }, [userId]);
 
@@ -118,7 +129,9 @@ const SuperAdminPanelPage = () => {
 
   const deleteUserById = async (targetUserId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`);
+      await axios.delete(
+        `http://localhost:8080/api/admin/delete-user/${targetUserId}?currentAdminId=${userId}`
+      );
       alert("✅ User deleted successfully");
       fetchUsers().then(setUsers); // load lại danh sách
     } catch (err) {
@@ -150,7 +163,12 @@ const SuperAdminPanelPage = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user && (activeAdminTab === "dashboard" || activeAdminTab === "users" || activeAdminTab === "admin")) {
+      if (
+        !user &&
+        (activeAdminTab === "dashboard" ||
+          activeAdminTab === "users" ||
+          activeAdminTab === "admin")
+      ) {
         setError("Please log in to access this page");
         navigate("/login");
       }
@@ -242,7 +260,9 @@ const SuperAdminPanelPage = () => {
     setSelectedUser(user);
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/admin/user/${user.id}`);
+      const response = await axios.get(
+        `http://localhost:8080/api/admin/user/${user.id}`
+      );
       console.log("Fetched data:", response.data); // Xem có đúng dữ liệu không
       setUserProfile(response.data); // CHỈ LẤY PHẦN PROFILE
     } catch (error) {
@@ -291,7 +311,10 @@ const SuperAdminPanelPage = () => {
 
   return (
     // đánh dấu trang admin, giúp CSS/JS ẩn hoặc vô hiệu hóa Header/Footer trong App.jsx, nhằm ngăn người dùng tương tác với chúng ở trang này.
-    <div data-admin-page="true" style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div
+      data-admin-page="true"
+      style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}
+    >
       <header className="admin-header">
         <div className="admin-header-top">
           <div className="admin-logo">
@@ -315,7 +338,9 @@ const SuperAdminPanelPage = () => {
               </span>
               SuperAdmin Page
             </div>
-            <div className="admin-subtitle">Manage users/admins and platform content</div>
+            <div className="admin-subtitle">
+              Manage users/admins and platform content
+            </div>
           </div>
         </div>
       </header>
@@ -324,7 +349,9 @@ const SuperAdminPanelPage = () => {
           <a
             key={tab.path}
             href={`#${tab.path}`}
-            className={`tab-item ${activeAdminTab === tab.path ? "active" : ""}`}
+            className={`tab-item ${
+              activeAdminTab === tab.path ? "active" : ""
+            }`}
             onClick={(e) => {
               e.preventDefault();
               setActiveAdminTab(tab.path);
@@ -362,15 +389,21 @@ const SuperAdminPanelPage = () => {
                       <UserOutlined />
                     </div>
                     <div className="card-label">Total Users</div>
-                    <div className="card-value">{dashboardStats?.totalUsers ?? "N/A"}</div>
-                    <div className="card-sub">{dashboardStats?.growthRate ?? "N/A"}% from last month</div>
+                    <div className="card-value">
+                      {dashboardStats?.totalUsers ?? "N/A"}
+                    </div>
+                    <div className="card-sub">
+                      {dashboardStats?.growthRate ?? "N/A"}% from last month
+                    </div>
                   </div>
                   <div className="dashboard-card-admin">
                     <div className="card-icon">
                       <RiseOutlined />
                     </div>
                     <div className="card-label">Success Rate</div>
-                    <div className="card-value">{dashboardStats?.successRate ?? "N/A"}%</div>
+                    <div className="card-value">
+                      {dashboardStats?.successRate ?? "N/A"}%
+                    </div>
                     <div className="card-sub">Users who quit successfully</div>
                   </div>
                   <div className="dashboard-card-admin">
@@ -379,62 +412,84 @@ const SuperAdminPanelPage = () => {
                     </div>
                     <div className="card-label">Support Requests</div>
                     <div className="card-value">N/A</div>
-                    <div className="card-sub-sub">Pending responses (no API yet)</div>
+                    <div className="card-sub-sub">
+                      Pending responses (no API yet)
+                    </div>
                   </div>
                 </div>
                 <div className="section-box" style={{ marginTop: "20px" }}>
                   <div className="section-title">Platform Analytics</div>
                   <div className="dashboard-grid analytics-section">
                     <div className="analytics-card">
-
                       <div className="analytics-title">
                         <UserOutlined /> New Users
                       </div>
-                      <div className="analytics-value">{dashboardStats?.newUsersThisMonth ?? "N/A"}</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.newUsersThisMonth ?? "N/A"}
+                      </div>
                       <div className="analytics-sub">This month</div>
                     </div>
                     <div className="analytics-card">
-
                       <div className="analytics-title">
-                        <CheckCircleOutlined style={{ color: "#52c41a" }} /> Smoke-Free Rate
+                        <CheckCircleOutlined style={{ color: "#52c41a" }} />{" "}
+                        Smoke-Free Rate
                       </div>
-                      <div className="analytics-value">{dashboardStats?.overallSmokeFreeRate ?? "N/A"}%</div>
-                      <div className="analytics-sub">+{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from last month</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.overallSmokeFreeRate ?? "N/A"}%
+                      </div>
+                      <div className="analytics-sub">
+                        +{dashboardStats?.lastMonthSmokeFreeRate ?? "N/A"}% from
+                        last month
+                      </div>
                     </div>
                     <div className="analytics-card">
-
                       <div className="analytics-title">
-                        <AreaChartOutlined style={{ color: "#9254de" }} /> Avg. Days Quit
+                        <AreaChartOutlined style={{ color: "#9254de" }} /> Avg.
+                        Days Quit
                       </div>
-                      <div className="analytics-value">{dashboardStats?.averageDailyUsers ?? "N/A"}</div>
+                      <div className="analytics-value">
+                        {dashboardStats?.averageDailyUsers ?? "N/A"}
+                      </div>
                       <div className="analytics-sub">Per successful user</div>
                     </div>
                   </div>
                 </div>
                 <div className="section-box">
-                  <div className="section-title">User Progress Distribution</div>
+                  <div className="section-title">
+                    User Progress Distribution
+                  </div>
                   <div className="progress-row">
                     <div className="progress-label">First Week (1–7 days)</div>
                     <div className="progress-bar-container">
                       <div className="progress-bar-track">
                         <div
                           className="bar-red"
-                          style={{ width: `${dashboardStats?.firstWeekPercent ?? 0}%` }}
+                          style={{
+                            width: `${dashboardStats?.firstWeekPercent ?? 0}%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.firstWeekPercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.firstWeekPercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                   <div className="progress-row">
-                    <div className="progress-label">First Month (8–30 days)</div>
+                    <div className="progress-label">
+                      First Month (8–30 days)
+                    </div>
                     <div className="progress-bar-container">
                       <div className="progress-bar-track">
                         <div
                           className="bar-orange"
-                          style={{ width: `${dashboardStats?.firstMonthPercent ?? 0}%` }}
+                          style={{
+                            width: `${dashboardStats?.firstMonthPercent ?? 0}%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.firstMonthPercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.firstMonthPercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                   <div className="progress-row">
@@ -443,10 +498,16 @@ const SuperAdminPanelPage = () => {
                       <div className="progress-bar-track">
                         <div
                           className="bar-green"
-                          style={{ width: `${dashboardStats?.threeMonthsOrMorePercent ?? 0}%` }}
+                          style={{
+                            width: `${
+                              dashboardStats?.threeMonthsOrMorePercent ?? 0
+                            }%`,
+                          }}
                         ></div>
                       </div>
-                      <div className="progress-percent">{dashboardStats?.threeMonthsOrMorePercent ?? "N/A"}%</div>
+                      <div className="progress-percent">
+                        {dashboardStats?.threeMonthsOrMorePercent ?? "N/A"}%
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -478,7 +539,9 @@ const SuperAdminPanelPage = () => {
                 <div className="user-header">
                   <div>
                     <div className="user-title">User Management</div>
-                    <div className="user-sub">Manage all users and their progress</div>
+                    <div className="user-sub">
+                      Manage all users and their progress
+                    </div>
                   </div>
                   <div className="user-search">
                     <Input
@@ -524,16 +587,28 @@ const SuperAdminPanelPage = () => {
                       </div>
                     </div>
                     <div className="user-action-wrapper">
-                      <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
+                      <MoreOutlined
+                        className="admin-action"
+                        onClick={() => toggleMenu(index)}
+                      />
                       {openMenu === index && (
                         <div className="user-dropdown">
-                          <div className="dropdown-item" onClick={() => handlePromoteAdmin(user)}>
+                          <div
+                            className="dropdown-item"
+                            onClick={() => handlePromoteAdmin(user)}
+                          >
                             <UserOutlined /> Promote to Admin
                           </div>
-                          <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
+                          <div
+                            className="dropdown-item"
+                            onClick={() => handleUserProfile(user)}
+                          >
                             <UserOutlined /> User Profile
                           </div>
-                          <div className="dropdown-item delete-option" onClick={() => handleDeleteUser(user)}>
+                          <div
+                            className="dropdown-item delete-option"
+                            onClick={() => handleDeleteUser(user)}
+                          >
                             <DeleteOutlined /> Delete User
                           </div>
                         </div>
@@ -570,7 +645,9 @@ const SuperAdminPanelPage = () => {
                 <div className="user-header">
                   <div>
                     <div className="user-title">Admin Management</div>
-                    <div className="user-sub">Manage all admins and their progress</div>
+                    <div className="user-sub">
+                      Manage all admins and their progress
+                    </div>
                   </div>
                   <div className="user-search">
                     <Input
@@ -616,13 +693,22 @@ const SuperAdminPanelPage = () => {
                       </div>
                     </div>
                     <div className="user-action-wrapper">
-                      <MoreOutlined className="admin-action" onClick={() => toggleMenu(index)} />
+                      <MoreOutlined
+                        className="admin-action"
+                        onClick={() => toggleMenu(index)}
+                      />
                       {openMenu === index && (
                         <div className="user-dropdown">
-                          <div className="dropdown-item delete-option" onClick={() => handleDemoteAdmin(user)}>
+                          <div
+                            className="dropdown-item delete-option"
+                            onClick={() => handleDemoteAdmin(user)}
+                          >
                             <DeleteOutlined /> Demote Admin
                           </div>
-                          <div className="dropdown-item" onClick={() => handleUserProfile(user)}>
+                          <div
+                            className="dropdown-item"
+                            onClick={() => handleUserProfile(user)}
+                          >
                             <UserOutlined /> Admin Profile
                           </div>
                         </div>
@@ -635,14 +721,16 @@ const SuperAdminPanelPage = () => {
           </div>
         )}
 
-
         {activeAdminTab === "content" && (
           <div>
             <div className="section-box">
               <div className="section-title">
-                <FileTextOutlined style={{ color: "#000" }} /> SuperAdmin Community Management
+                <FileTextOutlined style={{ color: "#000" }} /> SuperAdmin
+                Community Management
               </div>
-              <div className="section-sub">View and manage community blog posts</div>
+              <div className="section-sub">
+                View and manage community blog posts
+              </div>
               <CommunityBlogPage />
             </div>
           </div>
@@ -650,9 +738,7 @@ const SuperAdminPanelPage = () => {
       </div>
       <Modal
         title={
-          selectedUser?.role === "ADMIN"
-            ? "ADMIN Profile"
-            : "User Profile"
+          selectedUser?.role === "ADMIN" ? "ADMIN Profile" : "User Profile"
         }
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -675,7 +761,6 @@ const SuperAdminPanelPage = () => {
               <div style={{ fontWeight: "bold", marginTop: 8 }}>
                 {selectedUser?.name || "N/A"}
               </div>
-
             </div>
 
             {/* Thông báo nếu chưa có profile */}
@@ -687,22 +772,35 @@ const SuperAdminPanelPage = () => {
               </p>
             )}
 
-
             {/* Bảng Descriptions */}
             <Descriptions bordered column={1} size="middle">
-              <Descriptions.Item label="Phone">{userProfile?.phone || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Birthdate">{userProfile?.birthdate || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Gender">{userProfile?.gender || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Smoking Age">{userProfile?.smokingAge ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Years Smoked">{userProfile?.yearsSmoked ?? "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Occupation">{userProfile?.occupation || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Health Status">{userProfile?.healthStatus || "N/A"}</Descriptions.Item>
-              <Descriptions.Item label="Bio">{userProfile?.bio || "No bio provided."}</Descriptions.Item>
+              <Descriptions.Item label="Phone">
+                {userProfile?.phone || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Birthdate">
+                {userProfile?.birthdate || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Gender">
+                {userProfile?.gender || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Smoking Age">
+                {userProfile?.smokingAge ?? "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Years Smoked">
+                {userProfile?.yearsSmoked ?? "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Occupation">
+                {userProfile?.occupation || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Health Status">
+                {userProfile?.healthStatus || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Bio">
+                {userProfile?.bio || "No bio provided."}
+              </Descriptions.Item>
             </Descriptions>
           </div>
         )}
-
-
       </Modal>
     </div>
   ); // Added the missing closing parenthesis here
