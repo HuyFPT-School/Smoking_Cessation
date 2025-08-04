@@ -58,10 +58,17 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Cho phép tất cả các đường dẫn
-                        .allowedOrigins("https://smoking-cessation-brown.vercel.app","http://localhost:3000") // Chỉ cho phép từ frontend này
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
+                        .allowedOrigins(
+                            "https://smoking-cessation-brown.vercel.app",
+                            "https://*.vercel.app", 
+                            "http://localhost:3000",
+                            "http://localhost:5173",
+                            "http://localhost:5174"
+                        ) // Cho phép nhiều frontend domains
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Các phương thức được phép
                         .allowedHeaders("*") // Cho phép tất cả các header
-                        .allowCredentials(true); // Cho phép gửi cookie, thông tin xác thực
+                        .allowCredentials(true) // Cho phép gửi cookie, thông tin xác thực
+                        .maxAge(3600); // Cache preflight request trong 1 giờ
             }
         };
     }
