@@ -33,12 +33,19 @@ public class FirebaseConfig {
 
                 InputStream serviceAccount = null;
                 String serviceAccountJson = System.getenv("FIREBASE_SERVICE_ACCOUNT");
+                
                 if (serviceAccountJson != null && !serviceAccountJson.isEmpty()) {
-                    System.out.println("ℹ️ Using service account from environment variable FIREBASE_SERVICE_ACCOUNT");
-                    serviceAccount = new java.io.ByteArrayInputStream(serviceAccountJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    System.out.println("ℹ️ Using service account from Azure environment variable FIREBASE_SERVICE_ACCOUNT");
+                    serviceAccount = new java.io.ByteArrayInputStream(
+                        serviceAccountJson.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+                    );
                 } else {
-                    System.out.println("ℹ️ Using service account from classpath resource serviceAccountKey.json");
-                    serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+                    System.out.println("ℹ️ Using service account from classpath resource serviceAccountKey.json (development mode)");
+                    ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+                    if (!resource.exists()) {
+                        throw new RuntimeException("❌ serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT not set!");
+                    }
+                    serviceAccount = resource.getInputStream();
                 }
 
                 FirebaseOptions options = FirebaseOptions.builder()
