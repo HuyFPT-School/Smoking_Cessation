@@ -17,29 +17,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-            fetch-depth: 0
-            submodules: recursive
-
 
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'microsoft'
-          
-      - name: List files for debug
-        run: ls -lR
 
       - name: Build with Maven
-        working-directory: backend/demo
-        run: mvn clean install -DskipTests
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: ${{ github.workspace }}/backend/demo/target/*.jar
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E2ABB2A349764F3285EC73E6209FBE5B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F5C57E0079A74E4C81BD2A8C29A052CA }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9D6D2E64CBAD4041A71EDC9A7EC908F2 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_81910A4A579F489E81191533F12451A6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C87E88DB387C4EB38A77793561874FBE }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_528FE5596F8F4CBABA6127FE0C76B291 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -68,5 +60,4 @@ jobs:
           app-name: 'smoking-cessation'
           slot-name: 'Production'
           package: '*.jar'
-
           
