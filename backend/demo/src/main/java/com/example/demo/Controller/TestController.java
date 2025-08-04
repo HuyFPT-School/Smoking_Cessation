@@ -1,80 +1,55 @@
 package com.example.demo.Controller;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/test")
 @CrossOrigin(origins = "*")
 public class TestController {
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Backend is running! 🚀");
+    }
+
     @GetMapping("/firebase")
-    public ResponseEntity<Map<String, Object>> testFirebase() {
-        Map<String, Object> response = new HashMap<>();
-        
+    public ResponseEntity<String> testFirebase() {
         try {
+            // Kiểm tra FirebaseApp có được khởi tạo không
+            if (FirebaseApp.getApps().isEmpty()) {
+                return ResponseEntity.ok("❌ Firebase chưa được khởi tạo");
+            }
+            
+            // Lấy FirebaseApp default
+            FirebaseApp app = FirebaseApp.getInstance();
+            String projectId = app.getOptions().getProjectId();
+            
+            // Test FirebaseAuth
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            String projectId = auth.getApp().getOptions().getProjectId();
             
-            response.put("status", "success");
-            response.put("message", "Firebase đã được khởi tạo thành công!");
-            response.put("projectId", projectId);
-            response.put("timestamp", System.currentTimeMillis());
+            return ResponseEntity.ok("✅ Firebase hoạt động! Project ID: " + projectId);
             
-            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("status", "error");
-            response.put("message", "Lỗi Firebase: " + e.getMessage());
-            response.put("timestamp", System.currentTimeMillis());
-            
-            return ResponseEntity.status(500).body(response);
+            return ResponseEntity.ok("❌ Lỗi Firebase: " + e.getMessage());
         }
     }
     
     @PostMapping("/verify-token")
-    public ResponseEntity<Map<String, Object>> verifyToken(@RequestHeader("Authorization") String token) {
-        Map<String, Object> response = new HashMap<>();
-        
+    public ResponseEntity<String> verifyToken(@RequestHeader("Authorization") String token) {
         try {
             // Bỏ "Bearer " prefix
             String idToken = token.replace("Bearer ", "");
             
             // Verify token
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            var decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
             String uid = decodedToken.getUid();
-            String email = decodedToken.getEmail();
-            String name = decodedToken.getName();
             
-            response.put("status", "success");
-            response.put("message", "Token hợp lệ!");
-            response.put("uid", uid);
-            response.put("email", email);
-            response.put("name", name);
-            response.put("timestamp", System.currentTimeMillis());
-            
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok("✅ Token hợp lệ! UID: " + uid);
         } catch (Exception e) {
-            response.put("status", "error");
-            response.put("message", "Token không hợp lệ: " + e.getMessage());
-            response.put("timestamp", System.currentTimeMillis());
-            
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.ok("❌ Token không hợp lệ: " + e.getMessage());
         }
-    }
-    
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> healthCheck() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "healthy");
-        response.put("message", "Backend đang hoạt động bình thường");
-        response.put("timestamp", System.currentTimeMillis());
-        response.put("branch", "huy");
-        
-        return ResponseEntity.ok(response);
     }
 }
